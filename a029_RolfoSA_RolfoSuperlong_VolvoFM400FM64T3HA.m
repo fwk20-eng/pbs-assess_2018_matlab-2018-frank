@@ -1,6 +1,9 @@
 % Project Notes
 % [2017-03-15] Changed the engagement torque to be the lowest between the max torque / 2
 % and the minimum torque on the torque curve.
+% [2017-03-16] 
+%   - Updated the wheelbase to match the new client request of a 8.4 m follower and 9.5 m leader
+%   - Updated filename convention so that files are sorted according to their revision number
 %%
 function a029_RolfoSA_RolfoSuperlong_VolvoFM400FM64T3HA
 clear; close all; format longG; set(0,'DefaultFigureWindowStyle','docked'); %Comment out set(0,'DefaultFigureWindowStyle','docked') if you do not want images docked & initialising data for each run & setting format of command window output
@@ -28,8 +31,7 @@ for loadConfig = 0:1
     %% --------------------------------------------------------------------------------------
     %	2017001-RolfoSA_RolfoSuperlong_VolvoFM400FM64T3HA
     %----------------------------------------------------------------------------------------
-    wbs = 1.050; %Reduction of wheelbase, from the original 10 m
-    rev = '7';
+    rev = '8';
     projectKey = 'P029_RolfoSuperlong-VolvoFM64T3HA';
     rootPath = 'C:\Dropbox\PBS\Projects\P2017001_RolfoSA-RolfoSuperlong_VolvoFM64T3HA\Results\'; %end with a \ ALWAYS. This is where the file will be saved
     runsPath = 'C:\Dropbox\witsPBS_2017-02-15\Runs';
@@ -39,10 +41,8 @@ for loadConfig = 0:1
     disp('-------------------------------------------------------------------------------------')
     disp('	Run Notes')
     disp('-------------------------------------------------------------------------------------')
-    runNotes = {'8950 mm wheelbase trailers';...
-                'Checked input parameters against input data and excel spreadsheets in Matlab and TruckSim';...
-                'Updated the axle centre heights according to loaded radius at design load';...
-                'Updated to Combination B payload';...
+    runNotes = {'New Combination C wheelbase trailers';...
+                'Please be aware that the payload is currently incorrect as it is still using the original design parameters';...
                         }; %Notes will be saved in Excel results sheet for reference
     %% --------------------------------------------------------------------------------------
     %	Generating project folders/filenames
@@ -50,11 +50,11 @@ for loadConfig = 0:1
     switch loadConfig
         case 0
             matModKey = '_FL';
-            savePath = sprintf('%s%s%s%s',rootPath, datestr(now,'yyyy-mm-dd'), '_FL_', rev);
+            savePath = sprintf('%s%s%s%s%s',rootPath, datestr(now,'yyyy-mm-dd'), '_', rev, '_FL');
             runKey = sprintf('%s%s%s',projectKey,'_FL_', rev);
         case 1
             matModKey = '_TD';
-            savePath = sprintf('%s%s%s%s',rootPath, datestr(now,'yyyy-mm-dd'), '_TD_', rev);
+            savePath = sprintf('%s%s%s%s%s',rootPath, datestr(now,'yyyy-mm-dd'), '_', rev, '_TD');
             runKey = sprintf('%s%s%s',projectKey,'_TD_',rev);
     end
     fileName = strcat(runKey, '_summary.xlsx');
@@ -73,7 +73,7 @@ for loadConfig = 0:1
     loadshare2 = [1 0.5 0.5 0.5 0.5 0.5 0.5]; % [%] startability loadsharing numbers
     
     mAxle = [750 1300 1300 650 650 650 650]; % [kg]
-    xAxle = [0 3.2 4.57 (9.15-wbs) (10.85-wbs) (9.15-wbs) (10.85-wbs)]; % [m] distances back of axles on 2nd, 3rd etc. vehicle unit are from hitch point (hp) Using Follower 2A
+    xAxle = [0 3.2 4.57 (8.4-1.7/2) (8.4+1.7/2) (9.5-1.7/2) (9.5+1.7/2)]; % [m] distances back of axles on 2nd, 3rd etc. vehicle unit are from hitch point (hp) Using Follower 2A
     zAxle = [0.517 0.532 0.532 0.383 0.383 0.387 0.387]; % [m] trucksim model
     
     Ndrive = [2:3]; % driven axles
@@ -94,7 +94,7 @@ for loadConfig = 0:1
     %	Additional dimensional inputs
     %----------------------------------------------------------------------------------------
     Area = 2.550*4.600;
-    Ltot = 29716;          % [mm] see the gaReference points with combination B
+    Ltot = 28115;          % [mm] see the gaReference points with combination C
     VehWidthLoad = 2550;   % [mm] total width - max vehicle width at the loaded condition
     VehWidthUnload = 2550; % [mm] total width - max vehicle width at the unloaded condition
     SteerWidth = 2494; % [mm] total width @ steer tyre (axle centres + 1 x (tyre width))
