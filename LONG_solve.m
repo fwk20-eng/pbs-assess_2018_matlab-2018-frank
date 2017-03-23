@@ -1,4 +1,4 @@
-function [START, GRADA, GRADB, ACC] = LONG_solve(mTotal,Axle1,Axle2,A,radial,Ch,Cd,Ce,gears,eff_gear,gearsStart,eff_gearStart,eff_diff,dif,eff_diffStart,difStart,Torquerpm,TorqueNm,engageTrpm,engageTNm,changeT,rr,Ie,It,Ndrive,gearshiftregime,savePath, runKey, plotOn, isSave);
+function [START, GRADA, GRADB, ACC] = LONG_solve(mTotal,Axle1,Axle2,A,radial,Ch,Cd,Ce,gears,eff_gear,gearsStart,eff_gearStart,eff_diff,dif,eff_diffStart,difStart,Torquerpm,TorqueNm,engageTrpm,engageTNm,changeT,rr,Ie,It,Ndrive,gearshiftregime,savePath, runKey, plotOn, isSave,mAxle,xAxle,zAxle,l,h,mSprung,XcgSprung,HcgSprung,grouping,loadshare2,loadCoupled);
 % START: grade; sat = 0 if tyres not saturated and 1 if yes & 2 if over 30%
 % GRADA: grade; sat = 0 if tyres not saturated and 1 if yes & 2 if over 30%
 % GRADB: speed; sat = 0 if tyres not saturated and 1 if yes & 2 if over 120
@@ -15,31 +15,42 @@ if nargin == 0  % i.e. no inputs given then use inputs below
 end
 %%
 %Startability
-G=difStart*gearsStart(1); %Assume start in first
-m=sum(mTotal);
-me=m+It/rr/rr+Ie*G^2/rr/rr;
-Fengine=engageTNm*eff_diffStart*eff_gearStart(1)*G/rr;
-grad=[0:0.1:30];
-contin=1;
-i=0;
-Frr=rolling(0,sum(mTotal),Ch,radial);
+G = difStart*gearsStart(1); %Assume start in first
+
+m = sum(mTotal);
+me = m + It/rr^2 + Ie*G^2/rr^2;
+
+grad = [0:0.1:30];
+contin = 1;
+i = 0;
+
+Fengine = engageTNm*eff_diffStart*eff_gearStart(1)*G/rr;
+Frr = rolling(0,sum(mTotal),Ch,radial); %Rolling resistance at 0 velocity
 
 while contin
     i=i+1;
     th=atan(grad(i)/100);
-    Favail=sum(0.8*9.81*Axle2(Ndrive));
-    Fdrive=sin(th)*m*9.81+Frr;
-    acc(i)=(min([Fengine Favail])-sin(th)*m*9.81-Frr)/me;
-    if Fdrive>Fengine;
-        contin=0; % The engine force is not big enough to generate the required drive
-        saturate=0;
-    elseif Fdrive>Favail
-        contin=0; % The available force from the tyres is not big enough to generate the required drive
-        saturate=1;
-    elseif i==length(grad)
-        contin=0; % There is plenty of engine and available tyre force
-        saturate=2;
+    
+    Axle2 = AxleLoade(grad(i),mAxle,xAxle,zAxle,l,h,mSprung,XcgSprung,HcgSprung,grouping,loadshare2,loadCoupled);
+    Favail=sum(0.8*9.81*Axle2(Ndrive)); %Add the gradient to this
+    
+    Fdrive = sin(th)*m*9.81 + Frr;
+    
+    Ftractive = min([Fengine Favail]);
+    
+    acc(i) = (Ftractive-Fdrive)/me;
+    
+    if Fdrive > Fengine;
+        contin = 0; % The engine force is not big enough to generate the required drive
+        saturate = 0;
+    elseif Fdrive > Favail
+        contin = 0; % The available force from the tyres is not big enough to generate the required drive
+        saturate = 1;
+    elseif i == length(grad)
+        contin = 0; % There is plenty of engine and available tyre force
+        saturate = 2;
     end
+    
 end
 
 START=[grad(i-1)];
