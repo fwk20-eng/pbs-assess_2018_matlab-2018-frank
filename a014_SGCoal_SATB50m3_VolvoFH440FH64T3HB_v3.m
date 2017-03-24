@@ -9,6 +9,9 @@
 % data sent by Jacques Posthumus. The new details are based on GA series 2D
 % [2017-03-15] Changed the engagement torque to be the lowest between the max torque / 2
 % and the minimum torque on the torque curve.
+%===2016-03-23===
+% Updated overall length for new rugged bumper
+%
 %% ---------------------------------------------------------------------------------------
 %	POST PROCESS
 %----------------------------------------------------------------------------------------
@@ -19,6 +22,7 @@ function a014_SGCoal_SATB50m3_VolvoFH440FH64T3HB_v2
 clear; close all; format longG; set(0,'DefaultFigureWindowStyle','docked'); %Comment out set(0,'DefaultFigureWindowStyle','docked') if you do not want images docked
 
 isBus = 0; % Set 1 if bus **Must add dangerous goods
+isDanGoods = 0;
 isSemi = 1; % Put 1 if it is a semitrailer with front overhang, 0 if no front overhang (this will eliminate MoD and DoM from the Summary Chart & results)
 
 isPBS =         1;      isSave =   1;     plotOn =        1;
@@ -33,9 +37,9 @@ isRemoveMFiles = 0; %Set this to 0 to remove the request for removing M files in
 %% --------------------------------------------------------------------------------------
 %	P014-Wits-PBS-assess-SGCOAL-SATB-50cubesidetipinterlink-Volvo_FH64T3HB
 %----------------------------------------------------------------------------------------
-rev = 'NLST'; %;
+rev = '6'; %;
 projectKey = 'P014_sgCoal-SATB50m3-VolvoFH64T3HB'; %Include an underscore as the final character
-rootPath = 'C:\Dropbox\PBS\Projects\Database Check\P014_SATB50m3_VolvoFH64T3HB\'; %end with a \ ALWAYS. This is where the file will be saved
+rootPath = 'C:\Dropbox\PBS\Projects\P2016014_SGCoal-SATruckBodies50m3STI-VolvoFH440FH64T3HB\Results\'; %end with a \ ALWAYS. This is where the file will be saved
 runsPath = 'C:\Dropbox\witsPBS_2017-02-15\Runs';
 %% --------------------------------------------------------------------------------------
 %	Run Details
@@ -44,8 +48,7 @@ disp('--------------------------------------------------------------------------
 disp(strcat('Run Notes for run titled: ', rev))
 disp('-------------------------------------------------------------------------------------')
 
-runNotes = {'-> Using new and improved trailer from GA series D';...
-            '-> Updated the overall height, which affects the GRAb performance measure';...
+runNotes = {'-> Updated reference points according to new rugged bumper & Adjusted the overall length';...
 } %Do not suppress
 %% --------------------------------------------------------------------------------------
 %	Generating project folders/filenames
@@ -151,8 +154,8 @@ zLoad{:,3} = [hcogFollow*0.001]'; %
 %% --------------------------------------------------------------------------------------
 %	Additional inputs
 %----------------------------------------------------------------------------------------
-Area = 3.901*2.600; %[m2] Frontal area according to GA-3940 v3.1D
-Ltot = 21892;          % [mm] ***need to confirm this
+Area = 3.940*2.600; %[m2] Frontal area according to GA-3940 v3.1E
+Ltot = 21994+132;          % [mm] ***2017-03-23 Updated according to commissioning and new Volvo FH model
 VehWidthLoad = 2600;   % [mm] total width - @ trailer axle width
 VehWidthUnload = 2600; % [mm] total width - @ trailer axle width
 SteerWidth = 2494; % [mm] total width @ steer tyre (axle centres + 1 x (tyre width))
@@ -230,7 +233,7 @@ end
 %% --------------------------------------------------------------------------------------
 %	Passing variables to PostProcess
 %----------------------------------------------------------------------------------------
-PostProcessMultiChoice(plotOn, plotSummary, isBus, isSemi, isPBS, isAxleLoads, runsPath, Ldesired, groupingHeadings, grouping, loadshare1, loadshare2,... 
+PostProcessMultiChoice(plotOn, plotSummary, isBus, isDanGoods, isSemi, isPBS, isAxleLoads, runsPath, Ldesired, groupingHeadings, grouping, loadshare1, loadshare2,... 
             savePath, rootPath, runKey, fileName, mAxle, xAxle, zAxle, Ndrive, nSteer, rollCoupled, loadCoupled, dollys, l, h, mChas, xChas, zChas, dLoad, mLoad, xLoad, zLoad, uLoad,...
             Area, gears, eff_gear, gearsStart, eff_gearStart, eff_diff, dif, eff_diffStart, difStart, Torquerpm, TorqueNm, engageTrpm, engageTNm, changeT, rr, Ie, It, gearshiftregime,...
             Ltot, VehWidthLoad, VehWidthUnload, SteerWidth, matKeyYawD, matKeyRA, matKeyHSTO, matKeySRTt, matKeyTASP, matKeyLSTurn, matKeyLSTurnu, isLong, isYawD, isRA, isHSTO,...
