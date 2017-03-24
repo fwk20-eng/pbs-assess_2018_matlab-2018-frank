@@ -102,7 +102,10 @@ Frr=rolling(0,sum(mTotal),Ch,radial);
 while contin
     i=i+1;
     th=atan(grad(i)/100);
+    
+    Axle2 = AxleLoade(grad(i),mAxle,xAxle,zAxle,l,h,mSprung,XcgSprung,HcgSprung,grouping,loadshare2,loadCoupled);
     Favail=sum(0.8*9.81*Axle2(Ndrive));
+    
     Fdrive=sin(th)*m*9.81+Frr+FA;
     acc(i)=(min([Fengine Favail])-sin(th)*m*9.81-Frr-FA)/me;    
     if Fdrive>Fengine;
@@ -153,10 +156,13 @@ end
 vel=[40:0.1:120]; % speeds in km/h
 contin=1;
 i=0;
+
+grad=1;
+th=atan(grad/100);
+Axle2 = AxleLoade(grad,mAxle,xAxle,zAxle,l,h,mSprung,XcgSprung,HcgSprung,grouping,loadshare2,loadCoupled);
+
 while contin
     i=i+1;
-    grad=1;
-    th=atan(grad/100);
     v=vel(i)/3.6; % convert speed to m/s metric units
     Frr=rolling(v,sum(mTotal),Ch,radial);
     FA=drag(A,Cd,v,Ce);    
