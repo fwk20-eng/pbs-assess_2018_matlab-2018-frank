@@ -159,7 +159,7 @@ i=0;
 
 grad=1;
 th=atan(grad/100);
-Axle2 = AxleLoade(grad,mAxle,xAxle,zAxle,l,h,mSprung,XcgSprung,HcgSprung,grouping,loadshare2,loadCoupled);
+Axle1 = AxleLoade(grad,mAxle,xAxle,zAxle,l,h,mSprung,XcgSprung,HcgSprung,grouping,loadshare1,loadCoupled);
 
 while contin
     i=i+1;
@@ -225,7 +225,8 @@ end
 
 %%
 %Acceleration Capability
-%
+% Axle loads
+Axle1 = AxleLoade(0,mAxle,xAxle,zAxle,l,h,mSprung,XcgSprung,HcgSprung,grouping,loadshare1,loadCoupled);
 %Determine start gear
 Fengine=engageTNm*eff_diffStart/rr*difStart.*gears.*eff_gear;
 Frr=rolling(0,sum(mTotal),Ch,radial);
