@@ -14,7 +14,9 @@
 %   *Renamed h_off as x_hitch
 %% 2016-12-07
 %   Changed profile of the bin to the new one sent by SATB
-function [m, hcog, xcogPayload] = binCoG_SATB50m3_v2(roh, m, x_hitch, h_bin, fileName, savePath, runKey, sheetName, isPrint, isSave)
+%% 2017-03-27
+%   Added the functionality to continually add new bin models
+function [m, hcog, xcogPayload] = binCoG_SATB50m3_v2(binModel, angleRepose, roh, m, x_hitch, h_bin, fileName, savePath, runKey, sheetName, isPrint, isSave)
 % Function calculates the total height, COG height, and inertias of the
 % load: htot (heap not included), hcog, Ixx, Iyy, Izz given the bucket profile, length and
 % density of the load and mass. The bucket mass and inertias are also
@@ -28,68 +30,33 @@ function [m, hcog, xcogPayload] = binCoG_SATB50m3_v2(roh, m, x_hitch, h_bin, fil
 % Add input data here. Units mm and kg. roh=1000e-9 water. =833e-9 coal. 7810e-9 steel.
 % The co-ordinates below are for the inside of the bucket
 
+switch binModel
+    case 'Afrit 45 m3'
+        buc_w = [   566     794     1132    1347    1549    1682    1964    2069    2444];
+        buc_h = [   0       133     133     212     539     627     1090    1136    1767];
+        L = 7000; %[mm]
+        f_anc = 1.8;
+        t = 3; %[mm] Plate thickness acc.to D718-28 SHEET 1 OF 2 21/06/16
+        roh1 = 7850e-9*f_anc; %[kg/mm^-3] Density of the bucket material - factored for equipment
+    case 'SATB 50 m3'
+        buc_w = [   204     309     1125    1355    1565    1707    1786    1979    2081    2238    2453];
+        buc_h = [   0       -45     -45     51      51      111     335     416     757     826     1545];
+        L = 7500; %[mm]
+        f_anc = 1.8; %[-] Ancilliaries loading factor (to take into account the ancilliary equipment such as pistons, mechanicals etc)
+        t = 3; %[mm] Plate thickness acc.to D718-28 SHEET 1 OF 2 21/06/16
+        roh1 = 7850e-9*f_anc; %[kg/mm^-3] Density of the bucket material - factored for equipment
+    case 'SATB 50 m3 (v2 with reduced CoGz)'
+        buc_w = [   200     309     1125    1355    1565    1707    1786    1979    2081    2238    2453];
+        buc_h = [   0       45      45      142     142     201     425     506     847     916     1635];
+        L = 7500; %[mm]
+        f_anc = 1.8; %[-] Ancilliaries loading factor (to take into account the ancilliary equipment such as pistons, mechanicals etc)
+        t = 3; %[mm] Plate thickness acc.to D718-28 SHEET 1 OF 2 21/06/16
+        roh1 = 7850e-9*f_anc; %[kg/mm^-3] Density of the bucket material - factored for equipment
+    otherwise
+        error('THE REQUESTED BIN MODEL DOES NOT EXIST, PLEASE ADD DATA FOR THIS BIN INTO getBinCoG.m');
+end
 
-%% --------------------------------------------------------------------------------------
-%	Old Afrit buckets
-%----------------------------------------------------------------------------------------
-% buc_w=[   1140    1406   2585];
-% buc_h=[   0       190    1710];
-% L=6332;
-
-%% --------------------------------------------------------------------------------------
-%	40 cubic metre Afrit bucket
-%----------------------------------------------------------------------------------------
-% buc_w = [   565     797    1129    1349    1646    1797    2030     2143    2448];
-% buc_h = [   0       133     133     209     685     735     1078    1120    1568];
-% L = 7000;
-
-% %% --------------------------------------------------------------------------------------
-% %	45 cubic metre Afrit bucket
-% %----------------------------------------------------------------------------------------
-% buc_w = [   566     794     1132    1347    1549    1682    1964    2069    2444];
-% buc_h = [   0       133     133     212     539     627     1090    1136    1767];
-% %h_max = buc_h(length(buc_h)) - 150; %Maximum payload load height (150 mm from the top of the bin)
-% L = 7000; %[mm]
-% 
-% % Datums and factors
-% f_anc = 1.8; %[-] Ancilliaries loading factor (to take into account the ancilliary equipment such as pistons, mechanicals etc)
-% %h_bin = 1621-133; %[mm] Distance from the floor reference to the bottom of the bucket
-
-% % --------------------------------------------------------------------------------------
-% %	45 cubic metre SA Truck Bodies bucket
-% %----------------------------------------------------------------------------------------
-% buc_w = [1123    1352     1559    1788    1857    2017    2086    2269    2418];
-% buc_h = [   0      92       92     195     435     481     802     871    1444];
-% L = 7500;
-
-%% --------------------------------------------------------------------------------------
-%	50 cubic metre SA Truck Bodies bucket
-%----------------------------------------------------------------------------------------
-% buc_w = [   204     309     1125    1355    1565    1707    1786    1979    2081    2238    2453];
-% buc_h = [   0       -45     -45     51      51      111     335     416     757     826     1545];
-% L = 7500; %[mm]
-% 
-% % Datums and factors
-% f_anc = 1.8; %[-] Ancilliaries loading factor (to take into account the ancilliary equipment such as pistons, mechanicals etc)
-
-%% --------------------------------------------------------------------------------------
-%	50 cubic metre SA Truck Bodies bucket with centre bent down
-%----------------------------------------------------------------------------------------
-buc_w = [   200     309     1125    1355    1565    1707    1786    1979    2081    2238    2453];
-buc_h = [   0       45      45      142     142     201     425     506     847     916     1635];
-L = 7500; %[mm]
-
-% Datums and factors
-f_anc = 1.8; %[-] Ancilliaries loading factor (to take into account the ancilliary equipment such as pistons, mechanicals etc)
-%% --------------------------------------------------------------------------------------
-%	Material Properties
-%----------------------------------------------------------------------------------------
-%roh = 1072e-9; %[kg/mm^-3] Carried material density (chromium)
-%m = 25100-1709; %[kg] Load mass required
-t = 3; %[mm] Plate thickness acc.to D718-28 SHEET 1 OF 2 21/06/16
-roh1 = 7850e-9*f_anc; %[kg/mm^-3] Density of the bucket material - factored for equipment
-bet = 0.1; %[deg] Angle of repose
-
+bet = angleRepose;
 %% --------------------------------------------------------------------------------------
 %	Calculations & Plotting
 %----------------------------------------------------------------------------------------
@@ -138,16 +105,16 @@ if isPrint
 end
 
 payloadSummary = {'Payload mass [kg]', m;...
-                  'Payload density [kg/m^3]', roh*10^9;...
-                  'Load height from top of bin [mm]', (buc_h(length(buc_h))-htot);...
-                  'Payload CoGz rel. to ground [mm]', (hcog+h_bin+t);...
-                  'Payload CoGx rel. to hitch [mm]', xcogPayload;...
-                  'Payload Rx [m]', ((Ixx*10^-6)/m)^0.5;...
-                  'Payload Ry [m]', ((Iyy*10^-6)/m)^0.5;...
-                  'Payload Rz [m]', ((Izz*10^-6)/m)^0.5;...
-                  'Loaded Volume [m^3]', (m/(roh*10^9));...
-                  'Angle of repose [deg]', bet;...
-                  } %Results to display in PostProcessor
+    'Payload density [kg/m^3]', roh*10^9;...
+    'Load height from top of bin [mm]', (buc_h(length(buc_h))-htot);...
+    'Payload CoGz rel. to ground [mm]', (hcog+h_bin+t);...
+    'Payload CoGx rel. to hitch [mm]', xcogPayload;...
+    'Payload Rx [m]', ((Ixx*10^-6)/m)^0.5;...
+    'Payload Ry [m]', ((Iyy*10^-6)/m)^0.5;...
+    'Payload Rz [m]', ((Izz*10^-6)/m)^0.5;...
+    'Loaded Volume [m^3]', (m/(roh*10^9));...
+    'Angle of repose [deg]', bet;...
+    } %Results to display in PostProcessor
 end
 
 function [hcog1, m1, Ixx1, Iyy1, Izz1]=inertia_calc1(buc_w,buc_h,roh,t,L)
