@@ -91,7 +91,7 @@ if isPBS
     roundAxleLoading = [[1:nAxles]; loadshare1; round(Axle1,0); round(AxleU1,0); loadshare2; round(Axle2,0); round(AxleU2,0)];%Rounded axle loadings
     
     if isLong
-        [r.STA, r.GRAa, r.GRAb, r.ACC] = LONG_solve(mTotal,Axle1,Axle2,Area,radial,Ch,Cd,Ce,gears,eff_gear,gearsStart,eff_gearStart,eff_diff,dif,eff_diffStart,difStart,Torquerpm,TorqueNm,engageTrpm,engageTNm,changeT,rr,Ie,It,Ndrive,gearshiftregime,savePath, runKey, plotOn, isSave,mAxle,xAxle,zAxle,l,h,mSprung,XcgSprung,HcgSprung,grouping,loadshare2,loadCoupled);
+        [r.STA, r.GRAa, r.GRAb, r.ACC] = LONG_solve(mTotal,Axle1,Axle2,Area,radial,Ch,Cd,Ce,gears,eff_gear,gearsStart,eff_gearStart,eff_diff,dif,eff_diffStart,difStart,Torquerpm,TorqueNm,engageTrpm,engageTNm,changeT,rr,Ie,It,Ndrive,gearshiftregime,savePath, runKey, plotOn, isSave,mAxle,xAxle,zAxle,l,h,mSprung,XcgSprung,HcgSprung,grouping,loadshare1, loadshare2,loadCoupled);
     end
     
     if isYawD
