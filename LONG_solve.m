@@ -34,16 +34,16 @@ while contin
     Axle2 = AxleLoade(grad(i),mAxle,xAxle,zAxle,l,h,mSprung,XcgSprung,HcgSprung,grouping,loadshare2,loadCoupled);
     Favail=sum(0.8*9.81*Axle2(Ndrive)); %Add the gradient to this
     
-    Fdrive = sin(th)*m*9.81 + Frr;
+    Freq = sin(th)*m*9.81 + Frr;
     
     Ftractive = min([Fengine Favail]);
     
-    acc(i) = (Ftractive-Fdrive)/me;
+    acc(i) = (Ftractive-Freq)/me;
     
-    if Fdrive > Fengine;
+    if Freq > Fengine;
         contin = 0; % The engine force is not big enough to generate the required drive
         saturate = 0;
-    elseif Fdrive > Favail
+    elseif Freq > Favail
         contin = 0; % The available force from the tyres is not big enough to generate the required drive
         saturate = 1;
     elseif i == length(grad)
@@ -106,12 +106,12 @@ while contin
     Axle2 = AxleLoade(grad(i),mAxle,xAxle,zAxle,l,h,mSprung,XcgSprung,HcgSprung,grouping,loadshare2,loadCoupled);
     Favail=sum(0.8*9.81*Axle2(Ndrive));
     
-    Fdrive=sin(th)*m*9.81+Frr+FA;
+    Freq=sin(th)*m*9.81+Frr+FA;
     acc(i)=(min([Fengine Favail])-sin(th)*m*9.81-Frr-FA)/me;    
-    if Fdrive>Fengine;
+    if Freq>Fengine;
         contin=0; % The engine force is not big enough to generate the required drive
         saturate=0;
-    elseif Fdrive>Favail
+    elseif Freq>Favail
         contin=0; % The available force from the tyres is not big enough to generate the required drive
         saturate=1;
     elseif i==length(grad)
@@ -167,7 +167,7 @@ while contin
     Frr=rolling(v,sum(mTotal),Ch,radial);
     FA=drag(A,Cd,v,Ce);    
     Favail=sum(0.8*9.81*Axle1(Ndrive));
-    Fdrive=sin(th)*m*9.81+Frr+FA;       
+    Freq=sin(th)*m*9.81+Frr+FA;       
     Nvec=v/rr*gears*difStart*60/2/pi;    
     G=difStart*gears;    
     me=m+It/rr/rr+Ie*G.^2/rr/rr;    
@@ -177,10 +177,10 @@ while contin
     Fengine=Fengine(jgear);    
     G=difStart*gears(jgear);
     N=v/rr*G*60/2/pi;    
-    if Fdrive>Fengine;
+    if Freq>Fengine;
         contin=0; % The engine force is not big enough to generate the required drive
         saturate=0;
-    elseif Fdrive>Favail
+    elseif Freq>Favail
         contin=0; % The available force from the tyres is not big enough to generate the required drive
         saturate=1;
     elseif i==length(vel)
@@ -233,7 +233,7 @@ Frr=rolling(0,sum(mTotal),Ch,radial);
 maxFthrust=sum(0.8*9.81*Axle1(Ndrive))-sin(0)*sum(mTotal)*9.81-Frr;
 %startGear=find(Fengine<maxFthrust,1,'first');
 startGear=2;
-Fdrive=engageTNm*eff_gear(startGear)*eff_diffStart/rr*difStart*gears(startGear);
+Freq=engageTNm*eff_gear(startGear)*eff_diffStart/rr*difStart*gears(startGear);
 %
 %1 Start gear and release clutch
 % Allow a linear increase up to engageTNm in 1 s
@@ -245,7 +245,7 @@ gearvec(1)=startGear;
 G=gears(startGear)*difStart;
 for i=1:(length(tspan)-1); %-1 for extra i+1
     t2=tspan(i);
-    dvdt=veh_start1(t2,v2,Fdrive,rr,G,sum(mTotal),Ie,It,Ch,radial,A,Cd,Ce);
+    dvdt=veh_start1(t2,v2,Freq,rr,G,sum(mTotal),Ie,It,Ch,radial,A,Cd,Ce);
     v(i+1)=v(i)+dvdt*dt;
     gearvec(i+1)=startGear;
 end
@@ -257,7 +257,7 @@ while N<engageTrpm,
     i=i+1;
     tspan(i)=tspan(i-1)+dt;
     t2=tspan(i);
-    dvdt=veh_start2(t2,v2,Fdrive,rr,gears(startGear)*difStart,sum(mTotal),Ie,It,Ch,radial,A,Cd,Ce);
+    dvdt=veh_start2(t2,v2,Freq,rr,gears(startGear)*difStart,sum(mTotal),Ie,It,Ch,radial,A,Cd,Ce);
     v(i+1)=v(i)+dvdt*dt;
     gearvec(i+1)=startGear;
     N=v(end)/rr*G*60/2/pi;
@@ -269,19 +269,19 @@ tspan(i+1)=tspan(i)+dt;
 % increase to full value
 for j=1:100
     i=i+1;
-    Fdrive1=interp1(Torquerpm,TorqueNm,N,'linear',0)*eff_gear(startGear)*eff_diffStart/rr*difStart*gears(startGear);    
-    Fdrive2=engageTNm*eff_gear(startGear)*eff_diffStart/rr*difStart*gears(startGear);
-    Fdrive=Fdrive1*j/100+Fdrive2*(100-j)/100;
+    Freq1=interp1(Torquerpm,TorqueNm,N,'linear',0)*eff_gear(startGear)*eff_diffStart/rr*difStart*gears(startGear);    
+    Freq2=engageTNm*eff_gear(startGear)*eff_diffStart/rr*difStart*gears(startGear);
+    Freq=Freq1*j/100+Freq2*(100-j)/100;
     tspan(i)=tspan(end)+0.01;
-    dvdt=veh_start2(t2,v2,Fdrive,rr,G,sum(mTotal),Ie,It,Ch,radial,A,Cd,Ce);
+    dvdt=veh_start2(t2,v2,Freq,rr,G,sum(mTotal),Ie,It,Ch,radial,A,Cd,Ce);
     v(i+1)=v(i)+dvdt*dt;
     N=v(end)/rr*G*60/2/pi;
     gearvec(i+1)=startGear;
 end
 tspan(i+1)=tspan(i)+dt;
 %
-%4 Alter Fdrive with speed of engine accelerate until N matches changeT
-%  If yes Gear changes to next and integrate for 1 s with Fdrive=0
+%4 Alter Freq with speed of engine accelerate until N matches changeT
+%  If yes Gear changes to next and integrate for 1 s with Freq=0
 Gear=startGear;
 changephase=0;
 Tchange=0;
@@ -303,20 +303,20 @@ while t2<40,
             end
             G=gears(Gear)*difStart;
             N=v(end)/rr*G*60/2/pi;
-            Fdrive=0;
-            dvdt=veh_change(t2,v2,Fdrive,rr,gears(startGear)*difStart,sum(mTotal),Ie,It,Ch,radial,A,Cd,Ce);
+            Freq=0;
+            dvdt=veh_change(t2,v2,Freq,rr,gears(startGear)*difStart,sum(mTotal),Ie,It,Ch,radial,A,Cd,Ce);
             Tchange=Tchange+dt;
         else
-            Fdrive=interp1(Torquerpm,TorqueNm,N,'linear',0)*eff_gear(Gear)*eff_diffStart/rr*difStart*gears(Gear);
-            dvdt=veh_throttle(t2,v2,Fdrive,rr,gears(startGear)*difStart,sum(mTotal),Ie,It,Ch,radial,A,Cd,Ce);
+            Freq=interp1(Torquerpm,TorqueNm,N,'linear',0)*eff_gear(Gear)*eff_diffStart/rr*difStart*gears(Gear);
+            dvdt=veh_throttle(t2,v2,Freq,rr,gears(startGear)*difStart,sum(mTotal),Ie,It,Ch,radial,A,Cd,Ce);
         end
     else
         Tchange=Tchange+dt;
         if Tchange>=1.5,
             Tchange=0;
             changephase=0;
-            Fdrive=0;
-            dvdt=veh_change(t2,v2,Fdrive,rr,gears(startGear)*difStart,sum(mTotal),Ie,It,Ch,radial,A,Cd,Ce);
+            Freq=0;
+            dvdt=veh_change(t2,v2,Freq,rr,gears(startGear)*difStart,sum(mTotal),Ie,It,Ch,radial,A,Cd,Ce);
         end
     end
     v(i+1)=v(i)+dvdt*dt;
@@ -354,7 +354,7 @@ end
 end
 
 %ensure t is output every 0.01;
-%[t,v]=ode45(@(t,v) veh_start(t,v,Fdrive,rr,gears(startGear)*dif,sum(mTotal),Ie,It,Ch,radial,A,Cd,Ce),tspan,0);
+%[t,v]=ode45(@(t,v) veh_start(t,v,Freq,rr,gears(startGear)*dif,sum(mTotal),Ie,It,Ch,radial,A,Cd,Ce),tspan,0);
 %function dydt = f(t,y)
 %dydt = [y(2); -9.8];
 %end
@@ -369,23 +369,23 @@ end
 %end
 
 %%
-function vdot=veh_start1(t,v,Fdrive,rr,G,m,Ie,It,Ch,radial,A,Cd,Ce)
+function vdot=veh_start1(t,v,Freq,rr,G,m,Ie,It,Ch,radial,A,Cd,Ce)
 me=m+It/rr/rr+Ie*G^2/rr/rr;
-vdot=(t*(Fdrive-rolling(v,m,Ch,radial))-drag(A,Cd,v,Ce))/me;
+vdot=(t*(Freq-rolling(v,m,Ch,radial))-drag(A,Cd,v,Ce))/me;
 end
 
-function vdot=veh_start2(t,v,Fdrive,rr,G,m,Ie,It,Ch,radial,A,Cd,Ce)
+function vdot=veh_start2(t,v,Freq,rr,G,m,Ie,It,Ch,radial,A,Cd,Ce)
 me=m+It/rr/rr+Ie*G^2/rr/rr;
-vdot=((Fdrive-rolling(v,m,Ch,radial))-drag(A,Cd,v,Ce))/me;
+vdot=((Freq-rolling(v,m,Ch,radial))-drag(A,Cd,v,Ce))/me;
 end
 
-function vdot=veh_throttle(t,v,Fdrive,rr,G,m,Ie,It,Ch,radial,A,Cd,Ce)
+function vdot=veh_throttle(t,v,Freq,rr,G,m,Ie,It,Ch,radial,A,Cd,Ce)
 me=m+It/rr/rr+Ie*G^2/rr/rr;
-vdot=((Fdrive-rolling(v,m,Ch,radial))-drag(A,Cd,v,Ce))/me;
+vdot=((Freq-rolling(v,m,Ch,radial))-drag(A,Cd,v,Ce))/me;
 end
 
-function vdot=veh_change(t,v,Fdrive,rr,G,m,Ie,It,Ch,radial,A,Cd,Ce)
-vdot=((Fdrive-rolling(v,m,Ch,radial))-drag(A,Cd,v,Ce))/m;
+function vdot=veh_change(t,v,Freq,rr,G,m,Ie,It,Ch,radial,A,Cd,Ce)
+vdot=((Freq-rolling(v,m,Ch,radial))-drag(A,Cd,v,Ce))/m;
 end
 
 function [Frr] = rolling(v,m,Ch,radial);
