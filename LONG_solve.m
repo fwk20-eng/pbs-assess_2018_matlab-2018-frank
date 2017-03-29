@@ -1,4 +1,4 @@
-function [START, GRADA, GRADB, ACC] = LONG_solve(mTotal,Axle1,Axle2,A,radial,Ch,Cd,Ce,gears,eff_gear,gearsStart,eff_gearStart,eff_diff,dif,eff_diffStart,difStart,Torquerpm,TorqueNm,engageTrpm,engageTNm,changeT,rr,Ie,It,Ndrive,gearshiftregime,savePath, runKey, plotOn, isSave,mAxle,xAxle,zAxle,l,h,mSprung,XcgSprung,HcgSprung,grouping,loadshare1,loadshare2,loadCoupled);
+function [START, GRADA, GRADB, ACC] = LONG_solve(mTotal,A,radial,Ch,Cd,Ce,gears,eff_gear,gearsStart,eff_gearStart,eff_diff,dif,eff_diffStart,difStart,Torquerpm,TorqueNm,engageTrpm,engageTNm,changeT,rr,Ie,It,Ndrive,gearshiftregime,savePath, runKey, plotOn, isSave,mAxle,xAxle,zAxle,l,h,mSprung,XcgSprung,HcgSprung,grouping,loadshare1,loadshare2,loadCoupled);
 % START: grade; sat = 0 if tyres not saturated and 1 if yes & 2 if over 30%
 % GRADA: grade; sat = 0 if tyres not saturated and 1 if yes & 2 if over 30%
 % GRADB: speed; sat = 0 if tyres not saturated and 1 if yes & 2 if over 120
@@ -28,14 +28,14 @@ while contin
     i=i+1;
     th=atan(grad(i)/100);
     
-    Axle2 = AxleLoade(grad(i),mAxle,xAxle,zAxle,l,h,mSprung,XcgSprung,HcgSprung,grouping,loadshare2,loadCoupled);
+    Axle = AxleLoade(grad(i),mAxle,xAxle,zAxle,l,h,mSprung,XcgSprung,HcgSprung,grouping,loadshare2,loadCoupled);
     
-    FrrD = rolling(0,sum(Axle2(Ndrive)),Ch,radial); %Rolling resistance at 0 velocity
-    FrrN = rolling(0,(sum(mTotal) - sum(Axle2(Ndrive))),Ch,radial);
+    FrrD = rolling(0,sum(Axle(Ndrive)),Ch,radial); %Rolling resistance at 0 velocity
+    FrrN = rolling(0,(sum(mTotal) - sum(Axle(Ndrive))),Ch,radial);
     Frr = FrrD + FrrN;
     
     Fengine = (engageTNm*eff_diffStart*eff_gearStart(1)*G/rr) - FrrD;
-    Favail=sum(0.8*9.81*Axle2(Ndrive)); %Add the gradient to this 
+    Favail=sum(0.8*9.81*Axle(Ndrive)); %Add the gradient to this 
     Freq = sin(th)*m*9.81 + FrrN;
     Ftractive = min([Fengine Favail]);
     
@@ -109,14 +109,14 @@ while contin
     i=i+1;
     th=atan(grad(i)/100);
     
-    Axle2 = AxleLoade(grad(i),mAxle,xAxle,zAxle,l,h,mSprung,XcgSprung,HcgSprung,grouping,loadshare2,loadCoupled);
+    Axle = AxleLoade(grad(i),mAxle,xAxle,zAxle,l,h,mSprung,XcgSprung,HcgSprung,grouping,loadshare2,loadCoupled);
     
-    FrrD = rolling(v,sum(Axle2(Ndrive)),Ch,radial); %Rolling resistance at 0 velocity
-    FrrN = rolling(v,(sum(mTotal) - sum(Axle2(Ndrive))),Ch,radial);
+    FrrD = rolling(v,sum(Axle(Ndrive)),Ch,radial); %Rolling resistance at 0 velocity
+    FrrN = rolling(v,(sum(mTotal) - sum(Axle(Ndrive))),Ch,radial);
     Frr = FrrD + FrrN;
     
     Fengine = (maxTorqueNm*eff_gear(1)*eff_diffStart/rr*difStart*gears(1)) - FrrD;
-    Favail = sum(0.8*9.81*Axle2(Ndrive));
+    Favail = sum(0.8*9.81*Axle(Ndrive));
     Freq = sin(th)*m*9.81 + FrrN + FA;
     Ftractive = min([Fengine Favail]);
     
@@ -179,19 +179,19 @@ i=0;
 
 grad=1;
 th=atan(grad/100);
-Axle1 = AxleLoade(grad,mAxle,xAxle,zAxle,l,h,mSprung,XcgSprung,HcgSprung,grouping,loadshare1,loadCoupled);
+Axle = AxleLoade(grad,mAxle,xAxle,zAxle,l,h,mSprung,XcgSprung,HcgSprung,grouping,loadshare1,loadCoupled);
 
 while contin
     i=i+1;
     v=vel(i)/3.6; % convert speed to m/s metric units
     
-    FrrD = rolling(v,sum(Axle2(Ndrive)),Ch,radial); %Rolling resistance at 0 velocity
-    FrrN = rolling(v,(sum(mTotal) - sum(Axle2(Ndrive))),Ch,radial);
+    FrrD = rolling(v,sum(Axle(Ndrive)),Ch,radial); %Rolling resistance at 0 velocity
+    FrrN = rolling(v,(sum(mTotal) - sum(Axle(Ndrive))),Ch,radial);
     Frr = FrrD + FrrN;
     
     FA = drag(A,Cd,v,Ce);    
     
-    Favail = sum(0.8*9.81*Axle1(Ndrive));
+    Favail = sum(0.8*9.81*Axle(Ndrive));
     Freq = sin(th)*m*9.81 + FrrN + FA;       
     
     Nvec=v/rr*gears*difStart*60/2/pi;    
@@ -255,13 +255,14 @@ end
 %%
 %Acceleration Capability
 % Axle loads
-Axle1 = AxleLoade(0,mAxle,xAxle,zAxle,l,h,mSprung,XcgSprung,HcgSprung,grouping,loadshare1,loadCoupled);
+Axle = AxleLoade(0,mAxle,xAxle,zAxle,l,h,mSprung,XcgSprung,HcgSprung,grouping,loadshare1,loadCoupled);
 %Determine start gear
 
-FrrD = rolling(0,sum(Axle2(Ndrive)),Ch,radial); %Rolling resistance at 0 velocity
-FrrN = rolling(0,(sum(mTotal) - sum(Axle2(Ndrive))),Ch,radial);
+FrrD = rolling(0,sum(Axle(Ndrive)),Ch,radial); %Rolling resistance at 0 velocity
+FrrN = rolling(0,(sum(mTotal) - sum(Axle(Ndrive))),Ch,radial);
+Frr = FrrD + FrrN;
 Fengine = engageTNm*eff_diffStart/rr*difStart.*gears.*eff_gear - FrrD;
-maxFthrust = sum(0.8*9.81*Axle1(Ndrive))-sin(0)*sum(mTotal)*9.81 - FrrN;
+maxFthrust = sum(0.8*9.81*Axle(Ndrive))-sin(0)*sum(mTotal)*9.81 - FrrN;
 %startGear=find(Fengine<maxFthrust,1,'first');
 startGear=2;
 Freq = engageTNm*eff_gear(startGear)*eff_diffStart/rr*difStart*gears(startGear);
