@@ -1,10 +1,10 @@
-function runSummaryChart(name, r, lim, L, savePath, runKey, isSemi)
+function runSummaryChart(name, r, Lim, L, savePath, runKey, isSemi)
 if isSemi,
     Ylabs = {name.STA name.GRAa name.GRAb name.SRTt name.YDC name.ACC name.RA name.HSTO name.TASP name.LSSP name.TS name.FS name.MoD name.DoM name.STFD name.LSSPu name.TSu name.FSu name.MoDu name.DoMu name.STFDu};
-    res = [r.STA/lim.STA(L) r.GRAa/lim.GRAa(L) r.GRAb/lim.GRAb(L) r.SRTt/lim.SRT(L) r.YDC/lim.YDC(L) r.ACC/lim.ACC(L) r.RA/lim.RA(L) r.HSTO/lim.HSTO(L) r.TASP/lim.TASP(L) r.LSSP/lim.LSSP(L) r.TS/lim.TS(L) r.FS/lim.FS(L) r.MoD/lim.MoD(L) r.DoM/lim.DoM(L) r.STFD/lim.STFD(L) r.LSSPu/lim.LSSP(L) r.TSu/lim.TS(L) r.FSu/lim.FS(L) r.MoDu/lim.MoD(L) r.DoMu/lim.DoM(L) r.STFDu/lim.STFD(L)]*100;
+    res = [r.STA/Lim.STA(L) r.GRAa/Lim.GRAa(L) r.GRAb/Lim.GRAb(L) r.SRTt/Lim.SRT(L) r.YDC/Lim.YDC(L) r.ACC/Lim.ACC(L) r.RA/Lim.RA(L) r.HSTO/Lim.HSTO(L) r.TASP/Lim.TASP(L) r.LSSP/Lim.LSSP(L) r.TS/Lim.TS(L) r.FS/Lim.FS(L) r.MoD/Lim.MoD(L) r.DoM/Lim.DoM(L) r.STFD/Lim.STFD(L) r.LSSPu/Lim.LSSP(L) r.TSu/Lim.TS(L) r.FSu/Lim.FS(L) r.MoDu/Lim.MoD(L) r.DoMu/Lim.DoM(L) r.STFDu/Lim.STFD(L)]*100;
 else
     Ylabs = {name.STA name.GRAa name.GRAb name.SRTt name.YDC name.ACC name.RA name.HSTO name.TASP name.LSSP name.TS name.FS name.STFD name.LSSPu name.TSu name.FSu name.STFDu};
-    res = [r.STA/lim.STA(L) r.GRAa/lim.GRAa(L) r.GRAb/lim.GRAb(L) r.SRTt/lim.SRT(L) r.YDC/lim.YDC(L) r.ACC/lim.ACC(L) r.RA/lim.RA(L) r.HSTO/lim.HSTO(L) r.TASP/lim.TASP(L) r.LSSP/lim.LSSP(L) r.TS/lim.TS(L) r.FS/lim.FS(L) r.STFD/lim.STFD(L) r.LSSPu/lim.LSSP(L) r.TSu/lim.TS(L) r.FSu/lim.FS(L) r.STFDu/lim.STFD(L)]*100;
+    res = [r.STA/Lim.STA(L) r.GRAa/Lim.GRAa(L) r.GRAb/Lim.GRAb(L) r.SRTt/Lim.SRT(L) r.YDC/Lim.YDC(L) r.ACC/Lim.ACC(L) r.RA/Lim.RA(L) r.HSTO/Lim.HSTO(L) r.TASP/Lim.TASP(L) r.LSSP/Lim.LSSP(L) r.TS/Lim.TS(L) r.FS/Lim.FS(L) r.STFD/Lim.STFD(L) r.LSSPu/Lim.LSSP(L) r.TSu/Lim.TS(L) r.FSu/Lim.FS(L) r.STFDu/Lim.STFD(L)]*100;
 end
 
 maxX = ceil(max(res)/5)*5+5;

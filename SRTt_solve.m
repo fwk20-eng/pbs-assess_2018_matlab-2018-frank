@@ -20,7 +20,7 @@ end
 
 nVehUnits = length(mSprung);
 
-[Data, error] = readData(matKey, {'Roll' 'AyBf_SM' 'Fz_L' 'Roll_Tab'}, [nVehUnits nVehUnits nLastAxle 1], {'_' '' '' ''}, [], savePath, runsPath, runKey,[0 0 1 0], isSave);
+[Data, error] = readData(matKey, {'Roll' 'AyBf_SM' 'Fz_L' 'Roll_Tab'}, [nVehUnits nVehUnits nLastAxle 1], {'_' '' '' ''}, [], savePath, runsPath, runKey,[0 0 1 0]);
 
 if error == 1
     ind=min(find(Data{1}>=0));

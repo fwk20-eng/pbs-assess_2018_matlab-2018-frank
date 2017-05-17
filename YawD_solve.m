@@ -18,7 +18,7 @@ if nargin == 0  % i.e. program run directly from here
     % -----------------------------------------------------------------
 end
 
-[Data, errorx] = readData(matKey, {'Art_H' 'ArtR_H' 'AVz' 'Ay'}, [nVehUnits-1 nVehUnits-1 nVehUnits 1], {'' '' '_' ''}, [], savePath, runsPath, runKey, zeros(1,4), isSave);
+[Data, errorx] = readData(matKey, {'Art_H' 'ArtR_H' 'AVz' 'Ay'}, [nVehUnits-1 nVehUnits-1 nVehUnits 1], {'' '' '_' ''}, [], savePath, runsPath, runKey, zeros(1,4));
 
 if errorx == 1
     Time    = Data{1};      % convert to vector

@@ -10,7 +10,7 @@ if nargin == 0  % i.e. program run directly from here
 end
 
 
-[Data, error] = readData(matKey, {'X_A1' 'Y_A1' ['X_A' int2str(nLastAxle)] ['Y_A' int2str(nLastAxle)]}, ones(1,4), {'' '' '' ''}, [],  savePath, runsPath, runKey, [0 0 0 0], isSave);
+[Data, error] = readData(matKey, {'X_A1' 'Y_A1' ['X_A' int2str(nLastAxle)] ['Y_A' int2str(nLastAxle)]}, ones(1,4), {'' '' '' ''}, [],  savePath, runsPath, runKey, [0 0 0 0]);
 
 if error == 1
     Time    = Data{1};      % convert to vectors
