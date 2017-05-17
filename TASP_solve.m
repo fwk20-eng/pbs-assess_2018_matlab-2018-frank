@@ -18,7 +18,7 @@ end
 
 [Data, error] = readData(matKey, {'X_RP1' 'X_RP2' 'X_RP6' 'X_RP7' 'X_RP8' 'X_RP9' ...
     'Y_RP1' 'Y_RP2' 'Y_RP6' 'Y_RP7' 'Y_RP8' 'Y_RP9'}, nVehUnits*ones(1,12),...
-    {'' '' '' '' '' '' '' '' '' '' '' ''}, dollys, savePath, runsPath, runKey, zeros(1, 12), isSave);
+    {'' '' '' '' '' '' '' '' '' '' '' ''}, dollys, savePath, runsPath, runKey, zeros(1, 12));
 
 if error == 1
     Time    = Data{1};      % convert to vector

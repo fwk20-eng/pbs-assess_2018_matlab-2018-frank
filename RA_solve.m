@@ -19,7 +19,7 @@ end
 
 nVehUnits = length(mSprung);
 
-[Data, errorx] = readData(matKey, {'AyBf_SM' 'X_A' 'Y_A' 'LatError'}, [nVehUnits 1 1 1], {'' '' '' ''}, [], savePath, runsPath, runKey, [0 1 1 0], isSave); % must use body fixed Ay in accordance with SAE definition
+[Data, errorx] = readData(matKey, {'AyBf_SM' 'X_A' 'Y_A' 'LatError'}, [nVehUnits 1 1 1], {'' '' '' ''}, [], savePath, runsPath, runKey, [0 1 1 0]); % must use body fixed Ay in accordance with SAE definition
 %[Data, error] = readData(matKey, {'Ay_S1'}, [nVehUnits], {''}, [], savePath, runsPath, runKey); % must use body fixed Ay in accordance with SAE definition
 % must use body fixed Ay in accordance with SAE definition
 
