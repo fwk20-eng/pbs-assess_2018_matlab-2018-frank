@@ -35,9 +35,11 @@ Table.primeMoverSummary = generateTablePrimeMoverSummary(Engine, Sprung);
 Table.engineTorqueCurve = generateTableEngineTorqueCurve(Engine);
 Table.gearboxTransmission = generateTableGearboxTransmission(Engine);
 Table.ladenReferencePoints = generateTableReferencePoints(Report.ladenReferencePointNames, ...
-    Dimensions.RefPointsLadenCell, Sprung, 'Reference Points for Laden Combination','ReferencePointsForLadenCombination');
+    Dimensions.RefPointsLadenCell, Sprung, Hitch,...
+    'Reference Points for Laden Combination','ReferencePointsForLadenCombination');
 Table.unladenReferencePoints = generateTableReferencePoints(Report.unladenReferencePointNames, ...
-    Dimensions.RefPointsUnladenCell, Sprung, 'Reference Points for Unladen Combination','ReferencePointsForUnladenCombination');
+    Dimensions.RefPointsUnladenCell, Sprung, Hitch,...
+    'Reference Points for Unladen Combination','ReferencePointsForUnladenCombination');
 
 
 % Generate results tables
