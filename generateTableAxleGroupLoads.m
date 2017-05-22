@@ -11,14 +11,14 @@
 %
 %% Outputs
 %
-% * TablTwo: a structure containing all the details in table two for a PBS report including the latex settings
+% * Table: a structure containing all the details in table two for a PBS report including the latex settings
 %
 %% Change Log
 %
 % [0.1.0] - 2017-05-08
 %
 % *Added*
-%
+% 
 % * First code
 
 function PBSreportTable = generateTableAxleGroupLoads(Axle, Axle1, AxleU1)
@@ -56,6 +56,10 @@ for iAxle = 1 : nAxles
     
 end
 
+% Axle load ratings
+Table.axleLoadRating = Axle.loadRatings;
+axleLoadRatingNumeric = cellfun(@(x) str2double(x), Axle.loadRatings, 'UniformOutput', false);
+
 
 %% Convert TableOne to a format that will create the latexTable correctly.
 %
@@ -90,6 +94,10 @@ for iField = 1 : nFields
             % Sum the axle loads for the group
             axleGroupLoad = sum(cell2mat(axleUnladenLoadsNumeric{iUnit}));
             tableData{iField} = [tableData{iField}; int2str(axleGroupLoad)];
+        elseif strcmp(sFieldNames{iField}, 'axleLoadRating')
+            % Sum the axle load ratings for the axle group
+            axleGroupRating = sum(axleLoadRatingNumeric{iUnit});
+            tableData{iField} = [tableData{iField}; int2str(axleGroupRating)];
         else
         % Note the indexing here with the circular brackets.
         tableData{iField} = [tableData{iField}; fieldData{iUnit}(1)'];
@@ -104,7 +112,7 @@ for iCol = 2 : nFields
 end
 
 Table.headings = {'\textbf{Unit}' '\textbf{Axle description}' '\textbf{Fully laden axle group load (kg)}\tnote{1}'...
-                  '\textbf{Unladen axle group load (kg)}\tnote{2}'};
+                  '\textbf{Unladen axle group load (kg)}\tnote{2}' '\textbf{Axle Load Rating (kg)}'};
 
 Table.footNotes = {'\item[1] Discrepencies between axle loads and GCM may occur due to rounding';...
                    '\item[2] Proposed vehicle with no payload, only fuel and driver'};

@@ -161,6 +161,24 @@ disp('Note: the code assumes all axles in the first axle group are steered');
 Axle.XPositionArray = Axle.XPositionArray .* 0.001;
 Axle.ZPositionArray = Axle.ZPositionArray .* 0.001;
 
+% Axle load rating
+GetAxleSuspensionModel.dataSetKeyCell = {'ENTER_PARSFILE Suspensions\Compliance', 'EXIT_PARSFILE Suspensions\Compliance'};
+GetAxleSuspensionModel.key = 'LOG_ENTRY Used Dataset: Suspension: Solid Axle Compliance, Springs, and Dampers;';
+GetAxleSuspensionModel.keySeperator = '} ';
+Axle.complianceDatasetName = getAllParDataForEachAxle(allParLadenFileData, GetAxleSuspensionModel, Sprung);
+
+% Extract the name only without any additional parameters stored in parethesis
+for iUnit = 1 : Sprung.numberOffUnits
+    % Loop through each axle
+    nAxles = length(Axle.complianceDatasetName{iUnit});
+    for iAxle = 1 : nAxles
+        truckSimDatasetName = Axle.complianceDatasetName{iUnit}{iAxle};
+        breakdownOfDatasetName = regexpFindTextBetweenText(truckSimDatasetName, '\[', '\]');
+        axleLoadRating = breakdownOfDatasetName;
+        Axle.loadRatings{iUnit}{iAxle} = axleLoadRating{:};
+    end
+end
+
 %% Extract tyre properties
 % Find number of tyres from number of tyre model instances in the par file
 Tyre.NumberOff = length(getVariableValuesFromPar(endParLadenFileData, '\<OPT_TIRE_MODEL'));
