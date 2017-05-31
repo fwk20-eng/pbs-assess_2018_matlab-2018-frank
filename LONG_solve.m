@@ -30,19 +30,19 @@ while contin
     
     Axle = AxleLoade(grad(i),mAxle,xAxle,zAxle,l,h,mSprung,XcgSprung,HcgSprung,grouping,loadshare2,loadCoupled);
     
-    FrrD = rolling(0,sum(Axle(Ndrive)),ch,radial); %Rolling resistance at 0 velocity
+    FrrD = rolling(0,sum(Axle(Ndrive)),ch,radial); % Rolling resistance at 0 velocity
     FrrN = rolling(0,(sum(mTotal) - sum(Axle(Ndrive))),ch,radial);
     Frr = FrrD + FrrN;
     
     Fengine = (engageTNm*eff_diffStart*eff_gearStart(1)*G/rr) - FrrD;
-    Favail=sum(0.8*9.81*Axle(Ndrive)); %Add the gradient to this 
+    Favail=sum(0.8*9.81*Axle(Ndrive)); % Add the gradient to this 
     Freq = sin(th)*m*9.81 + FrrN;
     Ftractive = min([Fengine Favail]);
     
     if Favail == Ftractive
-        acc(i) = (Ftractive - Freq - Frr)/me; %Need to consider the total rolling resistance
+        acc(i) = (Ftractive - Freq - Frr)/me; % Need to consider the total rolling resistance
     else if Fengine == Ftractive
-            acc(i) = (Ftractive - Freq - FrrN)/me; %Need to consider only the non-driven rolling resistance as the driven rolling resistance is included in the Fengine term
+            acc(i) = (Ftractive - Freq - FrrN)/me; % Need to consider only the non-driven rolling resistance as the driven rolling resistance is included in the Fengine term
         end
     end
     
@@ -111,7 +111,7 @@ while contin
     
     Axle = AxleLoade(grad(i),mAxle,xAxle,zAxle,l,h,mSprung,XcgSprung,HcgSprung,grouping,loadshare2,loadCoupled);
     
-    FrrD = rolling(v,sum(Axle(Ndrive)),ch,radial); %Rolling resistance at 0 velocity
+    FrrD = rolling(v,sum(Axle(Ndrive)),ch,radial); % Rolling resistance at 0 velocity
     FrrN = rolling(v,(sum(mTotal) - sum(Axle(Ndrive))),ch,radial);
     Frr = FrrD + FrrN;
     
@@ -121,9 +121,9 @@ while contin
     Ftractive = min([Fengine Favail]);
     
     if Favail == Ftractive
-        acc(i) = (Ftractive - Freq - Frr)/me; %Need to consider the total rolling resistance
+        acc(i) = (Ftractive - Freq - Frr)/me; % Need to consider the total rolling resistance
     else if Fengine == Ftractive
-            acc(i) = (Ftractive - Freq - FrrN)/me; %Need to consider only the non-driven rolling resistance as the driven rolling resistance is included in the Fengine term
+            acc(i) = (Ftractive - Freq - FrrN)/me; % Need to consider only the non-driven rolling resistance as the driven rolling resistance is included in the Fengine term
         end
     end
         
@@ -185,7 +185,7 @@ while contin
     i=i+1;
     v=vel(i)/3.6; % convert speed to m/s metric units
     
-    FrrD = rolling(v,sum(Axle(Ndrive)),ch,radial); %Rolling resistance at 0 velocity
+    FrrD = rolling(v,sum(Axle(Ndrive)),ch,radial); % Rolling resistance at 0 velocity
     FrrN = rolling(v,(sum(mTotal) - sum(Axle(Ndrive))),ch,radial);
     Frr = FrrD + FrrN;
     

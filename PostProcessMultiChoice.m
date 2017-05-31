@@ -89,7 +89,7 @@
 % 1. List of inputs from TruckSim listed in "Inputs required from TruckSim.xls" file in this folder
 
 %% Beginning of function
-function [Project, ParDetails, Sprung, Axle, Hitch, Engine, Report, Dimensions, fullName, Lim, LimReport, resultsPbs, nLevels, Is, PayloadLaden, Axle1, AxleU1] =...
+function [Project, ParDetails, Sprung, Axle, Hitch, Engine, Report, Dimensions, fullName, Lim, LimReport, resultsPbs, nLevels, Is, PayloadLaden, Axle1, AxleU1, Tyre] =...
     PostProcessMultiChoice(Is, Project, Combination, MatKey, Report)
 %% Preamble
 %% Generate the required file paths and perform the necessary checks for the assessment
@@ -102,6 +102,8 @@ if Is.save
     copyTruckSimRunFiles(MatKey, Project, Is);
     [Tyre, Axle, Hitch, Sprung, Dimensions, PayloadLaden, PayloadUnladen] = getTruckSimSimulationData(ParDetails);
     [Engine] = getEngineData(Combination.engineModel, Tyre.NumberOff);
+    
+    writeToExcelAxleLoads(Project, Sprung, PayloadLaden, Axle, Hitch, Combination, Is);
 end
 %%	Constants
 warning off
@@ -169,10 +171,8 @@ if Is.pbs
     %% Adding functionality to remove the .mat files from the runs directory
     removeMFilesFromTruckSimRunsFolder(Project, Is);
     warning on
+    
+    %% Write data to excel
+    writeToExcelPbsResults(Lim, fullName, nLevels, Project, AxleLoading, Is, roundAxleLoading, r, Combination);
 end
-
-%% Write data to excel
-writeToExcelPbsResults(Lim, fullName, nLevels, Project, AxleLoading, Is, roundAxleLoading, r, Combination);
-writeToExcelAxleLoads(Project, Sprung, PayloadLaden, Axle, Hitch, Combination, Is);
-
 end
