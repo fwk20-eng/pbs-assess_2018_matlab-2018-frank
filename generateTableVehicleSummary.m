@@ -18,10 +18,10 @@
 % [0.1.0] - 2017-05-08
 %
 % *Added*
-%f
+%
 % * First code
 
-function [PBSreportTable, axleDescriptionCellArray] = generateTableVehicleSummary(ParDetails, Sprung, Axle)
+function [PBSreportTable, axleDescriptionCellArray] = generateTableVehicleSummary(ParDetails, Tyre, Axle)
 %% Generating the Latex Tables (this should be moved to a standalone function file when suitably tested.
 %% Table 1: Summary of Vehicle
 % Extracting table contents
@@ -37,44 +37,12 @@ allParLadenFileData = readLinesFromFile(allParLadenFileFullPath);
 
 %% Table One: Units
 Table.Units = Axle.UnitCellArray;
-%% Table One: Axle Description
-
-GetAxleDescription.dataSetKeyCell = {'ENTER_PARSFILE Suspensions\Kin_Solid', 'EXIT_PARSFILE Suspensions\Kin_Solid'};
-GetAxleDescription.key = 'LOG_ENTRY Used Dataset: Animator: Shape File Link;';
-GetAxleDescription.keySeperator = '} ';
-Table.AxleDescription = getAllParDataForEachAxle(allParLadenFileData, GetAxleDescription, Sprung);
-
+Table.AxleDescription = Axle.type;
 axleDescriptionCellArray = Table.AxleDescription;
-%% Table One: Axle Configuration
 Table.AxleConfiguration = getAxleGroupConfiguration(Axle);
-
-%% Table One: Spring type
-% *Note:* there are 2 iterations of spring for each axle. This is because TruckSim makes contingency for having a
-% different left and right spring. Thus will only take the first indice where multiple indices are found.
-% For this I have manually added information on the spring indicating its type [Air] or [Steel] within the par file. All
-% springs must be renamed accordingly.
-
-%% Table One: Axle spring datasets and spring type
-GetAxleSpringDatasets.dataSetKeyCell = {'ENTER_PARSFILE Suspensions\Compliance', 'EXIT_PARSFILE Suspensions\Compliance'};
-GetAxleSpringDatasets.key = 'LOG_ENTRY Used Dataset: Suspension: Spring;';
-GetAxleSpringDatasets.keySeperator = '} ';
-Axle.SpringDatasets = getAllParDataForEachAxle(allParLadenFileData, GetAxleSpringDatasets, Sprung);
-
-Table.AxleSpringType = getAxleParameterTypeFromTruckSimDatasetName(Axle.SpringDatasets);
-
-%% Table One: Tyre Size and spacing
-extractedTyreData = getAllParDataForEachAxleFromTyreData(allParLadenFileData, Sprung);
-
-Table.TyreSize = extractedTyreData.Sizes;
-
-%% Table One: Axle suspension kinematics and rim material
-GetSuspensionKinematics.dataSetKeyCell = {'ENTER_PARSFILE Suspensions\Kin_Solid', 'EXIT_PARSFILE Suspensions\Kin_Solid'};
-GetSuspensionKinematics.key = 'Suspension: Solid Axle System Kinematics';
-GetSuspensionKinematics.keySeperator = '} ';
-Axle.SuspensionKinDatasets = getAllParDataForEachAxle(allParLadenFileData, GetSuspensionKinematics, Sprung);
-
-Table.RimMaterial = getAxleParameterTypeFromTruckSimDatasetName(Axle.SuspensionKinDatasets);
-
+Table.AxleSpringType = Axle.springType;
+Table.TyreSize = Tyre.sizes;
+Table.RimMaterial = Axle.rimMaterial;
 %% Convert Table to a format that will create the latexTable correctly.
 %
 % *Some notes on the conversion*

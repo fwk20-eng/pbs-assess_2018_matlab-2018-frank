@@ -11,6 +11,12 @@
 % 
 %% Change Log
 % 
+% [0.5.0]
+%
+% *Fixed*
+% 
+% * Moved all of the information extracted elsewhere to this function file to centralise the data extraction
+%
 % [0.4.0] - 2017-05-03
 %
 % *Added*
@@ -69,37 +75,7 @@
 % * [x] zLoad - all units [H_CG_PL]
 
 function [Tyre, Axle, Hitch, Sprung, Dimensions, PayloadLaden, PayloadUnladen] = getTruckSimSimulationData(ParDetails) 
-%% Adding paths to required functions
-% addpath('C:\Dropbox\_Personal\Programming\Global_Matlab_Toolbox');
-%% Test Data (once a function, uncomment the nargin argument)
-%-------------------------------------------------------------------------
-% if nargin == 0
-%% Semi-trailer
-
-% % % Do not end folder path with a \
-%     ParDetails.parFileFolderPath = 'C:\Dropbox\PBS\MatLab\TruckSim Data Extraction\Validation\PBS Assessment Files and Results_Cosmopolitan Hauliers';
-% % Do not begin filename with a \
-%     ParDetails.endParLadenFileName = 'Run218_end.par';
-%     ParDetails.allParLadenFileName = 'Run218_all.par';
-%     
-%     ParDetails.endParUnladenFileName = 'Run220_end.par';
-%     ParDetails.allParUnladenFileName = 'Run220_all.par';
-    
-% end
-
-%% B-Double
-
-% % Do not end folder path with a \
-%     ParDetails.parFileFolderPath = 'C:\Dropbox\PBS\MatLab\TruckSim Data Extraction\Validation\PBS Assessment Files and Results_SG Coal 50 m3 SATB STI Volvo FH440';
-% % Do not begin filename with a \
-%     ParDetails.endParLadenFileName = 'Run216_end.par';
-%     ParDetails.allParLadenFileName = 'Run216_all.par';
-%     
-%     ParDetails.endParUnladenFileName = 'Run217_end.par';
-%     ParDetails.allParUnladenFileName = 'Run217_all.par';
-
 %% Reading par file data
-%-------------------------------------------------------------------------
 endParLadenFileFullPath = strcat(ParDetails.parFileFolderPath, '\', ParDetails.endParLadenFileName);
 endParLadenFileData = readLinesFromFile(endParLadenFileFullPath);
 
@@ -114,7 +90,6 @@ allParUnladenFileFullPath = strcat(ParDetails.parFileFolderPath, '\', ParDetails
 allParUnladenFileData = readLinesFromFile(allParUnladenFileFullPath);
 
 %% Generate the remaining Post Process variables
-%-------------------------------------------------------------------------
 %% Extract sprung mass properties
 Sprung.DescriptionArray = getSprungMassDescriptionArray(allParLadenFileData);
 Sprung.MassArray = getVariableValuesFromPar(endParLadenFileData, '\<M_SU');
@@ -142,7 +117,6 @@ Axle.TrackWidthArray = getVariableValuesFromPar(endParLadenFileData, '\<L_TRACK\
 
 [Axle.Grouping, Axle.UnitAndGroup, Axle.UnitCellArray] = getAxleGrouping(endParLadenFileData, Axle.XPositionArray, 2000);
 
-%Axle.Grouping = getAxleGrouping(Axle.XPositionArray, 2000);
 Axle.NumberOff = length(Axle.UnsprungMassArray);
 
 % Determine which axles are driven, this will not work if there are driven axles other than on the prime mover
@@ -161,42 +135,90 @@ disp('Note: the code assumes all axles in the first axle group are steered');
 Axle.XPositionArray = Axle.XPositionArray .* 0.001;
 Axle.ZPositionArray = Axle.ZPositionArray .* 0.001;
 
-% Axle load rating
+% Axle type
+GetAxleDescription.dataSetKeyCell = {'ENTER_PARSFILE Suspensions\Kin_Solid', 'EXIT_PARSFILE Suspensions\Kin_Solid'};
+GetAxleDescription.key = 'LOG_ENTRY Used Dataset: Animator: Shape File Link;';
+GetAxleDescription.keySeperator = '} ';
+Axle.type = getAllParDataForEachAxle(allParLadenFileData, GetAxleDescription, Sprung);
+
+% Axle compliance dataset name and load rating
 GetAxleSuspensionModel.dataSetKeyCell = {'ENTER_PARSFILE Suspensions\Compliance', 'EXIT_PARSFILE Suspensions\Compliance'};
 GetAxleSuspensionModel.key = 'LOG_ENTRY Used Dataset: Suspension: Solid Axle Compliance, Springs, and Dampers;';
 GetAxleSuspensionModel.keySeperator = '} ';
 Axle.complianceDatasetName = getAllParDataForEachAxle(allParLadenFileData, GetAxleSuspensionModel, Sprung);
 
-% Extract the name only without any additional parameters stored in parethesis
-for iUnit = 1 : Sprung.numberOffUnits
-    % Loop through each axle
-    nAxles = length(Axle.complianceDatasetName{iUnit});
-    for iAxle = 1 : nAxles
-        truckSimDatasetName = Axle.complianceDatasetName{iUnit}{iAxle};
-        breakdownOfDatasetName = regexpFindTextBetweenText(truckSimDatasetName, '\[', '\]');
-        axleLoadRating = breakdownOfDatasetName;
-        Axle.loadRatings{iUnit}{iAxle} = axleLoadRating{:};
-    end
-end
+Axle.loadRatings = getAxleParameterTypeFromTruckSimDatasetName(Axle.complianceDatasetName);
+
+% Axle kinematic dataset name and rim material
+GetAxleSuspensionKinematicsModel.dataSetKeyCell = {'ENTER_PARSFILE Suspensions\Kin_Solid', 'EXIT_PARSFILE Suspensions\Kin_Solid'};
+GetAxleSuspensionKinematicsModel.key = 'LOG_ENTRY Used Dataset: Suspension: Solid Axle System Kinematics;';
+GetAxleSuspensionKinematicsModel.keySeperator = '} ';
+Axle.suspensionKinematicsDatasetName = getAllParDataForEachAxle(allParLadenFileData,...
+    GetAxleSuspensionKinematicsModel, Sprung);
+
+Axle.suspensionKinematicsReportName = editCombinationCellSplitText(Axle.suspensionKinematicsDatasetName,...
+    {' (',' ['}, 1);
+Axle.rimMaterial = getAxleParameterTypeFromTruckSimDatasetName(Axle.suspensionKinematicsDatasetName);
+
+% Axle spring dataset name and spring type
+GetAxleSpringDatasets.dataSetKeyCell = {'ENTER_PARSFILE Suspensions\Compliance', 'EXIT_PARSFILE Suspensions\Compliance'};
+GetAxleSpringDatasets.key = 'LOG_ENTRY Used Dataset: Suspension: Spring;';
+GetAxleSpringDatasets.keySeperator = '} ';
+Axle.springDatasetName = getAllParDataForEachAxle(allParLadenFileData, GetAxleSpringDatasets, Sprung);
+
+% *Note:* there are 2 iterations of spring for each axle. This is because TruckSim makes contingency for having a
+% different left and right spring. Thus will only take the first indice where multiple indices are found.
+Axle.springType = getAxleParameterTypeFromTruckSimDatasetName(Axle.springDatasetName);
+
+% Axle roll centre height
+GetAxleRollCentre.dataSetKeyCell = {'ENTER_PARSFILE Suspensions\Kin_Solid', 'EXIT_PARSFILE Suspensions\Kin_Solid'};
+GetAxleRollCentre.key = 'LOG_ENTRY Used Dataset: Suspension: Lateral Movement Due to Roll and Jounce;';
+GetAxleRollCentre.keySeperator = '; ';
+Axle.rollCentreDatasetName = getAllParDataForEachAxle(allParLadenFileData, GetAxleRollCentre, Sprung);
+
+Axle.rollCentreHeight = editCombinationCellRegexpBetweenText(Axle.rollCentreDatasetName, ':\s+', '\smm');
+
+% Axle track width
+GetAxleTrack.dataSetKeyCell = {'ENTER_PARSFILE Suspensions\Kin_Solid', 'EXIT_PARSFILE Suspensions\Kin_Solid'};
+GetAxleTrack.key = 'L_TRACK';
+GetAxleTrack.keySeperator = ' ';
+Axle.trackWidth = getAllParDataForEachAxle(allParLadenFileData, GetAxleTrack, Sprung);
+
+% Axle auxiliary roll moment
+GetAxleAuxRoll.dataSetKeyCell = {'ENTER_PARSFILE Suspensions\Compliance', 'EXIT_PARSFILE Suspensions\Compliance'};
+GetAxleAuxRoll.key = 'MX_AUX_COEFFICIENT';
+GetAxleAuxRoll.keySeperator = ' ';
+Axle.auxRollMoment = getAllParDataForEachAxle(allParLadenFileData, GetAxleAuxRoll, Sprung);
+
+% Steer/Roll Ratio
+GetAxleSteerRoll.dataSetKeyCell = {'ENTER_PARSFILE Suspensions\Kin_Solid', 'EXIT_PARSFILE Suspensions\Kin_Solid'};
+GetAxleSteerRoll.key = 'SUSP_AXLE_ROLL_STEER_COEFFICIENT';
+GetAxleSteerRoll.keySeperator = ' ';
+Axle.steerRollRatio = getAllParDataForEachAxle(allParLadenFileData, GetAxleSteerRoll, Sprung);
 
 %% Extract tyre properties
+extractedTyreData = getAllParDataForEachAxleFromTyreData(allParLadenFileData, Sprung);
+
+% Tyre sizes
+Tyre.sizes = extractedTyreData.Sizes;
+
 % Find number of tyres from number of tyre model instances in the par file
 Tyre.NumberOff = length(getVariableValuesFromPar(endParLadenFileData, '\<OPT_TIRE_MODEL'));
 
 % Find the rolling radius from the first instance of rolling radius (steer tyre)
 tyreRollingRadiusArray = getVariableValuesFromPar(endParLadenFileData, '\<RRE');
-
 Tyre.RollingRadius = tyreRollingRadiusArray(1);
 
-Tyre.WidthArray = getVariableValuesFromPar(allParLadenFileData, '\<SET_THICKNESS_SGUI');
+% Tyre widths
+Tyre.width = getVariableValuesFromPar(allParLadenFileData, '\<SET_THICKNESS_SGUI');
 
-Axle.SteerAxleOverallWidth = Axle.TrackWidthArray(1) + Tyre.WidthArray(1);
+% Calculating the overall steer axle width
+Axle.SteerAxleOverallWidth = Axle.TrackWidthArray(1) + Tyre.width(1);
 
 % Converting to the correct units for the Post Processor
 Tyre.RollingRadius = Tyre.RollingRadius .* 0.001;
 
 %% Extract hitch properties
-
 [Hitch] = getHitchData(endParLadenFileData, allParLadenFileData);
 
 % Converting to the correct units for the Post Processor
