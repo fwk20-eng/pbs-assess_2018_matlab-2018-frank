@@ -4,7 +4,7 @@
 %
 %% Inputs
 %
-% * Sprung
+% * Engine
 %
 %% Outputs
 %

@@ -27,7 +27,6 @@ function PBSreportTable = generateTableAxleGroupLoads(Axle, Axle1, AxleU1)
 
 % Fetching the axle units
 Table.Units = Axle.UnitCellArray;
-
 Table.AxleDescription = Axle.DescriptionCell;
 
 % Fetching the number of axles
