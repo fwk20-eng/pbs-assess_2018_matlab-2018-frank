@@ -58,7 +58,7 @@ nAxleGroup = 1;
 for iAxle = 1 : nAxles
     % This will return 'unit,axlenumber'
     axleUnitAndNumber = regexpFindTextBetweenText(parFileData{varIndices{1,2}(iAxle)},'\(', '\)');
-    axleUnitAndNumberArray = split(axleUnitAndNumber, ',');
+    axleUnitAndNumberArray = strsplit(axleUnitAndNumber{:}, ',');
     
     nUnit = str2double(axleUnitAndNumberArray(1));
     

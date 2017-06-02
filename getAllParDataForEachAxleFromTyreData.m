@@ -47,7 +47,7 @@ for iAxle = 1 : nAxles
     % Note the tyreDataset must be named according to 315/80R22.5 (lag). A single space seperates the tyre size from the
     % lag/no lag modifier.
     tyreDataset = tyreDatasetArray{iTyreIndex};
-    tyreDatasetSplitWithLag = split(tyreDataset, ' ');
+    tyreDatasetSplitWithLag = strsplit(tyreDataset{:}, ' ');
     tyreSize = tyreDatasetSplitWithLag{1};
     
     if tyreDualSpacing(iAxle) == 0
@@ -95,7 +95,7 @@ for iAxle = 1 : nAxles
     end
     
     tyreDataset = tyreDatasetArray{iTyreIndex};
-    tyreDatasetSplitWithLag = split(tyreDataset, ' ');
+    tyreDatasetSplitWithLag = strsplit(tyreDataset{:}, ' ');
     
     tyreSize = tyreDatasetSplitWithLag{1};
     
