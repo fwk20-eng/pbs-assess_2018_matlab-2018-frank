@@ -30,7 +30,7 @@ for iUnit = 1 : nUnits
     nAxles = length(combinationDatasetTable{iUnit});
     for iAxle = 1 : nAxles
         axleDatasetModelAndType = combinationDatasetTable{iUnit}{iAxle};
-        axleSpringType = regexpFindTextBetweenText(axleDatasetModelAndType, '\[', '\]')
+        axleSpringType = regexpFindTextBetweenText(axleDatasetModelAndType, '\[', '\]');
         datasetTypeCellArray{iUnit}{iAxle} = axleSpringType{:};
     end
 end

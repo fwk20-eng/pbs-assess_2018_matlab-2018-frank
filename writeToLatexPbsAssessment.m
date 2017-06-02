@@ -19,9 +19,9 @@
 % * First code
 
 function writeToLatexPbsAssessment(Project, ParDetails, Sprung, Axle, Hitch, Engine, Report, Dimensions,...
-    fullName, Lim, LimReport, resultsPbs, nLevels, Is, PayloadLaden, Axle1, AxleU1, Topdeck)
+    fullName, Lim, LimReport, resultsPbs, nLevels, Is, PayloadLaden, Axle1, AxleU1, Tyre, Topdeck)
 
-[Table.vehicleSummary, Axle.DescriptionCell] = generateTableVehicleSummary(ParDetails, Sprung, Axle);
+[Table.vehicleSummary, Axle.DescriptionCell] = generateTableVehicleSummary(ParDetails, Tyre, Axle);
 Table.axleGroupLoads = generateTableAxleGroupLoads(Axle, Axle1, AxleU1);
 Table.unloadedSprungMassDetails = generateTableUnloadedSprungMassDetails(Sprung);
 Table.unsprungMassDetails = generateTableUnsprungMassDetails(Axle);
@@ -29,16 +29,17 @@ Table.payloadDetails = generateTablePayloadDetails(Sprung, PayloadLaden, 'Fully 
 if Is.carCarrier
     Table.payloadDetailsTopdeck = generateTablePayloadDetails(Sprung, Topdeck.PayloadLaden, 'Top Deck Laden Payload Details','TopDeckLadenPayloadDetails');
 end
-Table.suspensionDetails = generateTableSuspensionDetails(ParDetails, Sprung, Axle);
+Table.suspensionDetails = generateTableSuspensionDetails(ParDetails, Axle);
 Table.hitchDetails = generateTableHitchDetails(Hitch);
 Table.primeMoverSummary = generateTablePrimeMoverSummary(Engine, Sprung);
 Table.engineTorqueCurve = generateTableEngineTorqueCurve(Engine);
 Table.gearboxTransmission = generateTableGearboxTransmission(Engine);
 Table.ladenReferencePoints = generateTableReferencePoints(Report.ladenReferencePointNames, ...
-    Dimensions.RefPointsLadenCell, Sprung, 'Reference Points for Laden Combination','ReferencePointsForLadenCombination');
+    Dimensions.RefPointsLadenCell, Sprung, Hitch,...
+    'Reference Points for Laden Combination','ReferencePointsForLadenCombination');
 Table.unladenReferencePoints = generateTableReferencePoints(Report.unladenReferencePointNames, ...
-    Dimensions.RefPointsUnladenCell, Sprung, 'Reference Points for Unladen Combination','ReferencePointsForUnladenCombination');
-
+    Dimensions.RefPointsUnladenCell, Sprung, Hitch,...
+    'Reference Points for Unladen Combination','ReferencePointsForUnladenCombination');
 
 % Generate results tables
 Report.pbsResultsTable = generateTableResults(fullName, Lim, LimReport, rounder(resultsPbs), Report, nLevels, Is);
@@ -76,6 +77,20 @@ generateLatexTablesForPBSreport(Table, 'CombinationTables.tex', pbsAssessCopyToF
 Report.pbsAssessmentMainTexFilePath = strcat(pbsAssessCopyToFullPath, '\PBS_Assessment.tex');
 Report.pbsAssessmentResultsTexFilePath = strcat(pbsAssessCopyToFullPath, '\tex\CombinationResults.tex');
 
+% Add additional report modifiers according to extracted PBS data
+additionalModifiers = {...
+    '\\newcommand\{\\desiredPBSLevel\}', num2str(Combination.pbsLevelDesired);...
+    '\\newcommand\{\\client\}', 'still to be extracted';...
+    '\\newcommand\{\\pmDescr\}', 'still to be extracted';...
+    '\\newcommand\{\\tlDescr\}', 'still to be extracted';...
+    '\\newcommand\{\\tlManu\}', 'still to be extracted';...
+    '\\newcommand\{\\combAxles\}', num2str(Axle.NumberOff);...   
+    '\\newcommand\{\\combGCM\}', strcat(num2str(sum(Axle1)), '~kg');...
+    '\\newcommand\{\\combPayload\}', strcat(num2str(sum(cell2mat(PayloadLaden.MassCell))), '~kg')';...
+    };
+
+Report.modifiers = [Report.modifiers; additionalModifiers];
+    
 % Edit PBS assessment and save tex file with the correct name as per project
 editPbsAssessmentReport(Report, Is);
 
