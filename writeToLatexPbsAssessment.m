@@ -25,9 +25,11 @@ function writeToLatexPbsAssessment(Project, Combination, ParDetails, Sprung, Axl
 Table.axleGroupLoads = generateTableAxleGroupLoads(Axle, Axle1, AxleU1);
 Table.unloadedSprungMassDetails = generateTableUnloadedSprungMassDetails(Sprung);
 Table.unsprungMassDetails = generateTableUnsprungMassDetails(Axle);
-Table.payloadDetails = generateTablePayloadDetails(Sprung, PayloadLaden, 'Fully Laden Payload Details','FullyLadenPayloadDetails');
+Table.payloadDetails = generateTablePayloadDetails(Sprung, PayloadLaden, 'Fully Laden Payload Details',...
+    'FullyLadenPayloadDetails');
 if Is.carCarrier
-    Table.payloadDetailsTopdeck = generateTablePayloadDetails(Sprung, Topdeck.PayloadLaden, 'Top Deck Laden Payload Details','TopDeckLadenPayloadDetails');
+    Table.payloadDetailsTopdeck = generateTablePayloadDetails(Sprung, Topdeck.PayloadLaden, ...
+        'Top Deck Laden Payload Details','TopDeckLadenPayloadDetails');
 end
 Table.suspensionDetails = generateTableSuspensionDetails(ParDetails, Axle);
 Table.hitchDetails = generateTableHitchDetails(Hitch);
@@ -67,7 +69,8 @@ copyfile(pbsAssessFiguresCopyFromFullPath, pbsAssessFiguresCopyToFullPath);
 % Copying the additional summary image from the topdeck laden assessment for car-carriers
 if Is.carCarrier
     pbsAssessFiguresTopdeckCopyFromFullPath = strcat(Topdeck.Project.savePath,'\', Topdeck.Project.runKey, '_figures');
-    copyfile(strcat(pbsAssessFiguresTopdeckCopyFromFullPath,'\summary.pdf'), strcat(pbsAssessFiguresCopyToFullPath, '\summaryTopdeck.pdf'));
+    copyfile(strcat(pbsAssessFiguresTopdeckCopyFromFullPath,'\summary.pdf'), strcat(pbsAssessFiguresCopyToFullPath,...
+        '\summaryTopdeck.pdf'));
 end
 
 % Generate the latex tables and save in the PBS assessment tex folder
@@ -86,7 +89,8 @@ additionalModifiers = {...
     '\\newcommand\{\\tlManu\}', 'still to be extracted';
     '\\newcommand\{\\combAxles\}', num2str(Axle.NumberOff);  
     '\\newcommand\{\\combGCM\}', strcat(num2str(sum(Axle1)), '~kg');
-    '\\newcommand\{\\combPayload\}', strcat(num2str(sum(cell2mat(PayloadLaden.MassCell).*cell2mat(Combination.includedPayloads))), '~kg');%strcat(num2str(sum(cell2mat(PayloadLaden.MassCell))), '~kg')';
+    '\\newcommand\{\\combPayload\}', strcat(num2str(sum(cell2mat(PayloadLaden.MassCell).*...
+    cell2mat(Combination.includedPayloads))), '~kg');
     };
 
 Report.modifiers = [Report.modifiers; additionalModifiers];
