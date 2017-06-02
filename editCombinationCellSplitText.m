@@ -31,7 +31,7 @@ for iUnit = 1 : nUnits
     nAxles = length(combinationCell{iUnit});
     for iAxle = 1 : nAxles
         datasetName = combinationCell{iUnit}{iAxle};
-        breakdownOfDatasetName = split(datasetName, splitText);
+        breakdownOfDatasetName = strsplit(datasetName, splitText);
         indexedSplitText = breakdownOfDatasetName(index);
         modifiedCombinationCell{iUnit}{iAxle} = indexedSplitText{:};
     end

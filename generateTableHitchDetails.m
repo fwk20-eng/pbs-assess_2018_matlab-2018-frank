@@ -32,13 +32,13 @@ Table.data = {};
 % Loop through the hitches and format the table
 for iHitch = 1 : nHitches
     sUnit = int2str(iHitch);
-    temp = split(Hitch.DatasetArray{iHitch}, ' (');
+    temp = strsplit(Hitch.DatasetArray{iHitch}{:}, ' (');
     sType = temp{1};
     % Negate TruckSim to get coordinate for X hitch position according to SAE coordinate system
     sLongitudinalPosition = num2str(-Hitch.XPositionArray(iHitch)*1000);
     sHeight = num2str(Hitch.ZPositionArray(iHitch)*1000);
     % Roll moment dataset must be named to suit the PBS assessment report
-    temp = split(Hitch.RollMomentArray{iHitch}, ' (');
+    temp = strsplit(Hitch.RollMomentArray{iHitch}{:}, ' (');
     sRollStiffness = temp{1};
     
     rowOfDataForTable = {sUnit, sType, sLongitudinalPosition, sHeight, sRollStiffness};
