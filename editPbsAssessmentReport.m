@@ -29,6 +29,13 @@ for iModifier = 1 : nModifiers
         Report.modifiers{iModifier,2}, '(?<=\}\{).*(?=\}\>)');
 end
 
+% Modify the date the report was generated and version. Cannot use it in report modifiers due to different regexp
+date = strsplit(datestr(now,'yyyy-mmmm-dd'),'-');
+PbsReportFileData = editLinesInCellArray(PbsReportFileData, '\\ReportDay', date(3), '(?<=\{).*(?=\})');
+PbsReportFileData = editLinesInCellArray(PbsReportFileData, '\\ReportMonth', date(2), '(?<=\{).*(?=\})');
+PbsReportFileData = editLinesInCellArray(PbsReportFileData, '\\ReportYear', date(1), '(?<=\{).*(?=\})');
+PbsReportFileData = editLinesInCellArray(PbsReportFileData, '\\ReportRev', Report.reportRevision, '(?<=\{).*(?=\})');
+
 % Write main tex file
 fid = fopen(Report.pbsAssessmentMainTexFilePath,'w');
 

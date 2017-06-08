@@ -14,27 +14,28 @@
 %
 %% Change Log
 %
+% [0.2.0] 2017-06-04
+%
+% *Fixed*
+%
+% * Removed ParDetails pass-through as it is no longer required, all data is extracted in getTruckSimSimulationData
+%
 % [0.1.0] - 2017-05-09
 %
 % *Added*
 %
 % * First code
 
-function PBSreportTable = generateTableSuspensionDetails(ParDetails, Axle)
+function PBSreportTable = generateTableSuspensionDetails(Axle)
 %% Extracting table contents
-
-%% Generating par file data
-allParLadenFileFullPath = strcat(ParDetails.parFileFolderPath, '\', ParDetails.allParLadenFileName);
-allParLadenFileData = readLinesFromFile(allParLadenFileFullPath);
 
 %% Table Six: Data
 Table.Units = Axle.UnitCellArray;
 Table.AxleDescription = Axle.DescriptionCell;
-Table.AxleSuspensionModel = Axle.suspensionKinematicsReportName;
-Table.AxleRollCentre = Axle.rollCentreHeight;
-Table.AxleTrack = Axle.trackWidth;
-Table.AxleAuxRoll = Axle.auxRollMoment;
-Table.AxleSteerRoll = Axle.steerRollRatio;
+Table.AxleSuspensionModel = Axle.complianceReportName;
+Table.SpringModel = Axle.springReportModel;
+Table.DamperModel = Axle.damperReportModel;
+Table.StabiliserModel = Axle.stabiliserModel;
 
 %% Convert Table to a format that will create the latexTable correctly.
 %
@@ -76,12 +77,12 @@ for iCol = 2 : nFields
     
 end
 
-Table.Headings = {'\textbf{Unit}' '\textbf{Axle}' '\textbf{Suspension}' '\textbf{RC height (mm)}\tnote{1}' '\textbf{Track width (mm)}' '\textbf{Auxiliary roll stiffness (Nm/\degree{})}' '\textbf{Steer/roll ratio (\degree{}/\degree{})}'};
+Table.Headings = {'\textbf{Unit}' '\textbf{Axle}' '\textbf{Suspension}' '\textbf{Spring Model}' '\textbf{Damper Model}' '\textbf{Stabiliser Model}\tnote{1}'};
 
 % Compiling the structure fields required by latexTable
 Table.data = [Table.Headings; Table.data];
-Table.footNotes = {'\item[1] Roll centre height relative to the axle centre height (+ above, - below)'};
-Table.userAlignment = 'c|c|c|C|C|C|C|';
+Table.footNotes = {'\item[1] If ``-", no stabiliser is present, the auxiliary roll moment is due to the inherent stiffness of the axle'};
+Table.userAlignment = 'c|c|c|C|C|C|';
 Table.tableCaption = 'Suspension Details';
 Table.tableLabel = 'SuspensionDetails';
 Table.booktabs = 0;

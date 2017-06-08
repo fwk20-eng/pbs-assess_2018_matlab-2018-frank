@@ -14,6 +14,12 @@
 %
 %% Change Log
 %
+% [0.4.0]
+%
+% *Added*
+%
+% * Support for dummy axles
+%
 % [0.3.0] 2017-05-08
 %
 % *Added*
@@ -34,12 +40,18 @@
 %
 % * Moved from getTruckSimSimulationData to a standalone function in the local folder
 
-function [axleGroupCell, axleUnitAndGroup, axleUnitCellArray] = getAxleGrouping(parFileData, axleXDistances, maxSpacing)
+function [axleGroupCell, axleUnitAndGroup, axleUnitCellArray] = getAxleGrouping(parFileData, axleXDistances, ...
+    maxSpacing, Dummy)
 
 MAX_AXLE_GROUP_DIST_MM = maxSpacing; % [mm]
 
 % Determine the indices of the variable within the end par file
 varIndices = indexTextArray(parFileData, '\<LX_AXLE');
+
+% If there are dummy axles, modify the varIndices variable 
+if Dummy.isDummyAxle
+    varIndices{1,2} = removeDummyAxlesFromArray(varIndices{1,2}, Dummy.isRealAxleArray);
+end
 
 % Determine the number of variables named the same as searchText
 nAxles = length(varIndices{1,2});
@@ -50,7 +62,6 @@ axleUnitAndGroup = [];
 
 % Start on the first unit, in the first axle group with the first axle
 iUnit = 1;
-
 iAxle = 0;
 nAxleGroup = 1;
 

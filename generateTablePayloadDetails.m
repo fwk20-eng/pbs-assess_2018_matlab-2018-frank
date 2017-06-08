@@ -28,6 +28,9 @@ function PBSreportTable = generateTablePayloadDetails(Sprung, Payload, caption, 
 % * Semi-trailer
 % * B-Double
 
+%% Removing trucksim modifiers from payload
+payloadDetailsForReport = editCombinationCellSplitText(Payload.DescriptionCell, {' (',' ['}, 1);
+
 %% Extracting table contents
 
 Table.data = {};
@@ -47,7 +50,7 @@ for iUnit = 1 : Sprung.numberOffUnits
         for iPayload = 1 : nPayloads
             sUnit = int2str(iUnit);
             sMass = int2str(Payload.MassCell{iUnit}(iPayload));
-            sPayloadDescription = Payload.DescriptionCell{iUnit}{iPayload};
+            sPayloadDescription = payloadDetailsForReport{iUnit}{iPayload};
             sMOIx = num2str(Payload.MOIxCell{iUnit}(iPayload), '%0.0f');
             sMOIy = num2str(Payload.MOIyCell{iUnit}(iPayload), '%0.0f');
             sMOIz = num2str(Payload.MOIzCell{iUnit}(iPayload), '%0.0f');

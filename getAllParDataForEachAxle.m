@@ -20,6 +20,12 @@
 %
 %% Change Log
 %
+% [0.4.0]
+%
+% *Added*
+%
+% * Dummy axle support
+%
 % [0.3.0] - 2017-05-08
 %
 % *Fixed*
@@ -61,7 +67,11 @@ for iAxle = 1: nSplicedAxles
         GetAxleData.key, GetAxleData.keySeperator);
     
     % The second index is to properly extract the string. If it is not there, there are problems when generating a table
-    extractedAxleData{:,iUnit}{iAxle} = axleDescription{1}{1};
+    if ~isempty(axleDescription)
+        extractedAxleData{:,iUnit}{iAxle} = axleDescription{1}{1};
+    else
+        extractedAxleData{:,iUnit}{iAxle} = 'Dummy';
+    end
 end
 
 %% Extracting data for unit 2 and beyond
@@ -85,7 +95,11 @@ for iUnit = 2:Sprung.numberOffUnits
         axleDescription = getDatasetNameFromPar(SplicedAllPar.AxleDataset{:,iUnit}{iAxle}, ...
             GetAxleData.key, GetAxleData.keySeperator);
         
-        extractedAxleData{:,iUnit}{iAxle} = axleDescription{1}{1};
+        if ~isempty(axleDescription)
+            extractedAxleData{:,iUnit}{iAxle} = axleDescription{1}{1};
+        else
+            extractedAxleData{:,iUnit}{iAxle} = 'Dummy';
+        end
     end
     
 end

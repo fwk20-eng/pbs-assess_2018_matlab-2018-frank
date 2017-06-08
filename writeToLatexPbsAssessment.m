@@ -21,15 +21,18 @@
 function writeToLatexPbsAssessment(Project, Combination, ParDetails, Sprung, Axle, Hitch, Engine, Report, Dimensions,...
     fullName, Lim, LimReport, resultsPbs, nLevels, Is, PayloadLaden, Axle1, AxleU1, Tyre, Topdeck)
 
-[Table.vehicleSummary, Axle.DescriptionCell] = generateTableVehicleSummary(ParDetails, Tyre, Axle);
+[Table.vehicleSummary, Axle.DescriptionCell] = generateTableVehicleSummary(Tyre, Axle);
 Table.axleGroupLoads = generateTableAxleGroupLoads(Axle, Axle1, AxleU1);
 Table.unloadedSprungMassDetails = generateTableUnloadedSprungMassDetails(Sprung);
 Table.unsprungMassDetails = generateTableUnsprungMassDetails(Axle);
-Table.payloadDetails = generateTablePayloadDetails(Sprung, PayloadLaden, 'Fully Laden Payload Details','FullyLadenPayloadDetails');
+Table.payloadDetails = generateTablePayloadDetails(Sprung, PayloadLaden, 'Fully Laden Payload Details',...
+    'FullyLadenPayloadDetails');
 if Is.carCarrier
-    Table.payloadDetailsTopdeck = generateTablePayloadDetails(Sprung, Topdeck.PayloadLaden, 'Top Deck Laden Payload Details','TopDeckLadenPayloadDetails');
+    Table.payloadDetailsTopdeck = generateTablePayloadDetails(Sprung, Topdeck.PayloadLaden, ...
+        'Top Deck Laden Payload Details','TopDeckLadenPayloadDetails');
 end
-Table.suspensionDetails = generateTableSuspensionDetails(ParDetails, Axle);
+Table.suspensionDetails = generateTableSuspensionDetails(Axle);
+Table.suspensionProperties = generateTableSuspensionProperties(Axle);
 Table.hitchDetails = generateTableHitchDetails(Hitch);
 Table.primeMoverSummary = generateTablePrimeMoverSummary(Engine, Sprung);
 Table.engineTorqueCurve = generateTableEngineTorqueCurve(Engine);
@@ -46,13 +49,15 @@ Report.pbsResultsTable = generateTableResults(fullName, Lim, LimReport, rounder(
 baselineResults = getBaselineResults(Report.baselinePbsCombination);
 Report.pbsBaselineResultsTable = generateBaselineResults(baselineResults, Lim, nLevels, Is);
 if Is.carCarrier
-    Report.pbsResultsTableTopdeck = generateBaselineResults(Topdeck.resultsPbs, Lim, nLevels, Is);
+    Report.pbsResultsTableTopdeck = generateBaselineResults(rounder(Topdeck.resultsPbs), Lim, nLevels, Is);
 end
 
 % Set-up the paths for copying to the assessment folder
 pbsAssessCopyToFullPath = strcat(Project.savePath, '\PBS_Assessment_', Project.runKey);
 pbsAssessFiguresCopyFromFullPath = strcat(Project.savePath,'\', Project.runKey, '_figures');
 pbsAssessFiguresCopyToFullPath =  strcat(pbsAssessCopyToFullPath, '\fig');
+
+pbsAssessGACopyFromFullPath = strcat(Project.runFolderPath, '\_GA_Images');
     
 % Remove the PBS assessment folder if it already exists
 if exist(pbsAssessCopyToFullPath, 'dir')
@@ -63,11 +68,13 @@ copyfile(Project.pbsAssessmentTemplatePath, pbsAssessCopyToFullPath);
 
 % Copy across the assessment figures
 copyfile(pbsAssessFiguresCopyFromFullPath, pbsAssessFiguresCopyToFullPath);
+copyfile(pbsAssessGACopyFromFullPath, pbsAssessFiguresCopyToFullPath);
 
 % Copying the additional summary image from the topdeck laden assessment for car-carriers
 if Is.carCarrier
     pbsAssessFiguresTopdeckCopyFromFullPath = strcat(Topdeck.Project.savePath,'\', Topdeck.Project.runKey, '_figures');
-    copyfile(strcat(pbsAssessFiguresTopdeckCopyFromFullPath,'\summary.pdf'), strcat(pbsAssessFiguresCopyToFullPath, '\summaryTopdeck.pdf'));
+    copyfile(strcat(pbsAssessFiguresTopdeckCopyFromFullPath,'\summary.pdf'), strcat(pbsAssessFiguresCopyToFullPath,...
+        '\summaryTopdeck.pdf'));
 end
 
 % Generate the latex tables and save in the PBS assessment tex folder
@@ -79,14 +86,14 @@ Report.pbsAssessmentResultsTexFilePath = strcat(pbsAssessCopyToFullPath, '\tex\C
 
 % Add additional report modifiers according to extracted PBS data
 additionalModifiers = {...
+    '\\newcommand\{\\combOverallLength\}', strcat(num2str(Combination.totalLength*0.001, '%0.3f'), '~m');
+    '\\newcommand\{\\combMaxHt\}', strcat(num2str(Combination.maxHeight*0.001, '%0.3f'), '~m');
+    '\\newcommand\{\\combMaxWidth\}', strcat(num2str(Combination.maxWidth*0.001, '%0.3f'), '~m');
     '\\newcommand\{\\desiredPBSLevel\}', num2str(Combination.pbsLevelDesired);
-    '\\newcommand\{\\client\}', 'still to be extracted';
-    '\\newcommand\{\\pmDescr\}', 'still to be extracted';
-    '\\newcommand\{\\tlDescr\}', 'still to be extracted';
-    '\\newcommand\{\\tlManu\}', 'still to be extracted';
     '\\newcommand\{\\combAxles\}', num2str(Axle.NumberOff);  
     '\\newcommand\{\\combGCM\}', strcat(num2str(sum(Axle1)), '~kg');
-    '\\newcommand\{\\combPayload\}', strcat(num2str(sum(cell2mat(PayloadLaden.MassCell).*cell2mat(Combination.includedPayloads))), '~kg');%strcat(num2str(sum(cell2mat(PayloadLaden.MassCell))), '~kg')';
+    '\\newcommand\{\\combPayload\}', strcat(num2str(sum(cell2mat(PayloadLaden.MassCell).*...
+    cell2mat(Combination.includedPayloads))), '~kg');
     };
 
 Report.modifiers = [Report.modifiers; additionalModifiers];
