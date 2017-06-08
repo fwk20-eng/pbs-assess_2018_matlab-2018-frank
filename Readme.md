@@ -4,7 +4,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## To Do
-[] Contemplate a manner in which the filename generation can be moved to the multi-choice post-processor. This will help consistency between all projects. I think all that is required is moving the write inertias line and to make a series of if statements depending on if inertial properties are to be written to file or not.
+* [ ] Update file name generator to be in a more central position. Try to not re-generate file paths in each individual manoeuvre.
+* [ ] Rename the Latex file according to the project version
 
 ## [0.6.0] - 2017-06-08
 
