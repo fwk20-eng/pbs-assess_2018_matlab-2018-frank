@@ -1,4 +1,4 @@
-function [SRTt, SRTtrrcu] = SRTt_solve(nLastAxle,nSteer,limSRT,SRTrollThresh, mSprung, HcgSprung, rollCoupled, dollys, savePath, runsPath, runKey, matKey, plotOn, isSave)
+function [SRTt, SRTtrrcu] = SRTt_solve(nLastAxle,nSteer,limSRT,SRTrollThresh, mSprung, HcgSprung, rollCoupled, dollys, savePath, runsPath, runKey, matKey, plotOn, isSave, Dummy)
 
 if nargin == 0  % i.e. program run directly from here
     % Example inputs:
@@ -20,7 +20,14 @@ end
 
 nVehUnits = length(mSprung);
 
-[Data, error] = readData(matKey, {'Roll' 'AyBf_SM' 'Fz_L' 'Roll_Tab'}, [nVehUnits nVehUnits nLastAxle 1], {'_' '' '' ''}, [], savePath, runsPath, runKey,[0 0 1 0]);
+if Dummy.isDummyAxle
+    % If there is a dummy axle, you need to pass through the indices of the valid axles
+    [Data, error] = readDataWithDummyAxles(matKey, {'Roll' 'AyBf_SM' 'Fz_L' 'Roll_Tab'}, ...
+        {nVehUnits nVehUnits Dummy.isRealAxleIndex 1}, {'_' '' '' ''}, [], savePath, runsPath, runKey, [0 0 1 0]);
+else
+    [Data, error] = readData(matKey, {'Roll' 'AyBf_SM' 'Fz_L' 'Roll_Tab'}, [nVehUnits nVehUnits nLastAxle 1], ...
+        {'_' '' '' ''}, [], savePath, runsPath, runKey,[0 0 1 0]);
+end
 
 if error == 1
     ind=min(find(Data{1}>=0));
@@ -99,7 +106,7 @@ SRTtrrcu = SRTrcu(end);
 % plotting
 if plotOn
     figure('name', 'SRT')
-
+    
     hold on
     axis([floor(Time(min(ind))/2) ceil(Time(max(ind))) 0 ceil((SRTt+0.01)*10)/10])  %set axis
     
@@ -123,7 +130,7 @@ if plotOn
     
     xlabel('Time [s]')
     ylabel('Lateral Acceleration [g]')
-        
+    
     text([floor(Time(min(ind))/2)+1], floor(SRTt*100)/100+0.01,['SRT = ' num2str(floor(SRTt*100)/100) ' g'])
     text([floor(Time(min(ind))/2)+1], floor(SRTt*100)/100-0.01,['SRTrrcu = ' num2str(floor(SRTtrrcu*100)/100) ' g'])
     

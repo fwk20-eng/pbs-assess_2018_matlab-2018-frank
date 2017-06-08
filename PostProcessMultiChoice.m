@@ -100,8 +100,8 @@ createRunLog(Is, Project);
 % With the new data extraction, the project needs to be saved in order to run, so Is.save may be redundant
 if Is.save
     copyTruckSimRunFiles(MatKey, Project, Is);
-    [Tyre, Axle, Hitch, Sprung, Dimensions, PayloadLaden, PayloadUnladen] = getTruckSimSimulationData(ParDetails);
-    [Engine] = getEngineData(Combination.engineModel, Tyre.NumberOff);
+    [Tyre, Axle, Hitch, Sprung, Dimensions, PayloadLaden, PayloadUnladen, Dummy] = getTruckSimSimulationData(ParDetails);
+    [Engine] = getEngineData(Combination.engineModel, Combination.gearboxModel, Tyre.NumberOff);
     
     writeToExcelAxleLoads(Project, Sprung, PayloadLaden, Axle, Hitch, Combination, Is);
 end
@@ -146,10 +146,10 @@ if Is.pbs
         r.RA = RA_solve(mSprung, HcgSprung, Hitch.RollCoupledArray, Combination.dollys, Project.savePath, Project.truckSimRunsPath, Project.runKey, MatKey.ra, Is.plotOn, Is.save);
     end
     if Is.hsto
-        r.HSTO = HSTO_solve(Axle.NumberOff, Combination.totalLength, Project.savePath, Project.truckSimRunsPath, Project.runKey, MatKey.hsto, Is.plotOn, Is.save);
+        r.HSTO = HSTO_solve(Axle.NumberOff, Combination.totalLength, Project.savePath, Project.truckSimRunsPath, Project.runKey, MatKey.hsto, Is.plotOn, Is.save, Dummy);
     end
     if Is.srt
-        [r.SRTt, r.SRTtrrcu] = SRTt_solve(Axle.NumberOff, Axle.NumberOffSteer, Lim.SRT(Combination.pbsLevelDesired), SRTrollThresh, mSprung, HcgSprung,  Hitch.RollCoupledArray, Combination.dollys, Project.savePath, Project.truckSimRunsPath, Project.runKey, MatKey.srt, Is.plotOn, Is.save);
+        [r.SRTt, r.SRTtrrcu] = SRTt_solve(Axle.NumberOff, Axle.NumberOffSteer, Lim.SRT(Combination.pbsLevelDesired), SRTrollThresh, mSprung, HcgSprung,  Hitch.RollCoupledArray, Combination.dollys, Project.savePath, Project.truckSimRunsPath, Project.runKey, MatKey.srt, Is.plotOn, Is.save, Dummy);
     end
     if Is.tasp
         r.TASP = TASP_solve(Sprung.numberOffUnits, Combination.dollys, Project.savePath, Project.truckSimRunsPath, Project.runKey, MatKey.tasp, Is.plotOn, Is.save);
