@@ -52,6 +52,8 @@ LimReport.MoD =     {'$\leq$0.55' '$\leq$0.55' '$\leq$0.55' '$\leq$0.55'};
 LimReport.DoM =     {'$\leq$0.25' '$\leq$0.25' '$\leq$0.25' '$\leq$0.25'};
 LimReport.STFD =    {'$\leq$80' '$\leq$80' '$\leq$80' '$\leq$80'};
 
+LimReport.RA =    {'-' '-' '-' '-'};
+
 % LimReport.STA =     [{'$\geq$15'} {'$\geq$12'} {'$\geq$10'} {'$\geq$5'}];
 % LimReport.GRAa =    [{'$\geq$20'}	{'$\geq$15'} {'$\geq$12'} {'$\geq$10'}];
 % LimReport.GRAb =    [{'$\geq$80'}	{'$\geq$70'} {'$\geq$70'} {'$\geq$60}'}];
