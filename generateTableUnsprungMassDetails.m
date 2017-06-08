@@ -75,7 +75,7 @@ for iUnit = 1 : nUnits
 end
 
 %% Generating the Latex Tables (this should be moved to a standalone function file when suitably tested.
-Table.Headings = {'\textbf{Unit}' '\textbf{Axle description}' '\textbf{Mass (kg)}' '\textbf{CoG height (mm)}'};
+Table.Headings = {'\textbf{Unit}' '\textbf{Axle}' '\textbf{Mass (kg)}' '\textbf{CoG height (mm)}'};
 
 % Compiling the structure fields required by latexTable
 Table.data = [Table.Headings; Table.data];

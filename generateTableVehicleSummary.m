@@ -15,13 +15,19 @@
 %
 %% Change Log
 %
+% [0.2.0] 2017-06-04
+%
+% *Fixed*
+%
+% * Removed ParDetails pass-through as it is no longer required, all data is extracted in getTruckSimSimulationData
+%
 % [0.1.0] - 2017-05-08
 %
 % *Added*
 %
 % * First code
 
-function [PBSreportTable, axleDescriptionCellArray] = generateTableVehicleSummary(ParDetails, Tyre, Axle)
+function [PBSreportTable, axleDescriptionCellArray] = generateTableVehicleSummary(Tyre, Axle)
 %% Generating the Latex Tables (this should be moved to a standalone function file when suitably tested.
 %% Table 1: Summary of Vehicle
 % Extracting table contents
@@ -30,10 +36,6 @@ function [PBSreportTable, axleDescriptionCellArray] = generateTableVehicleSummar
 %
 % * Semi-trailer
 % * B-Double
-
-%% Generating par file data
-allParLadenFileFullPath = strcat(ParDetails.parFileFolderPath, '\', ParDetails.allParLadenFileName);
-allParLadenFileData = readLinesFromFile(allParLadenFileFullPath);
 
 %% Table One: Units
 Table.Units = Axle.UnitCellArray;
@@ -83,7 +85,7 @@ for iCol = 2 : nFields
     
 end
 
-Table.Headings = {'\textbf{Unit}' '\textbf{Axle description}' '\textbf{Axle configuration}' '\textbf{Suspension type}' '\textbf{Tyre size}' '\textbf{Rim material}'};
+Table.Headings = {'\textbf{Unit}' '\textbf{Axle}' '\textbf{Axle configuration}' '\textbf{Suspension type}' '\textbf{Tyre size}' '\textbf{Rim material}'};
 
 % Compiling the structure fields required by latexTable
 Table.data = [Table.Headings; Table.data];

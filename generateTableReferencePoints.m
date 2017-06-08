@@ -16,6 +16,12 @@
 %
 %% Change Log
 %
+% [0.2.0]
+%
+% *Fixed*
+%
+% * Added "TASP" to manoeuvre for last 4 reference points
+%
 % [0.1.0] - 2017-05-09
 %
 % *Added*
@@ -37,17 +43,16 @@ for iUnit = 1 : Sprung.numberOffUnits
     % Only the first 9 reference points are used in the current post processor
     iXref = refPointsLadenCell{iUnit,1}(1:9);
     iYref = refPointsLadenCell{iUnit,2}(1:9);
+    iZref = refPointsLadenCell{iUnit,3}(1:9);
     
-    if iUnit == 1
-        % First unit will use its hitch height
-        iZref = refPointsLadenCell{iUnit,3}(1:9) + Hitch.ZPositionArray(iUnit)*1000;
-    elseif iUnit > 1
+    % Adding hitch height to reference points for trailers due to a bug in TruckSim 8.2a
+    if iUnit > 1
         % Looks at hitch height of previous unit as this is the connection point
          iZref = refPointsLadenCell{iUnit,3}(1:9) + Hitch.ZPositionArray(iUnit - 1)*1000;
     end
     
     sLeftRight = {'Left'; 'Left'; 'Right'; 'Right'; 'Right'; 'Right'; 'Right'; 'Right'; 'Right'};
-    sManoeuvre = {'TASP'; 'TASP'; 'FS'; 'FS'; 'FS'; 'TS'; 'TS'; 'TS'; 'TS'};
+    sManoeuvre = {'TASP'; 'TASP'; 'FS'; 'FS'; 'FS'; 'TASP \& TS'; 'TASP \& TS'; 'TASP \& TS'; 'TASP \& TS'};
     sReferencePointNumber = {'1'; '2'; '3'; '4'; '5'; '6'; '7'; '8'; '9'};
     sReferencePointsUnit = arrayfun(@(x) num2str(x, '%0.0f'), iReferencePointsUnit, 'UniformOutput', false);
     sXref = arrayfun(@(x) num2str(x, '%0.0f'), iXref, 'UniformOutput', false);

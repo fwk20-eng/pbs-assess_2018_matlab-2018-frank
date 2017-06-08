@@ -46,11 +46,12 @@ for iHitch = 1 : nHitches
     Table.data = [Table.data; rowOfDataForTable];
 end
 
-Table.Headings = {'\textbf{Unit}' '\textbf{Hitch type}' '\textbf{Longitudinal position (mm)}\tnote{1}' '\textbf{Height (mm)}' '\textbf{Roll stiffness (Nm/\degree{})}'};
+Table.Headings = {'\textbf{Unit}' '\textbf{Hitch type}' '\textbf{Longitudinal position (mm)}\tnote{1}' '\textbf{Height (mm)}\tnote{2}' '\textbf{Roll stiffness (Nm/\degree{})}'};
 
 % Compiling the structure fields required by latexTable
 Table.data = [Table.Headings; Table.data];
-Table.footNotes = {'\item[1] SAE up co-ordinate system and origin taken from centre of steer axle or hitch point at ground level'};
+Table.footNotes = {'\item[1] SAE up co-ordinate system and origin taken from centre of steer axle or hitch point at ground level';
+                   '\item[2] This hitch height is at the unladen condition and may differ from the hitch height indicated on the GA drawing'};
 Table.tableCaption = 'Hitch Details';
 Table.tableLabel = 'HitchDetails';
 Table.booktabs = 0;
