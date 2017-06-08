@@ -89,7 +89,7 @@
 % 1. List of inputs from TruckSim listed in "Inputs required from TruckSim.xls" file in this folder
 
 %% Beginning of function
-function [Project, ParDetails, Sprung, Axle, Hitch, Engine, Report, Dimensions, fullName, Lim, LimReport, resultsPbs, nLevels, Is, PayloadLaden, Axle1, AxleU1] =...
+function [Project, ParDetails, Sprung, Axle, Hitch, Engine, Report, Dimensions, fullName, Lim, LimReport, resultsPbs, nLevels, Is, PayloadLaden, Axle1, AxleU1, Tyre] =...
     PostProcessMultiChoice(Is, Project, Combination, MatKey, Report)
 %% Preamble
 %% Generate the required file paths and perform the necessary checks for the assessment
@@ -97,11 +97,13 @@ function [Project, ParDetails, Sprung, Axle, Hitch, Engine, Report, Dimensions, 
 
 createRunLog(Is, Project);
 
-% With the new data extraction, the project needs to be saved in order to run, so Is.save may be redundant 
+% With the new data extraction, the project needs to be saved in order to run, so Is.save may be redundant
 if Is.save
     copyTruckSimRunFiles(MatKey, Project, Is);
-    [Tyre, Axle, Hitch, Sprung, Dimensions, PayloadLaden, PayloadUnladen] = getTruckSimSimulationData(ParDetails);
-    [Engine] = getEngineData(Combination.engineModel, Tyre.NumberOff);
+    [Tyre, Axle, Hitch, Sprung, Dimensions, PayloadLaden, PayloadUnladen, Dummy] = getTruckSimSimulationData(ParDetails);
+    [Engine] = getEngineData(Combination.engineModel, Combination.gearboxModel, Tyre.NumberOff);
+    
+    writeToExcelAxleLoads(Project, Sprung, PayloadLaden, Axle, Hitch, Combination, Is);
 end
 %%	Constants
 warning off
@@ -115,14 +117,14 @@ SRTrollThresh = 30;    % PBS rules
 %%	Execute PBS manoeuvres if required
 if Is.pbs
     Sprung.numberOffUnits = length(Sprung.MassArray);      % includes Combination.dollys
-
+    
     fullName = setFullNames();
     [Lim, LimReport] = setLims(Is);
     
     [mSprung, XcgSprung, HcgSprung] = detSprung(Sprung.MassArray, Sprung.MassCoGxPosition, Sprung.MassCoGzPosition, PayloadLaden.MassCell, PayloadLaden.CoGxPositionCell, PayloadLaden.CoGzPositionCell); % Determine sprung mass properties of each vehicle unit
     [mSprungU, XcgSprungU, HcgSprungU] = detSprung(Sprung.MassArray, Sprung.MassCoGxPosition, Sprung.MassCoGzPosition, PayloadUnladen.MassCell, PayloadUnladen.CoGxPositionCell, PayloadUnladen.CoGzPositionCell); % Determine sprung mass properties of each vehicle unit in unloaded configuration
     [mTotal x z] = determineCOG(Sprung.MassArray, Sprung.MassCoGxPosition, Sprung.MassCoGzPosition, Axle.UnsprungMassArray, Axle.XPositionArray, Axle.ZPositionArray, Axle.Grouping, PayloadLaden.MassCell, PayloadLaden.CoGxPositionCell, PayloadLaden.CoGzPositionCell); % Determine sprung mass properties of each vehicle unit
-   
+    
     Axle1 = AxleLoade(0, Axle.UnsprungMassArray, Axle.XPositionArray, Axle.ZPositionArray, Hitch.XPositionArray, Hitch.ZPositionArray, mSprung, XcgSprung, HcgSprung, Axle.Grouping, Combination.loadshare1, Hitch.LoadCoupledArray); %Loaded axles loads for normal operation
     Axle2 = AxleLoade(0, Axle.UnsprungMassArray, Axle.XPositionArray, Axle.ZPositionArray, Hitch.XPositionArray, Hitch.ZPositionArray, mSprung, XcgSprung, HcgSprung, Axle.Grouping, Combination.loadshare2, Hitch.LoadCoupledArray); %Loaded axles loads for Startability
     AxleU1 = AxleLoade(0, Axle.UnsprungMassArray, Axle.XPositionArray, Axle.ZPositionArray, Hitch.XPositionArray, Hitch.ZPositionArray, mSprungU, XcgSprungU, HcgSprungU, Axle.Grouping, Combination.loadshare1, Hitch.LoadCoupledArray); %Unloaded axles loads for normal operation
@@ -131,7 +133,11 @@ if Is.pbs
     roundAxleLoading = [[1:Axle.NumberOff]; Combination.loadshare1; round(Axle1,0); round(AxleU1,0); Combination.loadshare2; round(Axle2,0); round(AxleU2,0)];%Rounded axle loadings
     
     if Is.long
-        [r.STA, r.GRAa, r.GRAb, r.ACC] = LONG_solve(mTotal, Combination.frontalAreaForDrag, radial, Combination.ch, Combination.cd, Combination.ce, Engine.gears, Engine.eff_gear, Engine.gearsStart, Engine.eff_gearStart, Engine.eff_diff, Engine.dif, Engine.eff_diffStart, Engine.difStart, Engine.Torquerpm, Engine.TorqueNm, Engine.engageTrpm, Engine.engageTNm, Engine.changeT, Tyre.RollingRadius, Engine.Ie, Engine.It, Axle.Driven, Engine.gearshiftregime, Project.savePath, Project.runKey, Is.plotOn, Is.save, Axle.UnsprungMassArray, Axle.XPositionArray, Axle.ZPositionArray, Hitch.XPositionArray, Hitch.ZPositionArray, mSprung, XcgSprung, HcgSprung, Axle.Grouping, Combination.loadshare1, Combination.loadshare2, Hitch.LoadCoupledArray);
+        if Is.longSolveWithGradient
+            [r.STA, r.GRAa, r.GRAb, r.ACC] = LONG_solve_gradient(mTotal, Combination.frontalAreaForDrag, radial, Combination.ch, Combination.cd, Combination.ce, Engine.gears, Engine.eff_gear, Engine.gearsStart, Engine.eff_gearStart, Engine.eff_diff, Engine.dif, Engine.eff_diffStart, Engine.difStart, Engine.Torquerpm, Engine.TorqueNm, Engine.engageTrpm, Engine.engageTNm, Engine.changeT, Tyre.RollingRadius, Engine.Ie, Engine.It, Axle.Driven, Engine.gearshiftregime, Project.savePath, Project.runKey, Is.plotOn, Is.save, Axle.UnsprungMassArray, Axle.XPositionArray, Axle.ZPositionArray, Hitch.XPositionArray, Hitch.ZPositionArray, mSprung, XcgSprung, HcgSprung, Axle.Grouping, Combination.loadshare1, Combination.loadshare2, Hitch.LoadCoupledArray);
+        else
+            [r.STA, r.GRAa, r.GRAb, r.ACC] = LONG_solve(mTotal,Axle1,Axle2, Combination.frontalAreaForDrag, radial, Combination.ch, Combination.cd, Combination.ce, Engine.gears, Engine.eff_gear, Engine.gearsStart, Engine.eff_gearStart, Engine.eff_diff, Engine.dif, Engine.eff_diffStart, Engine.difStart, Engine.Torquerpm, Engine.TorqueNm, Engine.engageTrpm, Engine.engageTNm, Engine.changeT, Tyre.RollingRadius, Engine.Ie, Engine.It, Axle.Driven, Engine.gearshiftregime, Project.savePath, Project.runKey, Is.plotOn, Is.save);
+        end
     end
     if Is.yawD
         r.YDC = YawD_solve(Sprung.numberOffUnits, Project.savePath, Project.truckSimRunsPath, Project.runKey, MatKey.yawD, Is.plotOn, Is.save);
@@ -140,10 +146,10 @@ if Is.pbs
         r.RA = RA_solve(mSprung, HcgSprung, Hitch.RollCoupledArray, Combination.dollys, Project.savePath, Project.truckSimRunsPath, Project.runKey, MatKey.ra, Is.plotOn, Is.save);
     end
     if Is.hsto
-        r.HSTO = HSTO_solve(Axle.NumberOff, Combination.totalLength, Project.savePath, Project.truckSimRunsPath, Project.runKey, MatKey.hsto, Is.plotOn, Is.save);
+        r.HSTO = HSTO_solve(Axle.NumberOff, Combination.totalLength, Project.savePath, Project.truckSimRunsPath, Project.runKey, MatKey.hsto, Is.plotOn, Is.save, Dummy);
     end
     if Is.srt
-        [r.SRTt, r.SRTtrrcu] = SRTt_solve(Axle.NumberOff, Axle.NumberOffSteer, Lim.SRT(Combination.pbsLevelDesired), SRTrollThresh, mSprung, HcgSprung,  Hitch.RollCoupledArray, Combination.dollys, Project.savePath, Project.truckSimRunsPath, Project.runKey, MatKey.srt, Is.plotOn, Is.save);
+        [r.SRTt, r.SRTtrrcu] = SRTt_solve(Axle.NumberOff, Axle.NumberOffSteer, Lim.SRT(Combination.pbsLevelDesired), SRTrollThresh, mSprung, HcgSprung,  Hitch.RollCoupledArray, Combination.dollys, Project.savePath, Project.truckSimRunsPath, Project.runKey, MatKey.srt, Is.plotOn, Is.save, Dummy);
     end
     if Is.tasp
         r.TASP = TASP_solve(Sprung.numberOffUnits, Combination.dollys, Project.savePath, Project.truckSimRunsPath, Project.runKey, MatKey.tasp, Is.plotOn, Is.save);
@@ -165,62 +171,12 @@ if Is.pbs
     resultsPbs = r;
     disp(r);
     editLogWithRunResults(Project, Is, r)
-
+    
     %% Adding functionality to remove the .mat files from the runs directory
     removeMFilesFromTruckSimRunsFolder(Project, Is);
     warning on
+    
+    %% Write data to excel
+    writeToExcelPbsResults(Lim, fullName, nLevels, Project, AxleLoading, Is, roundAxleLoading, r, Combination);
 end
-
-%% Write data to excel
-writeToExcelPbsResults(Lim, fullName, nLevels, Project, AxleLoading, Is, roundAxleLoading, r, Combination);
-writeToExcelAxleLoads(Project, Sprung, PayloadLaden, Axle, Hitch, Combination, Is);
-
-%% Generating the tables for the latex report
-% if Is.report
-%     [Table.One, Axle.DescriptionCell] = generateTableOne(ParDetails, Sprung, Axle);
-%     Table.Two = generateTableTwo(Axle, Axle1, AxleU1);
-%     Table.Three = generateTableThree(Sprung);
-%     Table.Four = generateTableFour(Axle);
-%     Table.Five = generateTableFive(Sprung, PayloadLaden);
-%     Table.Six = generateTableSix(ParDetails, Sprung, Axle);
-%     Table.Seven = generateTableSeven(Hitch);
-%     Table.Eight = generateTableEight(Engine, Sprung);
-%     Table.Nine = generateTableNine(Engine);
-%     Table.Ten = generateTableTen(Engine);
-%     Table.Eleven = generateTableEleven(Report.ladenReferencePointNames, Dimensions.RefPointsLadenCell, Sprung,...
-%         'Reference Points for Laden Combination','ReferencePointsForLadenCombination');
-%     Table.Twelve = generateTableEleven(Report.unladenReferencePointNames, Dimensions.RefPointsUnladenCell,...
-%         Sprung, 'Reference Points for Unladen Combination','ReferencePointsForUnladenCombination');
-%     
-%     % Generate results tables
-%     Report.pbsResultsTable = generateTableResults(fullName, Lim, LimReport, rounder(r), Report, nLevels, Is);
-%     baselineResults = getBaselineResults(Report.baselinePbsCombination);
-%     Report.pbsBaselineResultsTable = generateBaselineResults(baselineResults, Lim, nLevels, Is);
-%     
-%     % Set-up the paths for copying to the assessment folder
-%     pbsAssessCopyToFullPath = strcat(Project.savePath, '\PBS_Assessment_', Project.runKey);
-%     pbsAssessFiguresCopyFromFullPath = strcat(Project.savePath,'\', Project.runKey, '_figures');
-%     pbsAssessFiguresCopyToFullPath =  strcat(pbsAssessCopyToFullPath, '\fig');
-%     
-%     % Remove the PBS assessment folder if it already exists
-%     if exist(pbsAssessCopyToFullPath, 'dir')
-%         rmdir(pbsAssessCopyToFullPath, 's');
-%     end
-%     % Copy the PBS assessment template across
-%     copyfile(Project.pbsAssessmentTemplatePath, pbsAssessCopyToFullPath);
-%     
-%     % Copy across the assessment figures
-%     copyfile(pbsAssessFiguresCopyFromFullPath, pbsAssessFiguresCopyToFullPath);
-%     
-%     % Generate the latex tables and save in the PBS assessment tex folder
-%     generateLatexTablesForPBSreport(Table, 'CombinationTables.tex', pbsAssessCopyToFullPath); % !!! Move to editPbsAssessmentReport
-%     
-%     % Modify the PBS assessment parameters and save to a new file
-%     Report.pbsAssessmentMainTexFilePath = strcat(pbsAssessCopyToFullPath, '\PBS_Assessment.tex');
-%     Report.pbsAssessmentResultsTexFilePath = strcat(pbsAssessCopyToFullPath, '\tex\CombinationResults.tex');
-%     
-%     % Edit PBS assessment and save tex file with the correct name as per project
-%     editPbsAssessmentReport(Report);
-% end
-
 end
