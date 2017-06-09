@@ -30,7 +30,8 @@ disp('--------------------------------------------------------------------------
 
 display(Project.runNotes); %Do not suppress
 %% Generating project folders/filenames
-Project.savePath = sprintf('%s%s%s%s',Project.runFolderPath, datestr(now,'yyyy-mm-dd'), '_', Project.revision);
+
+Project.savePath = sprintf('%s%s%s%s',Project.runFolderPath, '\', datestr(now,'yyyy-mm-dd'), '_', Project.revision);
 Project.runKey = sprintf('%s%s%s',Project.key,'_',Project.revision);
 Project.resultsFileName = strcat(Project.runKey, '_summary.xlsx');
 
