@@ -1,7 +1,7 @@
 function PbsAssessmentPostAndReport(Is, Project, Combination, Report)
 %% Adding the paths containing the required .m files
-addpath('C:\Dropbox\PBS\MatLab\Automated PBS Assessment\TruckSim Data Extraction')
 addpath('C:\Dropbox\_Personal\Programming\Global_Matlab_Toolbox\Downloaded\latexTable');
+addpath('C:\Dropbox\PBS\MatLab\Automated PBS Assessment\Automated Post Process');
 
 %% Setting matlab keys for run
 % These can be changed as you loop through a project if required
