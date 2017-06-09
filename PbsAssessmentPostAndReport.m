@@ -3,6 +3,8 @@ function PbsAssessmentPostAndReport(Is, Project, Combination, Report)
 addpath('C:\Dropbox\_Personal\Programming\Global_Matlab_Toolbox\Downloaded\latexTable');
 addpath('C:\Dropbox\PBS\MatLab\Automated PBS Assessment\Automated Post Process');
 
+%% This has to go here to prevent the folder path being changed during a TD run
+Project.runFolderPath = strcat(Project.resultsFolderPath, '\Version_', Project.revision);
 %% Setting matlab keys for run
 % These can be changed as you loop through a project if required
 
