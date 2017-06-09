@@ -47,6 +47,9 @@ end
 
 fclose(fid);
 
+% Rename the latex report main tex file
+movefile(Report.pbsAssessmentMainTexFilePath, Report.pbsAssessmentRenamedTexFilePath);
+
 % Generate the latex results table
 if Is.carCarrier
     ResultsTable.data = [Report.pbsResultsTable(:,1:2) Report.pbsBaselineResultsTable Report.pbsResultsTable(:,3:4) ...

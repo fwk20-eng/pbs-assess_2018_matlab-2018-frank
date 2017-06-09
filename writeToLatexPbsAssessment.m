@@ -53,16 +53,17 @@ if Is.carCarrier
 end
 
 % Set-up the paths for copying to the assessment folder
-pbsAssessCopyToFullPath = strcat(Project.savePath, '\PBS_Assessment_', Project.runKey);
+pbsAssessCopyToFullPath = strcat(Project.runFolderPath, '\PBS_Assessment_', Project.runKey);
 pbsAssessFiguresCopyFromFullPath = strcat(Project.savePath,'\', Project.runKey, '_figures');
 pbsAssessFiguresCopyToFullPath =  strcat(pbsAssessCopyToFullPath, '\fig');
 
-pbsAssessGACopyFromFullPath = strcat(Project.runFolderPath, '\_GA_Images');
+pbsAssessGACopyFromFullPath = strcat(Project.resultsFolderPath, '\_GA_Images');
     
 % Remove the PBS assessment folder if it already exists
 if exist(pbsAssessCopyToFullPath, 'dir')
     rmdir(pbsAssessCopyToFullPath, 's');
 end
+
 % Copy the PBS assessment template across
 copyfile(Project.pbsAssessmentTemplatePath, pbsAssessCopyToFullPath);
 
@@ -83,6 +84,12 @@ generateLatexTablesForPBSreport(Table, 'CombinationTables.tex', pbsAssessCopyToF
 % Modify the PBS assessment parameters and save to a new file
 Report.pbsAssessmentMainTexFilePath = strcat(pbsAssessCopyToFullPath, '\PBS_Assessment.tex');
 Report.pbsAssessmentResultsTexFilePath = strcat(pbsAssessCopyToFullPath, '\tex\CombinationResults.tex');
+
+% Renamed tex filename for assessment
+date = strsplit(datestr(now,'yyyy-mm-dd'),'-');
+
+renamedTexFileName = strcat(date{1}, date{2}, date{3}, '_WITS_PBS-Assessment_', Project.key, '_V', Report.reportRevision);
+Report.pbsAssessmentRenamedTexFilePath = strcat(pbsAssessCopyToFullPath, '\', renamedTexFileName, '.tex');
 
 % Add additional report modifiers according to extracted PBS data
 additionalModifiers = {...
