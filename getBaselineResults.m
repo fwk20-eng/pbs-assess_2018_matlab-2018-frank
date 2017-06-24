@@ -107,7 +107,7 @@ switch baselineDescription
         r.FS = '-';
         r.MoD = '-';
         r.DoM = '-';
-        r.STFD = 34;
+        r.STFD = '-';
         r.LSSPu = '-';
         r.TSu = '-';
         r.FSu = '-';

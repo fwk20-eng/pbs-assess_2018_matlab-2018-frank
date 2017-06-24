@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 * [ ] Update file name generator to be in a more central position. Try to not re-generate file paths in each individual manoeuvre.
 * [ ] Rename the Latex file according to the project version
 
+## [1.1.0] - 2017-06-09
+
+**Changed**
+* File structure improved
+
 ## [0.6.0] - 2017-06-08
 
 **Added**
