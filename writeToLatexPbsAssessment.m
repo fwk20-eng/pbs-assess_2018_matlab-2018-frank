@@ -53,7 +53,7 @@ if Is.carCarrier
 end
 
 % Set-up the paths for copying to the assessment folder
-pbsAssessCopyToFullPath = strcat(Project.runFolderPath, '\PBS_Assessment_', Project.runKey);
+pbsAssessCopyToFullPath = strcat(Project.runFolderPath, '\PBS_Assessment_Report');
 pbsAssessFiguresCopyFromFullPath = strcat(Project.savePath,'\', Project.runKey, '_figures');
 pbsAssessFiguresCopyToFullPath =  strcat(pbsAssessCopyToFullPath, '\fig');
 
