@@ -1,3 +1,38 @@
+%% Function Description
+% 
+% Calculates axle loads and provides them in a format suitable for excel
+% 
+%% Inputs
+% 
+% * To be updated when the need arises
+% 
+%% Outputs
+% 
+% * To be updated when the need arises
+% 
+%% Change Log
+%
+% [0.3.0] - 2017-06-20
+%
+% *Added*
+%
+% * Check for NRTA regulation 239 (3) to ensure appropriate axle loads are present
+%
+% [0.2.0] - Date not recorded
+% 
+% *Fixed*
+% 
+% * Accounted for if a dolly is present
+% * dLoad is parameterised for each unit, includes dollys which are empty
+% * dgaLoad is parameterized for each table in a GA drawing
+% 
+% [0.1.0] - Date not recorded
+% 
+% *Added*
+% 
+% * First code
+
+
 %Changelogs
 %Ver 1.0
 %   -> First iteration
@@ -68,7 +103,31 @@ if isPrint
     printResultsAxleLoads(fileName, savePath, loadMat, loadHeadings, Acomb, groupingHeadings);
 end
 
-axleGroupLoads = Acomb(1,:)%Acomb(1,i) %Acomb1 calculated axleLoadCalc and individual masses
-GCM = sum(Acomb(1,:))
+axleGroupLoads = Acomb(1,:); %Acomb(1,i) %Acomb1 calculated axleLoadCalc and individual masses
+GCM = sum(Acomb(1,:));
+driveAxleLoad = Acomb(1,2);
+driveAxleLoadRatio = driveAxleLoad/GCM;
 
+disp(axleGroupLoads);
+fprintf('%s%0.0f%s\n','Combination GCM: ', GCM, ' kg');
+fprintf('%s%0.2f%s\n', 'Drive Axle Load Ratio: ', driveAxleLoadRatio*100, ' %');
+
+%% Check for NRTA regulation 239 (3)
+
+if driveAxleLoadRatio < 0.2
+    
+    warnAxleLoad = questdlg('Drive axle load does not satisfy the required 20 % of the total vehicle GCM (NRTA regulation 239 (3))',...
+        'Would you like to proceed with the assessment?',...
+        'Yes', 'End Assessment', 'End Assessment');
+    
+    switch warnAxleLoad
+        case 'Yes'
+            uiwait(msgbox('Please note that the assessed combination does not satisfy NRTA regulation 239 (3)'));
+        case 'End Assessment'
+            uiwait(msgbox('The assessment will now be ended with a manually initialised error'));
+            error('Manually initiated error in order to jump out of the script');
+    end
+    
+end
+    
 end
