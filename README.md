@@ -14,6 +14,11 @@ The following readme applies to all files in the TruckSim data extraction folder
 
 # Change Log
 
+[2.0.0] - 2017-06-09
+
+**Changed**
+* File structure improved
+
 [1.2.0] - 2017-06-08
 
 **Added**

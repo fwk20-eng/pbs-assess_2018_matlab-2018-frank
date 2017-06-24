@@ -22,7 +22,9 @@ function PBSreportTable = generateTablePrimeMoverSummary(Engine, Sprung)
 %% Table 8:  Truck-Tractor Details
 % Extracting table contents
 
-sPrimeMoverModel = Sprung.DescriptionArray{1}{:};
+sprungDescriptionArrayForReport = editCombinationCellSplitText(Sprung.DescriptionArray, {' (',' ['}, 1);
+
+sPrimeMoverModel = sprungDescriptionArrayForReport{1}{:};
 sEngineModel = Engine.EngineModelDescription;
 sGearboxModel = Engine.GearboxModelDescription;
 sDifferentialRatio = num2str(Engine.dif);
