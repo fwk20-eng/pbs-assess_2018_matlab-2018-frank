@@ -88,20 +88,23 @@
 % * [x] zLoad - all units [H_CG_PL]
 
 function [Tyre, Axle, Hitch, Sprung, Dimensions, PayloadLaden, PayloadUnladen, Dummy] = ...
-    getTruckSimSimulationData(ParDetails)
+    getTruckSimSimulationData(ParDetails, Is, Combination)
 %% Reading par file data
 endParLadenFileFullPath = strcat(ParDetails.parFileFolderPath, '\', ParDetails.endParLadenFileName);
 endParLadenFileData = readLinesFromFile(endParLadenFileFullPath);
 
-endParUnladenFileFullPath = strcat(ParDetails.parFileFolderPath, '\', ParDetails.endParUnladenFileName);
-endParUnladenFileData = readLinesFromFile(endParUnladenFileFullPath);
-
+if Is.lsunt
+    endParUnladenFileFullPath = strcat(ParDetails.parFileFolderPath, '\', ParDetails.endParUnladenFileName);
+    endParUnladenFileData = readLinesFromFile(endParUnladenFileFullPath);
+end
 % Details such as model names etc will need to be extracted from the _all par file
 allParLadenFileFullPath = strcat(ParDetails.parFileFolderPath, '\', ParDetails.allParLadenFileName);
 allParLadenFileData = readLinesFromFile(allParLadenFileFullPath);
 
-allParUnladenFileFullPath = strcat(ParDetails.parFileFolderPath, '\', ParDetails.allParUnladenFileName);
-allParUnladenFileData = readLinesFromFile(allParUnladenFileFullPath);
+if Is.lsunt
+    allParUnladenFileFullPath = strcat(ParDetails.parFileFolderPath, '\', ParDetails.allParUnladenFileName);
+    allParUnladenFileData = readLinesFromFile(allParUnladenFileFullPath);
+end
 
 %% Extract sprung mass properties
 Sprung.DescriptionArray = getSprungMassDescriptionArray(allParLadenFileData);
@@ -301,25 +304,63 @@ Hitch.ZPositionArray = Hitch.ZPositionArray .* 0.001;
 %% Extract payload properties including mass in kg and description
 [PayloadLaden] = determinePayloadCell(endParLadenFileData, allParLadenFileData, Sprung.numberOffUnits);
 
-[PayloadUnladen] = determinePayloadCell(endParUnladenFileData, allParUnladenFileData, Sprung.numberOffUnits);
-
 % Converting to the correct units for the Post Processor
+% It is assumed that all payloads are located along the longitudinal centreline (y = 0)
 PayloadLaden.CoGxPositionCell = cellfun(@(x) x .* 0.001, PayloadLaden.CoGxPositionCell, 'UniformOutput', 0);
 PayloadLaden.CoGzPositionCell = cellfun(@(x) x .* 0.001, PayloadLaden.CoGzPositionCell, 'UniformOutput', 0);
 
-PayloadUnladen.CoGxPositionCell = cellfun(@(x) x .* 0.001, PayloadUnladen.CoGxPositionCell, 'UniformOutput', 0);
-PayloadUnladen.CoGzPositionCell = cellfun(@(x) x .* 0.001, PayloadUnladen.CoGzPositionCell, 'UniformOutput', 0);
-
+if Is.lsunt
+    [PayloadUnladen] = determinePayloadCell(endParUnladenFileData, allParUnladenFileData, Sprung.numberOffUnits);
+    PayloadUnladen.CoGxPositionCell = cellfun(@(x) x .* 0.001, PayloadUnladen.CoGxPositionCell, 'UniformOutput', 0);
+    PayloadUnladen.CoGzPositionCell = cellfun(@(x) x .* 0.001, PayloadUnladen.CoGzPositionCell, 'UniformOutput', 0);
+else
+    % Need to manually crrate the unladen payload cell to allow for the axle load calculation to work
+    nUnits = length(Combination.includedPayloads);
+    for iUnit = 1 : nUnits
+        iUnladenPayload = 0;
+        
+        % Initialising unladen cell
+        PayloadUnladen.MassCell{iUnit} = [];
+        PayloadUnladen.CoGxPositionCell{iUnit} = [];
+        PayloadUnladen.CoGyPositionCell{iUnit} = [];
+        PayloadUnladen.CoGzPositionCell{iUnit} = [];
+        PayloadUnladen.MOIxCell{iUnit} = [];
+        PayloadUnladen.MOIyCell{iUnit} = [];
+        PayloadUnladen.MOIzCell{iUnit} = [];
+        PayloadUnladen.DescriptionCell{iUnit} = {};
+        
+        nPayloads = length(Combination.includedPayloads{iUnit});
+        for iPayload = 1 : nPayloads
+            % Include a payload in the unladen condition if it is fuel/driver or permanent payload
+            if ~Combination.includedPayloads{iUnit}(iPayload)
+                % Move to next payload
+                iUnladenPayload = iUnladenPayload + 1;
+                PayloadUnladen.MassCell{iUnit}(iUnladenPayload) = PayloadLaden.MassCell{iUnit}(iPayload);
+                PayloadUnladen.CoGxPositionCell{iUnit}(iUnladenPayload) = PayloadLaden.CoGxPositionCell{iUnit}(iPayload);
+                PayloadUnladen.CoGyPositionCell{iUnit}(iUnladenPayload) = PayloadLaden.CoGyPositionCell{iUnit}(iPayload);
+                PayloadUnladen.CoGzPositionCell{iUnit}(iUnladenPayload) = PayloadLaden.CoGzPositionCell{iUnit}(iPayload);
+                PayloadUnladen.MOIxCell{iUnit}(iUnladenPayload) = PayloadLaden.MOIxCell{iUnit}(iPayload);
+                PayloadUnladen.MOIyCell{iUnit}(iUnladenPayload) = PayloadLaden.MOIyCell{iUnit}(iPayload);
+                PayloadUnladen.MOIzCell{iUnit}(iUnladenPayload) = PayloadLaden.MOIzCell{iUnit}(iPayload);
+                PayloadUnladen.DescriptionCell{iUnit}(iUnladenPayload) = PayloadLaden.DescriptionCell{iUnit}(iPayload);
+            end
+        end
+    end
+end
 %% Extract reference points
 % Reference points are extracted into a cell where each row is a unit. Column 1 = X, Column 2 = Y, Column 3 = Z. Each
 % column is a column array of the X, Y or Z reference points for that particular unit.
 Dimensions.RefPointsLadenCell = getReferencePoints(endParLadenFileData, Sprung.numberOffUnits);
-Dimensions.RefPointsUnladenCell = getReferencePoints(endParUnladenFileData, Sprung.numberOffUnits);
 
+if Is.lsunt
+    Dimensions.RefPointsUnladenCell = getReferencePoints(endParUnladenFileData, Sprung.numberOffUnits);
+end
 %% Determining maximum vehicle width in the laden and unladen condition condition
 % The maximim width of the vehicle is found from the reference point at the widest point on the combination.
 
 Dimensions.MaxWidthLaden = getMaxVehicleWidth(Dimensions.RefPointsLadenCell, Sprung.numberOffUnits);
-Dimensions.MaxWidthUnladen = getMaxVehicleWidth(Dimensions.RefPointsUnladenCell, Sprung.numberOffUnits);
 
+if Is.lsunt
+Dimensions.MaxWidthUnladen = getMaxVehicleWidth(Dimensions.RefPointsUnladenCell, Sprung.numberOffUnits);
+end
 end

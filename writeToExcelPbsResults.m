@@ -26,13 +26,15 @@
 %
 % * Moved from the Post Processor to its own file
 
-function writeToExcelPbsResults(Lim, fullName, nLevels, Project, AxleLoading, Is, roundAxleLoading, r, Combination)
+function writeToExcelPbsResults(Lim, fullName, nLevels, Project, AxleLoading, Is, roundAxleLoading, r, Combination,...
+    resultsWithLevel)
 
 if Is.fullPBS && Is.save
     results_round = rounder(r);
-    results = r;
-    Report.results = printResultsPBSnotes(results, Lim, fullName, nLevels, Project.savePath, 'results', 'postAxleLoad',  AxleLoading, Is.semi, Project.resultsFileName, Project.runNotes);
-    printResultsPBS(results_round, Lim, fullName, nLevels, Project.savePath, 'resultsRounded', 'postAxleLoadRounded', roundAxleLoading, Is.semi, Project.resultsFileName);
+    printResultsPBSnotes(resultsWithLevel, Project.savePath, 'results', 'postAxleLoad',...
+        AxleLoading, Project.resultsFileName, Project.runNotes);
+    printResultsPBS(results_round, Lim, fullName, nLevels, Project.savePath, 'resultsRounded', 'postAxleLoadRounded',...
+        roundAxleLoading, Is.semi, Project.resultsFileName);
 end
 
 if Is.fullPBS && Is.plotSummary
