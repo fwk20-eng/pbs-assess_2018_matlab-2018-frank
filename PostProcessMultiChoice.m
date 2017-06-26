@@ -95,16 +95,13 @@ function [Project, ParDetails, Sprung, Axle, Hitch, Engine, Report, Dimensions, 
 %% Generate the required file paths and perform the necessary checks for the assessment
 [Project, ParDetails, Is] = generateFilePaths(Project, MatKey, Is);
 
-createRunLog(Is, Project);
+% createRunLog(Is, Project);
+copyTruckSimRunFiles(MatKey, Project, Is);
 
-% With the new data extraction, the project needs to be saved in order to run, so Is.save may be redundant
-if Is.save
-    copyTruckSimRunFiles(MatKey, Project, Is);
-    [Tyre, Axle, Hitch, Sprung, Dimensions, PayloadLaden, PayloadUnladen, Dummy] = getTruckSimSimulationData(ParDetails);
-    [Engine] = getEngineData(Combination.engineModel, Combination.gearboxModel, Tyre.NumberOff);
-    
-    writeToExcelAxleLoads(Project, Sprung, PayloadLaden, Axle, Hitch, Combination, Is);
-end
+[Tyre, Axle, Hitch, Sprung, Dimensions, PayloadLaden, PayloadUnladen, Dummy] =...
+    getTruckSimSimulationData(ParDetails, Is, Combination);
+
+[Engine] = getEngineData(Combination.engineModel, Combination.gearboxModel, Tyre.NumberOff);
 %%	Constants
 warning off
 
@@ -122,13 +119,19 @@ if Is.pbs
     [Lim, LimReport] = setLims(Is);
     
     [mSprung, XcgSprung, HcgSprung] = detSprung(Sprung.MassArray, Sprung.MassCoGxPosition, Sprung.MassCoGzPosition, PayloadLaden.MassCell, PayloadLaden.CoGxPositionCell, PayloadLaden.CoGzPositionCell); % Determine sprung mass properties of each vehicle unit
+    
     [mSprungU, XcgSprungU, HcgSprungU] = detSprung(Sprung.MassArray, Sprung.MassCoGxPosition, Sprung.MassCoGzPosition, PayloadUnladen.MassCell, PayloadUnladen.CoGxPositionCell, PayloadUnladen.CoGzPositionCell); % Determine sprung mass properties of each vehicle unit in unloaded configuration
+    
     [mTotal x z] = determineCOG(Sprung.MassArray, Sprung.MassCoGxPosition, Sprung.MassCoGzPosition, Axle.UnsprungMassArray, Axle.XPositionArray, Axle.ZPositionArray, Axle.Grouping, PayloadLaden.MassCell, PayloadLaden.CoGxPositionCell, PayloadLaden.CoGzPositionCell); % Determine sprung mass properties of each vehicle unit
     
     Axle1 = AxleLoade(0, Axle.UnsprungMassArray, Axle.XPositionArray, Axle.ZPositionArray, Hitch.XPositionArray, Hitch.ZPositionArray, mSprung, XcgSprung, HcgSprung, Axle.Grouping, Combination.loadshare1, Hitch.LoadCoupledArray); %Loaded axles loads for normal operation
     Axle2 = AxleLoade(0, Axle.UnsprungMassArray, Axle.XPositionArray, Axle.ZPositionArray, Hitch.XPositionArray, Hitch.ZPositionArray, mSprung, XcgSprung, HcgSprung, Axle.Grouping, Combination.loadshare2, Hitch.LoadCoupledArray); %Loaded axles loads for Startability
+    
+    
     AxleU1 = AxleLoade(0, Axle.UnsprungMassArray, Axle.XPositionArray, Axle.ZPositionArray, Hitch.XPositionArray, Hitch.ZPositionArray, mSprungU, XcgSprungU, HcgSprungU, Axle.Grouping, Combination.loadshare1, Hitch.LoadCoupledArray); %Unloaded axles loads for normal operation
     AxleU2 = AxleLoade(0, Axle.UnsprungMassArray, Axle.XPositionArray, Axle.ZPositionArray, Hitch.XPositionArray, Hitch.ZPositionArray, mSprungU, XcgSprungU, HcgSprungU, Axle.Grouping, Combination.loadshare2, Hitch.LoadCoupledArray); %Unloaded axle loads for Startability, which is not required
+    
+    
     AxleLoading = [[1:Axle.NumberOff]; Combination.loadshare1; Axle1; AxleU1; Combination.loadshare2; Axle2; AxleU2];%Raw axle loading values
     roundAxleLoading = [[1:Axle.NumberOff]; Combination.loadshare1; round(Axle1,0); round(AxleU1,0); Combination.loadshare2; round(Axle2,0); round(AxleU2,0)];%Rounded axle loadings
     
@@ -142,14 +145,17 @@ if Is.pbs
     if Is.yawD
         r.YDC = YawD_solve(Sprung.numberOffUnits, Project.savePath, Project.truckSimRunsPath, Project.runKey, MatKey.yawD, Is.plotOn, Is.save);
     end
-    if Is.ra
-        r.RA = RA_solve(mSprung, HcgSprung, Hitch.RollCoupledArray, Combination.dollys, Project.savePath, Project.truckSimRunsPath, Project.runKey, MatKey.ra, Is.plotOn, Is.save);
-    end
     if Is.hsto
         r.HSTO = HSTO_solve(Axle.NumberOff, Combination.totalLength, Project.savePath, Project.truckSimRunsPath, Project.runKey, MatKey.hsto, Is.plotOn, Is.save, Dummy);
     end
     if Is.srt
         [r.SRTt, r.SRTtrrcu] = SRTt_solve(Axle.NumberOff, Axle.NumberOffSteer, Lim.SRT(Combination.pbsLevelDesired), SRTrollThresh, mSprung, HcgSprung,  Hitch.RollCoupledArray, Combination.dollys, Project.savePath, Project.truckSimRunsPath, Project.runKey, MatKey.srt, Is.plotOn, Is.save, Dummy);
+        % SRT is required to determine the limits for the RA maneouvre, hence the RA manoeuvre can only be run along
+        % with the SRT manoeuvre
+        if Is.ra
+            Lim.RA = setLimsRA(r);
+            r.RA = RA_solve(mSprung, HcgSprung, Hitch.RollCoupledArray, Combination.dollys, Project.savePath, Project.truckSimRunsPath, Project.runKey, MatKey.ra, Is.plotOn, Is.save);
+        end
     end
     if Is.tasp
         r.TASP = TASP_solve(Sprung.numberOffUnits, Combination.dollys, Project.savePath, Project.truckSimRunsPath, Project.runKey, MatKey.tasp, Is.plotOn, Is.save);
@@ -161,22 +167,56 @@ if Is.pbs
         [r.LSSPu,r.TSu,r.FSu,r.MoDu,r.DoMu,r.STFDu] = LSTurn_solve(Sprung.numberOffUnits, Combination.dollys, Dimensions.MaxWidthUnladen, Axle.SteerAxleOverallWidth, Axle.NumberOffSteer, muPeakSteer, false, Project.savePath, Project.truckSimRunsPath, Project.runKey, MatKey.lsunt, Is.plotOn, Is.save);
     end
     
-    if Is.fullPBS %SRT required for this to work
-        Lim.RA = setLimsRA(r);
+    disp('-------------------------------------------------------------------------------------')
+    disp('	Axle Loads')
+    disp('-------------------------------------------------------------------------------------')
+    display(num2cell(roundAxleLoading));
+    % Calculating the GCM and drive axle load ratio
+    Axle.gcm = sum(AxleLoading(3,:));
+    Axle.driveAxleLoad = sum(AxleLoading(3,Axle.Driven));
+    Axle.driveAxleLoadRatio = Axle.driveAxleLoad/Axle.gcm;
+    
+    fprintf('%s%0.0f%s\n','Combination GCM: ', Axle.gcm, ' kg');
+    fprintf('%s%0.2f%s\n', 'Drive Axle Load Ratio: ', Axle.driveAxleLoadRatio*100, ' %');
+    
+    %% Check for NRTA regulation 239 (3)
+    
+    if Axle.driveAxleLoadRatio < 0.2
+        
+        warnAxleLoad = questdlg('Drive axle load does not satisfy the required 20 % of the total vehicle GCM (NRTA regulation 239 (3))',...
+            'Would you like to proceed with the assessment?',...
+            'Yes', 'End Assessment', 'End Assessment');
+        
+        switch warnAxleLoad
+            case 'Yes'
+                uiwait(msgbox('Please note that the assessed combination does not satisfy NRTA regulation 239 (3)'));
+            case 'End Assessment'
+                uiwait(msgbox('The assessment will now be ended with a manually initialised error'));
+                error('Manually initiated error in order to jump out of the script');
+        end
+        
     end
     
     disp('-------------------------------------------------------------------------------------')
     disp('	Results')
     disp('-------------------------------------------------------------------------------------')
     resultsPbs = r;
-    disp(r);
-    editLogWithRunResults(Project, Is, r)
+    resultsWithLevel = generateResults(r, Lim, fullName, nLevels, Is);
     
+    display(resultsWithLevel(:, 1:4));
     %% Adding functionality to remove the .mat files from the runs directory
     removeMFilesFromTruckSimRunsFolder(Project, Is);
     warning on
     
+    if Is.log
+        editLogWithRunResults(Project, Is, resultsWithLevel, roundAxleLoading, Axle);
+    end
     %% Write data to excel
-    writeToExcelPbsResults(Lim, fullName, nLevels, Project, AxleLoading, Is, roundAxleLoading, r, Combination);
+    
+    if Is.fullPBS
+        writeToExcelAxleLoads(Project, Sprung, PayloadLaden, Axle, Hitch, Combination, Is);
+        writeToExcelPbsResults(Lim, fullName, nLevels, Project, AxleLoading, Is, roundAxleLoading, r,...
+            Combination, resultsWithLevel);
+    end
 end
 end
