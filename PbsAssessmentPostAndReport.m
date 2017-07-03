@@ -17,8 +17,9 @@ if Is.carCarrier
     if Is.srt;      MatKey.srt = 'Tilt_FL';     end
     if Is.tasp;     MatKey.tasp = 'TASP_FL';    end
     if Is.lst;      MatKey.lst = 'LST_FL';      end
-    if Is.lsunt;    MatKey.lsunt = 'LSunT';     end %unloaded is always the same in all cases
-    if Is.long;     MatKey.long = 'LST_FL';       end % use LST erd file if you are going to be calculating the longitudinal standards
+    if Is.lsunt;    MatKey.lsunt = 'LSunT';     end % unloaded is always the same in all cases
+    if Is.long;     MatKey.long = 'LST_FL';     end % use LST erd file if you are going to be calculating the longitudinal standards
+    if Is.axle; MatKey.axle = 'AXLE_FL';    end
 else
     if Is.yawD;     MatKey.yawD = 'YawD';       end
     if Is.ra;       MatKey.ra = 'RA';           end
@@ -26,9 +27,9 @@ else
     if Is.srt;      MatKey.srt = 'Tilt';        end
     if Is.tasp;     MatKey.tasp = 'TASP';       end
     if Is.lst;      MatKey.lst = 'LST';         end
-    if Is.lsunt;    MatKey.lsunt = 'LSunT';     end %unloaded is always the same in all cases
-    if Is.long;     MatKey.long = 'LST';       end % use LST erd file if you are going to be calculating the longitudinal standards
-
+    if Is.lsunt;    MatKey.lsunt = 'LSunT';     end % unloaded is always the same in all cases
+    if Is.long;     MatKey.long = 'LST';        end % use LST erd file if you are going to be calculating the longitudinal standards
+    if Is.axle; MatKey.axle = 'AXLE';       end
 end
 
 %%	Passing variables to PostProcess
@@ -44,9 +45,10 @@ if Is.carCarrier
     if Is.srt;      MatKey.srt = 'Tilt_TD';     end
     if Is.tasp;     MatKey.tasp = 'TASP_TD';    end
     if Is.lst;      MatKey.lst = 'LST_TD';      end
-    if Is.lsunt;    MatKey.lsunt = 'LSunT';     end %unloaded is always the same in all cases
-    if Is.long;     MatKey.long = 'LST_TD';       end % use LST erd file if you are going to be calculating the longitudinal standards
-
+    if Is.lsunt;    MatKey.lsunt = 'LSunT';     end % unloaded is always the same in all cases
+    if Is.long;     MatKey.long = 'LST_TD';     end % use LST erd file if you are going to be calculating the longitudinal standards
+    if Is.axle;     MatKey.axle = 'AXLE_TD';    end
+    
     [Topdeck.Project, ~, ~, ~, ~, ~, ~, ~, ~, ~, ~, Topdeck.resultsPbs, ~, ~, Topdeck.PayloadLaden, ~, ~, ~] = ...
         PostProcessMultiChoice(Is, Project, Combination, MatKey, Report);
     
