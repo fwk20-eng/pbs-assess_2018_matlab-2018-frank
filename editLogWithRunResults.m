@@ -58,6 +58,17 @@ axleLoading = [axleLoadingHeadings, axleLoading];
 markdownAxleLoading = markdownTable(axleLoading);
 appendLogFileData = [appendLogFileData; markdownAxleLoading; ' '];
 
+% If axle loads are extracted from Trucksim, then add the comparison to log file
+if Is.axle
+    appendLogFileData = [appendLogFileData; ' '; '### Axle loading comparison with TruckSim'; ' '];
+    axleComparison = num2cell(Axle.truckSimLoads);
+    axleComparisonHeadings = {'**Axle**'; '**TruckSim Loads (kg)**'; '**Matlab Loads (kg)**'; '**Difference (kg)**';...
+        '**Difference (%)**'};
+    axleComparison = [axleComparisonHeadings, axleComparison];
+    markdownAxleLoadComparison = markdownTable(axleComparison);
+    appendLogFileData = [appendLogFileData; markdownAxleLoadComparison; ' '];
+end
+
 appendLogFileData = [appendLogFileData; ' '; '## CGM and Traction Check'; ' '];
 % Adding a table for GCM and drive axle load
 gcmHeadings = {'**GCM**', '**Drive axle load (kg)**', '**Drive axle load ratio (>20%)**'};
