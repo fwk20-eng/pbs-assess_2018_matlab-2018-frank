@@ -106,4 +106,5 @@ if plotOn
     title('Rearward Amplification')
     hold off
 end
+end
 

@@ -22,9 +22,14 @@ function checkedIs = checkBooleans(Is)
 % No need for Is.save any longer since the runs need to be saved. To prevent the need of going back to modify all the
 % code where Is.save is used, it is permanetly set to true here.
 Is.save =          1;
+
+if Is.ra
+    Is.SRT = 1; % SRT needs to be run in order to run ra
+end
+
 %% Run-checks, resetting booleans if necessary
 if Is.fullPBS == 1 %Turns on all PBS manoeuvres
-    Is.lst = 1;      Is.yawD = 1;     Is.hsto = 1;     Is.long = 1;
+    Is.lst = 1;      Is.yawD = 1;     Is.hsto = 1;     Is.long = 1;  Is.axle = 1;
     Is.lsunt = 1;    Is.ra = 1;       Is.tasp = 1;     Is.srt = 1;
     Is.report = 1;
     Is.plotOn = 1;
