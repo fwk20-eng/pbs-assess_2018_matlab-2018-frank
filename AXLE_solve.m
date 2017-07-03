@@ -1,0 +1,79 @@
+%% Function Description
+%
+% Extracts the axle loads from TruckSim
+%
+%% Inputs
+%
+% * variable: description
+%
+%% Outputs
+%
+% * variable: description
+%
+%% Change Log
+%
+% [0.1.0] - 2017-06-26
+%
+% *Added*
+%
+% * First code
+
+%% Test parameters
+% nAxles = 5;
+% matKey = 'AXLE';
+% Project.savePath = 'D:\Personal\Work\WITS PBS\Test Runs\AXLE';
+% Project.runKey = 'AXLE_TEST';
+% Project.runsPath = 'C:\Dropbox\Wits_TruckSimPBS_8.2a\Runs';
+% Is.plotOn = 1;
+% Is.save = 0;
+
+function [Axle] = AXLE_solve(Axle, matKey, Project, Is)
+
+% Extract the required data
+[Data, errorx] = readData(matKey, {'Fz_AXL'}, [Axle.NumberOff], {''}, [], Project.savePath, Project.truckSimRunsPath,...
+    Project.runKey, [1]);
+
+% Initialising the cell array of strings for the axle loads
+fzAxle = {};
+Axle.truckSimLoads = [];
+
+if errorx == 1
+    time    = Data{1};      % convert to vector
+    for iAxle = 1 : Axle.NumberOff
+        fzAxle{iAxle}  = Data{2,iAxle};    % convert to vector
+        % Average the last 500 data points to get the axle load
+        Axle.truckSimLoads(iAxle) = mean(fzAxle{iAxle}(end-500:end));
+    end
+else
+    return                  % data not loaded correctly
+end
+
+if Is.plotOn
+    figure('name', 'AXLE_LOADS')
+    hold on
+    
+    legTitles = {};
+    
+    for iAxle = 1 : Axle.NumberOff
+        plot(time, fzAxle{iAxle}, 'Color', getColour(iAxle));  % plot next line
+        legTitles = [legTitles; ['Axle ' int2str(iAxle)]];
+    end
+    
+    xlabel('Time [sec]')
+    ylabel('Axle Load [kg]')
+    
+    legend(legTitles, 'Location', 'Best');
+    
+    set(gcf,'PaperPosition',[0 0 16 11])
+    set(gca,'Xgrid','on');
+    set(gca,'Ygrid','on');
+    
+    if Is.save
+        savePlot(Project.savePath, Project.runKey, 'AXLE')
+    end
+    
+    title('TruckSim Axle Loads')
+    hold off
+end
+
+end

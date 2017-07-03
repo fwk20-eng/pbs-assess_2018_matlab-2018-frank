@@ -166,7 +166,17 @@ if Is.pbs
     if Is.lsunt
         [r.LSSPu,r.TSu,r.FSu,r.MoDu,r.DoMu,r.STFDu] = LSTurn_solve(Sprung.numberOffUnits, Combination.dollys, Dimensions.MaxWidthUnladen, Axle.SteerAxleOverallWidth, Axle.NumberOffSteer, muPeakSteer, false, Project.savePath, Project.truckSimRunsPath, Project.runKey, MatKey.lsunt, Is.plotOn, Is.save);
     end
-    
+    if Is.axle
+      [Axle] = AXLE_solve(Axle, MatKey.axle, Project, Is);
+      
+      axleNumbers = AxleLoading(1, :);
+      loadShare1AxleLoads = AxleLoading(3, :);
+      differenceInAxleLoad = round(Axle.truckSimLoads - loadShare1AxleLoads,3);
+      differenceInAxleLoadPerc = round((differenceInAxleLoad./Axle.truckSimLoads)*100,3);
+      
+      Axle.truckSimLoads = [axleNumbers; Axle.truckSimLoads; loadShare1AxleLoads; differenceInAxleLoad; ...
+          differenceInAxleLoadPerc];
+    end
     disp('-------------------------------------------------------------------------------------')
     disp('	Axle Loads')
     disp('-------------------------------------------------------------------------------------')
