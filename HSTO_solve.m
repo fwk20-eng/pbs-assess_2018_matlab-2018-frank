@@ -1,19 +1,19 @@
-function [maxOfftrack] = HSTO_solve(nLastAxle, Ltot, savePath, runsPath, runKey, matKey, plotOn, isSave, Dummy)
+function [maxOfftrack] = HSTO_solve(Axle, Combination, Project, MatKey, Is, Dummy)
 
 if nargin == 0  % i.e. program run directly from here
-    nLastAxle = 19;
-    Ltot = 41.205;
-    savePath = 'C:\Users\A0006942\Documents\PBS calculation results\20151209-Wits-PBS assess-Unitrans-AfritBABquad-Volvo FH86T6HT ver1';
-    runsPath = 'C:\Users\Public\Documents\TruckSim_Data\Runs';
-    runKey ='AfritBABquad-Volvo FH86T6HT';
-    plotOn = true;
+    Axle.NumberOff = 19;
+    Combination.totalLength = 41.205;
+    Project.savePath = 'C:\Users\A0006942\Documents\PBS calculation results\20151209-Wits-PBS assess-Unitrans-AfritBABquad-Volvo FH86T6HT ver1';
+    Project.truckSimRunsPath = 'C:\Users\Public\Documents\TruckSim_Data\Runs';
+    Project.runKey ='AfritBABquad-Volvo FH86T6HT';
+    Is.plotOn = true;
 end
 
 if Dummy.isDummyAxle
     % If a dummy axle is present, the number of axles will not match the last axle index
-    [Data, error] = readData(matKey, {'X_A1' 'Y_A1' ['X_A' int2str(Dummy.isRealAxleIndex(end))] ['Y_A' int2str(Dummy.isRealAxleIndex(end))]}, ones(1,4), {'' '' '' ''}, [],  savePath, runsPath, runKey, [0 0 0 0]);
+    [Data, error] = readData(MatKey, {'X_A1' 'Y_A1' ['X_A' int2str(Dummy.isRealAxleIndex(end))] ['Y_A' int2str(Dummy.isRealAxleIndex(end))]}, ones(1,4), {'' '' '' ''}, [],  Project.savePath, Project.truckSimRunsPath, Project.runKey, [0 0 0 0]);
 else
-    [Data, error] = readData(matKey, {'X_A1' 'Y_A1' ['X_A' int2str(nLastAxle)] ['Y_A' int2str(nLastAxle)]}, ones(1,4), {'' '' '' ''}, [],  savePath, runsPath, runKey, [0 0 0 0]);
+    [Data, error] = readData(MatKey, {'X_A1' 'Y_A1' ['X_A' int2str(Axle.NumberOff)] ['Y_A' int2str(Axle.NumberOff)]}, ones(1,4), {'' '' '' ''}, [],  Project.savePath, Project.truckSimRunsPath, Project.runKey, [0 0 0 0]);
 end
 
 if error == 1
@@ -32,14 +32,14 @@ maxOfftrack = -Ytangent;     %theoretical minimum value
 indMaxOff = 0;
 for i=1:length(Y_Last)
     offtrack = Y_Last(i)-Ytangent;
-    if (X_Last(i) >= 122-Ltot) && (offtrack > maxOfftrack)        %end of test section %highest value so far
+    if (X_Last(i) >= 122-Combination.totalLength) && (offtrack > maxOfftrack)        %end of test section %highest value so far
         maxOfftrack = offtrack;
         indMaxOff = i;
     end
 end
 
 
-if plotOn
+if Is.plotOn
     figure('name', 'HSTO')
     
     hold on
@@ -55,10 +55,10 @@ if plotOn
     set(gca,'Ygrid','on');
     xlabel('X [m]')
     ylabel('Y [m]')
-    legend(legTitles, 'Location', 'Best');
+    legend(legTitles, 'Location', 'northeastoutside'); legend('boxoff');
     
-    if isSave
-        savePlot(savePath, runKey, 'HSTO');
+    if Is.save
+        savePlot(Project.savePath, Project.runKey, 'HSTO');
     end
     
     title('High-Speed Transient Offtracking')

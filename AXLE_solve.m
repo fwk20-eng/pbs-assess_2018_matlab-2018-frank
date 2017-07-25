@@ -7,6 +7,7 @@
 % * variable: description
 %
 %% Outputs
+%% Outputs
 %
 % * variable: description
 %
@@ -27,10 +28,10 @@
 % Is.plotOn = 1;
 % Is.save = 0;
 
-function [Axle] = AXLE_solve(Axle, matKey, Project, Is)
+function [Axle] = AXLE_solve(Axle, MatKey, Project, Is)
 
 % Extract the required data
-[Data, errorx] = readData(matKey, {'Fz_AXL'}, [Axle.NumberOff], {''}, [], Project.savePath, Project.truckSimRunsPath,...
+[Data, errorx] = readData(MatKey, {'Fz_AXL'}, [Axle.NumberOff], {''}, [], Project.savePath, Project.truckSimRunsPath,...
     Project.runKey, [1]);
 
 % Initialising the cell array of strings for the axle loads
