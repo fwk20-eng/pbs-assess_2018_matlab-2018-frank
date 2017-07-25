@@ -13,6 +13,10 @@
 %
 %% Change Log
 %
+% [1.0.0] - 2017-07-03
+%
+% * Modified for TruckSim 2017.1
+%
 % [0.1.0] - 2017-05-14
 %
 % *Added*
@@ -27,7 +31,8 @@ nManoeuvres = length(keyFields);
 for iManoeuvre = 1 : nManoeuvres
     if Is.(keyFields{iManoeuvre})
         % Note the filename and error are not used anywhere, hence the tilde ignores the values
-        [~, ~] = getRun(MatKey.(keyFields{iManoeuvre}), Project.savePath, Project.truckSimRunsPath, Project.runKey, 1);
+        [~, ~] = getRun(MatKey.(keyFields{iManoeuvre}){1}, MatKey.(keyFields{iManoeuvre})(2), Project.savePath,...
+            Project.truckSimRunsPath, Project.runKey, 1);
     end
 end
 

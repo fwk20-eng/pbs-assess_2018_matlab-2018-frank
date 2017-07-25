@@ -1,14 +1,16 @@
-function [FS, MoDmax, DoMmax] = FS_solve(nVehUnits, dollys, X_StOut, Y_StOut, X_RP3, Y_RP3, X_RP4, Y_RP4, X_RP5, Y_RP5, ladentext, savePath, runKey, plotOn, isSave);
+function [FS, MoDmax, DoMmax] = FS_solve(Sprung, Combination, Is, Project, X_StOut, Y_StOut, X_RP3, Y_RP3, X_RP4, Y_RP4, X_RP5, Y_RP5,...
+    ladentext)
 
-FS = SPW_solve(X_StOut, Y_StOut, X_RP3{1}, Y_RP3{1}, X_RP4{1}, Y_RP4{1}, X_RP5{1}, Y_RP5{1}, 'FS', ladentext, savePath, runKey, plotOn, isSave);
+FS = SPW_solve(Project, Is, X_StOut, Y_StOut, X_RP3{1}, Y_RP3{1}, X_RP4{1}, Y_RP4{1}, X_RP5{1}, Y_RP5{1}, 'FS',...
+    ladentext);
 
 XexitTan = [X_StOut(end) X_StOut(end)];
 YexitTan = [0 max(Y_StOut)];
 
 % Determine maximum X of three RPs and combine to X345 Y345
 iCurr = 1;
-while iCurr <= nVehUnits
-    if sum(iCurr == dollys(:)) == 0       % Only evaluated if veh unit number not in dollys vector
+while iCurr <= Sprung.numberOffUnits
+    if sum(iCurr == Combination.dollys(:)) == 0       % Only evaluated if veh unit number not in dollys vector
         j3start=find(X_RP3{iCurr}>=X_StOut(end),1,'first'); % Only start evaluating once X is greater then X_StOut
         if isempty(j3start), j3start = 1;,end;
         j4start=find(X_RP4{iCurr}>=X_StOut(end),1,'first'); % Only start evaluating once X is greater then X_StOut
@@ -58,8 +60,8 @@ end
 iPrev = 1;
 iCurr = 2;
 
-while iCurr <= nVehUnits
-    if sum(iCurr == dollys(:)) == 0       % only evaluated if veh unit number not in dollys vector
+while iCurr <= Sprung.numberOffUnits
+    if sum(iCurr == Combination.dollys(:)) == 0       % only evaluated if veh unit number not in dollys vector
         % We expect Y to be lowest for iCurr when starting j=0, and Y to be lowest for iPrev when finished j=end 
         j=1;
         while (j<=(length(X1{iCurr}))&(Y1{iCurr}(j)<Y2{iCurr}(end-1))&(Y1{iCurr}(j)<Y3{iCurr}(end-1)))
@@ -93,7 +95,7 @@ if MoDmax<0
     MoDmax=NaN;
 end
 
-if plotOn
+if Is.plotOn
     figure('name', 'MoD')
 
     hold on
@@ -102,15 +104,15 @@ if plotOn
     plot(X_StOut, Y_StOut, 'Color', getColour(1))    
     legTitles = [legTitles; 'steer'];
     
-    for i = 1:nVehUnits                          
-        if sum(i == dollys(:)) == 0       % only plotted if veh unit number not in dollys vector
+    for i = 1:Sprung.numberOffUnits                          
+        if sum(i == Combination.dollys(:)) == 0       % only plotted if veh unit number not in dollys vector
             plot(X345{i}, Y345{i},'Color', getColour((i+1)));
             legTitles = [legTitles; ['unit ' int2str(i)]];                        
         end
     end
     
-    for i = 1:nVehUnits-1                                      
-        if sum(i == dollys(:)) == 0       % only evaluated if veh unit number not in dollys vector
+    for i = 1:Sprung.numberOffUnits-1                                      
+        if sum(i == Combination.dollys(:)) == 0       % only evaluated if veh unit number not in dollys vector
             plot(MoDx{i}, MoDy{i}, '-or')
             text(MoDx{i}(2)+0.1, MoDy{i}(1)+1, MoDtext(i))
         end
@@ -129,10 +131,10 @@ if plotOn
     set(gca,'Ygrid','on');
     xlabel('X [m]')
     ylabel('Y [m]')
-    legend(legTitles, 'Location', 'best');
+    legend(legTitles, 'Location', 'northeastoutside'); legend('boxoff');
     
-    if isSave
-        savePlot(savePath, runKey, ['MoD' ladentext])
+    if Is.save
+        savePlot(Project.savePath, Project.runKey, ['MoD' ladentext])
     end
     
     title(['Maximum of Difference' ladentext])
@@ -144,8 +146,8 @@ end
 pt{1}(indMaxPx(1));
 iPrev = 1;
 iCurr = 2;
-while iCurr <= nVehUnits
-    if sum(iCurr == dollys(:)) == 0       % only evaluated if veh unit number not in dollys vector
+while iCurr <= Sprung.numberOffUnits
+    if sum(iCurr == Combination.dollys(:)) == 0       % only evaluated if veh unit number not in dollys vector
         [maxPx(iCurr), indMaxPx(iCurr)] = max(X345{iCurr});        
         
         DoM(iPrev) = maxPx(iCurr) - maxPx(iPrev);
@@ -168,7 +170,7 @@ if MoDmax<0
     DoMmax=NaN;
 end
 
-if plotOn
+if Is.plotOn
     figure('name', 'DoM')
 
     hold on
@@ -177,15 +179,15 @@ if plotOn
     plot(X_StOut, Y_StOut,'Color', getColour(1))    
     legTitles = [legTitles; 'steer'];
     
-    for i = 1:nVehUnits
-        if sum(i == dollys(:)) == 0       % only plotted if veh unit number not in dollys vector
+    for i = 1:Sprung.numberOffUnits
+        if sum(i == Combination.dollys(:)) == 0       % only plotted if veh unit number not in dollys vector
             plot(X345{i}, Y345{i},'Color', getColour((i-1)+2));
             legTitles = [legTitles; ['unit ' int2str(i)]];
         end
     end
     
-    for i = 1:nVehUnits-1
-        if sum(i == dollys(:)) == 0       % only plotted if veh unit number not in dollys vector
+    for i = 1:Sprung.numberOffUnits-1
+        if sum(i == Combination.dollys(:)) == 0       % only plotted if veh unit number not in dollys vector
             plot(DoMx{i}, DoMy{i}, '-or')
             text(max(DoMx{i}(2), DoMx{i}(3))+0.1, Y345{i}(indMaxPx(i)), DoMtext(i))
         end
@@ -203,10 +205,10 @@ if plotOn
     set(gca,'Ygrid','on');
     xlabel('X [m]')
     ylabel('Y [m]')
-    legend(legTitles, 'Location', 'best');
+    legend(legTitles, 'Location', 'northeastoutside'); legend('boxoff');
     
-    if isSave
-        savePlot(savePath, runKey, ['DoM' ladentext])
+    if Is.save
+        savePlot(Project.savePath, Project.runKey, ['DoM' ladentext])
     end
     
     title(['Difference of Maxima' ladentext])

@@ -1,4 +1,4 @@
-function [START, GRADA, GRADB, ACC] = LONG_solve(mTotal,Axle1,Axle2,A,radial,Ch,Cd,Ce,gears,eff_gear,gearsStart,eff_gearStart,eff_diff,dif,eff_diffStart,difStart,Torquerpm,TorqueNm,engageTrpm,engageTNm,changeT,rr,Ie,It,Ndrive,gearshiftregime,savePath, runKey, plotOn, isSave);
+function [START, GRADA, GRADB, ACC] = LONG_solve(Combination, Engine, Tyre, Axle, Project, Is, mTotal,Axle1,Axle2, radial);
 % START: grade; sat = 0 if tyres not saturated and 1 if yes & 2 if over 30%
 % GRADA: grade; sat = 0 if tyres not saturated and 1 if yes & 2 if over 30%
 % GRADB: speed; sat = 0 if tyres not saturated and 1 if yes & 2 if over 120
@@ -13,21 +13,26 @@ if nargin == 0  % i.e. no inputs given then use inputs below
     % Redo
     % -----------------------------------------------------------------
 end
+%% Engine parameter edits for NTC longitudinal standards
+Engine.engageTrpm = 1005;
+Engine.engageTNm = 1126;
+Engine.Ie = 0.97;
+
 %%
 %Startability
-G=difStart*gearsStart(1); %Assume start in first
+G=Engine.difStart*Engine.gearsStart(1); %Assume start in first
 m=sum(mTotal);
-me=m+It/rr/rr+Ie*G^2/rr/rr;
-Fengine=engageTNm*eff_diffStart*eff_gearStart(1)*G/rr;
+me=m+Engine.It/Tyre.RollingRadius/Tyre.RollingRadius+Engine.Ie*G^2/Tyre.RollingRadius/Tyre.RollingRadius;
+Fengine=Engine.engageTNm*Engine.eff_diffStart*Engine.eff_gearStart(1)*G/Tyre.RollingRadius;
 grad=[0:0.1:30];
 contin=1;
 i=0;
-Frr=rolling(0,sum(mTotal),Ch,radial);
+Frr=rolling(0,sum(mTotal),Combination.ch,radial);
 
 while contin
     i=i+1;
     th=atan(grad(i)/100);
-    Favail=sum(0.8*9.81*Axle2(Ndrive));
+    Favail=sum(0.8*9.81*Axle2(Axle.Driven));
     Fdrive=sin(th)*m*9.81+Frr;
     acc(i)=(min([Fengine Favail])-sin(th)*m*9.81-Frr)/me;
     if Fdrive>Fengine;
@@ -44,7 +49,7 @@ end
 
 START=[grad(i-1)];
 
-if plotOn
+if Is.plotOn
     figure('name', 'START')
 
     hold on
@@ -69,8 +74,8 @@ if plotOn
     xlabel('Gradient [%]')
     ylabel('Acceleration [m/s^2]')
     
-    if isSave
-        savePlot(savePath, runKey, 'START')
+    if Is.save
+        savePlot(Project.savePath, Project.runKey, 'START')
     end
     
     title('Startability')
@@ -79,19 +84,19 @@ end
 
 %%
 %Gradability A
-[maxTorqueNm j]=max(TorqueNm);
-Fengine=maxTorqueNm*eff_gear(1)*eff_diffStart/rr*difStart*gears(1);
-N=Torquerpm(j);
-v=N*rr/G/60*2*pi;
-FA=drag(A,Cd,v,Ce);
+[maxTorqueNm j]=max(Engine.TorqueNm);
+Fengine=maxTorqueNm*Engine.eff_gear(1)*Engine.eff_diffStart/Tyre.RollingRadius*Engine.difStart*Engine.gears(1);
+N=Engine.Torquerpm(j);
+v=N*Tyre.RollingRadius/G/60*2*pi;
+FA=drag(Combination.frontalAreaForDrag,Combination.cd,v,Combination.ce);
 grad=[0:0.1:30];
 contin=1;
 i=0;
-Frr=rolling(0,sum(mTotal),Ch,radial);
+Frr=rolling(0,sum(mTotal),Combination.ch,radial);
 while contin
     i=i+1;
     th=atan(grad(i)/100);
-    Favail=sum(0.8*9.81*Axle2(Ndrive));
+    Favail=sum(0.8*9.81*Axle2(Axle.Driven));
     Fdrive=sin(th)*m*9.81+Frr+FA;
     acc(i)=(min([Fengine Favail])-sin(th)*m*9.81-Frr-FA)/me;    
     if Fdrive>Fengine;
@@ -106,7 +111,7 @@ while contin
     end
 end
 GRADA=[grad(i-1)];
-if plotOn
+if Is.plotOn
     figure('name', 'GRAa')
 
     hold on
@@ -130,8 +135,8 @@ if plotOn
     xlabel('Gradient [%]')
     ylabel('Acceleration [m/s^2]')
     
-    if isSave
-        savePlot(savePath, runKey, 'GRADA')    
+    if Is.save
+        savePlot(Project.savePath, Project.runKey, 'GRADA')    
     end
     
     title('Gradability A')
@@ -147,19 +152,19 @@ while contin
     grad=1;
     th=atan(grad/100);
     v=vel(i)/3.6; % convert speed to m/s metric units
-    Frr=rolling(v,sum(mTotal),Ch,radial);
-    FA=drag(A,Cd,v,Ce);    
-    Favail=sum(0.8*9.81*Axle1(Ndrive));
+    Frr=rolling(v,sum(mTotal),Combination.ch,radial);
+    FA=drag(Combination.frontalAreaForDrag,Combination.cd,v,Combination.ce);    
+    Favail=sum(0.8*9.81*Axle1(Axle.Driven));
     Fdrive=sin(th)*m*9.81+Frr+FA;       
-    Nvec=v/rr*gears*difStart*60/2/pi;    
-    G=difStart*gears;    
-    me=m+It/rr/rr+Ie*G.^2/rr/rr;    
-    Fengine=interp1(Torquerpm,TorqueNm,Nvec,'linear',0)*eff_diffStart/rr*difStart.*gears.*eff_gear;    
+    Nvec=v/Tyre.RollingRadius*Engine.gears*Engine.difStart*60/2/pi;    
+    G=Engine.difStart*Engine.gears;    
+    me=m+Engine.It/Tyre.RollingRadius/Tyre.RollingRadius+Engine.Ie*G.^2/Tyre.RollingRadius/Tyre.RollingRadius;    
+    Fengine=interp1(Engine.Torquerpm,Engine.TorqueNm,Nvec,'linear',0)*Engine.eff_diff/Tyre.RollingRadius*Engine.dif.*Engine.gears.*Engine.eff_gear;    
     [acc(i) jgear]=max((Fengine-sin(th)*m*9.81-Frr-FA)./me);    
     gearvec(i)=jgear;
     Fengine=Fengine(jgear);    
-    G=difStart*gears(jgear);
-    N=v/rr*G*60/2/pi;    
+    G=Engine.difStart*Engine.gears(jgear);
+    N=v/Tyre.RollingRadius*G*60/2/pi;    
     if Fdrive>Fengine;
         contin=0; % The engine force is not big enough to generate the required drive
         saturate=0;
@@ -173,7 +178,7 @@ while contin
 end
 
 GRADB=vel(i-1);
-if plotOn
+if Is.plotOn
     figure('name', 'GRAb')
 
     hold on
@@ -181,7 +186,7 @@ if plotOn
     xlabel('Velocity [km/h]')
     ylabel('Acceleration x 10 [m/s^2] ; gear')
     legTitles = {'acceleration'; 'gear';};
-    legend(legTitles, 'Location', 'Best');  
+    legend(legTitles, 'Location', 'northeastoutside'); legend('boxoff');
     if saturate==0
         text(0.8*floor(GRADB),0.6*max(acc*10.0),['GRADB = ' num2str(floor(GRADB)) ' km/h']);   
         text(0.6*floor(GRADB),0.8*max(acc*10.0),'Limited by torque');
@@ -198,8 +203,8 @@ if plotOn
     set(gca,'Xgrid','on');
     set(gca,'Ygrid','on');
     
-    if isSave
-        savePlot(savePath, runKey, 'GRADB')
+    if Is.save
+        savePlot(Project.savePath, Project.runKey, 'GRADB')
     end
     
     title('Gradability B')
@@ -210,12 +215,12 @@ end
 %Acceleration Capability
 %
 %Determine start gear
-Fengine=engageTNm*eff_diffStart/rr*difStart.*gears.*eff_gear;
-Frr=rolling(0,sum(mTotal),Ch,radial);
-maxFthrust=sum(0.8*9.81*Axle1(Ndrive))-sin(0)*sum(mTotal)*9.81-Frr;
+Fengine=Engine.engageTNm*Engine.eff_diffStart/Tyre.RollingRadius*Engine.difStart.*Engine.gears.*Engine.eff_gear;
+Frr=rolling(0,sum(mTotal),Combination.ch,radial);
+maxFthrust=sum(0.8*9.81*Axle1(Axle.Driven))-sin(0)*sum(mTotal)*9.81-Frr;
 %startGear=find(Fengine<maxFthrust,1,'first');
 startGear=2;
-Fdrive=engageTNm*eff_gear(startGear)*eff_diffStart/rr*difStart*gears(startGear);
+Fdrive=Engine.engageTNm*Engine.eff_gear(startGear)*Engine.eff_diffStart/Tyre.RollingRadius*Engine.difStart*Engine.gears(startGear);
 %
 %1 Start gear and release clutch
 % Allow a linear increase up to engageTNm in 1 s
@@ -224,25 +229,25 @@ dt=tspan(2);
 v2=0;
 v(1)=0;
 gearvec(1)=startGear;
-G=gears(startGear)*difStart;
+G=Engine.gears(startGear)*Engine.difStart;
 for i=1:(length(tspan)-1); %-1 for extra i+1
     t2=tspan(i);
-    dvdt=veh_start1(t2,v2,Fdrive,rr,G,sum(mTotal),Ie,It,Ch,radial,A,Cd,Ce);
+    dvdt=veh_start1(t2,v2,Fdrive,Tyre.RollingRadius,G,sum(mTotal),Engine.Ie,Engine.It,Combination.ch,radial,Combination.frontalAreaForDrag,Combination.cd,Combination.ce);
     v(i+1)=v(i)+dvdt*dt;
     gearvec(i+1)=startGear;
 end
 %
 %2 Get to engageTrpm
 % If N>=engageTrpm then move to 3, else keep Torque = engageTNm
-N=v(end)/rr*G*60/2/pi;
-while N<engageTrpm,
+N=v(end)/Tyre.RollingRadius*G*60/2/pi;
+while N<Engine.engageTrpm,
     i=i+1;
     tspan(i)=tspan(i-1)+dt;
     t2=tspan(i);
-    dvdt=veh_start2(t2,v2,Fdrive,rr,gears(startGear)*difStart,sum(mTotal),Ie,It,Ch,radial,A,Cd,Ce);
+    dvdt=veh_start2(t2,v2,Fdrive,Tyre.RollingRadius,Engine.gears(startGear)*Engine.difStart,sum(mTotal),Engine.Ie,Engine.It,Combination.ch,radial,Combination.frontalAreaForDrag,Combination.cd,Combination.ce);
     v(i+1)=v(i)+dvdt*dt;
     gearvec(i+1)=startGear;
-    N=v(end)/rr*G*60/2/pi;
+    N=v(end)/Tyre.RollingRadius*G*60/2/pi;
 end
 tspan(i+1)=tspan(i)+dt;
 %
@@ -251,13 +256,13 @@ tspan(i+1)=tspan(i)+dt;
 % increase to full value
 for j=1:100
     i=i+1;
-    Fdrive1=interp1(Torquerpm,TorqueNm,N,'linear',0)*eff_gear(startGear)*eff_diffStart/rr*difStart*gears(startGear);    
-    Fdrive2=engageTNm*eff_gear(startGear)*eff_diffStart/rr*difStart*gears(startGear);
+    Fdrive1=interp1(Engine.Torquerpm,Engine.TorqueNm,N,'linear',0)*Engine.eff_gear(startGear)*Engine.eff_diffStart/Tyre.RollingRadius*Engine.difStart*Engine.gears(startGear);    
+    Fdrive2=Engine.engageTNm*Engine.eff_gear(startGear)*Engine.eff_diffStart/Tyre.RollingRadius*Engine.difStart*Engine.gears(startGear);
     Fdrive=Fdrive1*j/100+Fdrive2*(100-j)/100;
     tspan(i)=tspan(end)+0.01;
-    dvdt=veh_start2(t2,v2,Fdrive,rr,G,sum(mTotal),Ie,It,Ch,radial,A,Cd,Ce);
+    dvdt=veh_start2(t2,v2,Fdrive,Tyre.RollingRadius,G,sum(mTotal),Engine.Ie,Engine.It,Combination.ch,radial,Combination.frontalAreaForDrag,Combination.cd,Combination.ce);
     v(i+1)=v(i)+dvdt*dt;
-    N=v(end)/rr*G*60/2/pi;
+    N=v(end)/Tyre.RollingRadius*G*60/2/pi;
     gearvec(i+1)=startGear;
 end
 tspan(i+1)=tspan(i)+dt;
@@ -272,25 +277,25 @@ while t2<40,
     tspan(i)=tspan(i-1)+dt;
     t2=tspan(i);
     if changephase==0 %Assume not in gear change mode
-        if (N>changeT)&Gear<length(gears), %Change gears
+        if (N>Engine.changeT)&Gear<length(Engine.gears), %Change gears
             changephase=1;
-            if gearshiftregime==1,
+            if Engine.gearshiftregime==1,
                 Gear=Gear+1;
             else
-                if (Gear<length(gears)-1)
+                if (Gear<length(Engine.gears)-1)
                     Gear=Gear+2;
                 else
                     Gear=Gear+1;
                 end
             end
-            G=gears(Gear)*difStart;
-            N=v(end)/rr*G*60/2/pi;
+            G=Engine.gears(Gear)*Engine.difStart;
+            N=v(end)/Tyre.RollingRadius*G*60/2/pi;
             Fdrive=0;
-            dvdt=veh_change(t2,v2,Fdrive,rr,gears(startGear)*difStart,sum(mTotal),Ie,It,Ch,radial,A,Cd,Ce);
+            dvdt=veh_change(t2,v2,Fdrive,Tyre.RollingRadius,Engine.gears(startGear)*Engine.difStart,sum(mTotal),Engine.Ie,Engine.It,Combination.ch,radial,Combination.frontalAreaForDrag,Combination.cd,Combination.ce);
             Tchange=Tchange+dt;
         else
-            Fdrive=interp1(Torquerpm,TorqueNm,N,'linear',0)*eff_gear(Gear)*eff_diffStart/rr*difStart*gears(Gear);
-            dvdt=veh_throttle(t2,v2,Fdrive,rr,gears(startGear)*difStart,sum(mTotal),Ie,It,Ch,radial,A,Cd,Ce);
+            Fdrive=interp1(Engine.Torquerpm,Engine.TorqueNm,N,'linear',0)*Engine.eff_gear(Gear)*Engine.eff_diffStart/Tyre.RollingRadius*Engine.difStart*Engine.gears(Gear);
+            dvdt=veh_throttle(t2,v2,Fdrive,Tyre.RollingRadius,Engine.gears(startGear)*Engine.difStart,sum(mTotal),Engine.Ie,Engine.It,Combination.ch,radial,Combination.frontalAreaForDrag,Combination.cd,Combination.ce);
         end
     else
         Tchange=Tchange+dt;
@@ -298,12 +303,12 @@ while t2<40,
             Tchange=0;
             changephase=0;
             Fdrive=0;
-            dvdt=veh_change(t2,v2,Fdrive,rr,gears(startGear)*difStart,sum(mTotal),Ie,It,Ch,radial,A,Cd,Ce);
+            dvdt=veh_change(t2,v2,Fdrive,Tyre.RollingRadius,Engine.gears(startGear)*Engine.difStart,sum(mTotal),Engine.Ie,Engine.It,Combination.ch,radial,Combination.frontalAreaForDrag,Combination.cd,Combination.ce);
         end
     end
     v(i+1)=v(i)+dvdt*dt;
     gearvec(i+1)=Gear;
-    N=v(end)/rr*G*60/2/pi;
+    N=v(end)/Tyre.RollingRadius*G*60/2/pi;
 end
 v=v(1:end-1);
 gearvec=gearvec(1:end-1);
@@ -311,7 +316,7 @@ s=cumtrapz(tspan,v);
 i=find(s>100,1,'first');
 endGear=gearvec(i);
 ACC=[tspan(i)];
-if plotOn
+if Is.plotOn
     figure('name', 'ACC')
 
     hold on
@@ -320,13 +325,13 @@ if plotOn
     ylabel('Velocity [m/s] ; gear')
     text(tspan(i)-5,2,['ACC = ' num2str(round(tspan(i)*10)/10) ' s'])
     legTitles = {'velocity'; 'gear';};
-    legend(legTitles, 'Location', 'NE');
+    legend(legTitles, 'Location', 'northeastoutside'); legend('boxoff');
     set(gcf,'PaperPosition',[0 0 16 11])            
     set(gca,'Xgrid','on');
     set(gca,'Ygrid','on');    
     
-    if isSave
-        savePlot(savePath, runKey, 'ACC')
+    if Is.save
+        savePlot(Project.savePath, Project.runKey, 'ACC')
     end
     
     title('Acceleration Capability')

@@ -1,36 +1,43 @@
-function [LSSP, TS, FS, MoD, DoM, STFD] = LSTurn_solve(nVehUnits, dollys, VehWidth, SteerWidth, nSteer, muPeakSteer, laden, savePath, runsPath, runKey, matKey, plotOn, isSave)
+function [LSSP, TS, FS, MoD, DoM, STFD] = LSTurn_solve(Sprung, Combination, Axle, Project, MatKey, Is,...
+    muPeakSteer, laden)
 
+%% Sample run data
 if nargin == 0  % i.e. program run directly from here
     % Example inputs: 
     % -----------------------------------------------------------------    
-    nVehUnits = 3;
-    nSteer = 1;
-    dollys = [];     % vehicle unit numbers with no reference points (dolly's do not have RPs)%    nSteer = 1;
-    VehWidth = 2600;       % [mm] total width
-    SteerWidth = 2494;     % [mm] total width
+    Sprung.numberOffUnits = 3;
+    Axle.NumberOffSteer = 1;
+    Combination.dollys = [];     % vehicle unit numbers with no reference points (dolly's do not have RPs)%    
+    Combination.maxWidth = 2600;       % [mm] total width
+    Axle.SteerAxleOverallWidth = 2494;     % [mm] total width
+    Axle.NumberOffSteer = 1;
     muPeakSteer = 1;    
     laden = true;
-    savePath = 'C:\Users\A0006942\Documents\Delete';
-    runsPath = 'C:\Dropbox\trucksimDatabase_JAD\Runs';
-    runKey ='Test';
-    matKey = 'LST_FL';
-    plotOn = true;
+    Project.savePath = 'C:\Users\A0006942\Documents\Delete';
+    Project.truckSimRunsPath = 'C:\Dropbox\trucksimDatabase_JAD\Runs';
+    Project.runKey ='Test';
+    MatKey = 'LST_FL';
+    Is.plotOn = true;
     % -----------------------------------------------------------------
 end
 
-if laden
-    keyword = matKey;
-else
-    keyword = 'LSunT';  % Low Speed unladen Turn (can't use LSTun because readData would get confused) 
-end
+% No longer necessary since the MatKey is 
+% if laden
+%     keyword = MatKey;
+% else
+%     keyword = 'LSunT'; % Low Speed unladen Turn (can't use LSTun because readData would get confused) 
+% end
 
-[Data, error] = readData(keyword, {'X_RP3' 'X_RP4' 'X_RP5' 'X_RP6' 'X_RP7' 'X_RP8' 'X_RP9' 'X_Lin' 'X_StOut'...
-    'Y_RP3' 'Y_RP4' 'Y_RP5' 'Y_RP6' 'Y_RP7' 'Y_RP8' 'Y_RP9' 'Y_Lin' 'Y_StOut' 'Fx_L' 'Fy_L' 'Fz_L' ...
-    'Fx_R' 'Fy_R' 'Fz_R'}, ...
-    [nVehUnits nVehUnits nVehUnits nVehUnits nVehUnits nVehUnits nVehUnits 1 1 nVehUnits nVehUnits nVehUnits nVehUnits nVehUnits nVehUnits nVehUnits 1 1 ...
-    nSteer nSteer nSteer nSteer nSteer nSteer],...
-    {'' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' ''}, dollys, savePath, runsPath, runKey, ...
-    [zeros(1,18) ones(1,6)]);   % last entry specifies that tyre forces numbered with a 1 for first entry
+% last entry specifies that tyre forces numbered with a 1 for first entry
+
+%% Actual Script
+[Data, error] = readData(MatKey, {'X_S3' 'X_S4' 'X_S5' 'X_S6' 'X_S7' 'X_S8' 'X_S9' 'X_Lin' 'X_StOut'...
+    'Y_S3' 'Y_S4' 'Y_S5' 'Y_S6' 'Y_S7' 'Y_S8' 'Y_S9' 'Y_Lin' 'Y_StOut' 'Fx_L' 'Fy_L' 'Fz_L' ...
+    'Fx_R' 'Fy_R' 'Fz_R'},...
+    [Sprung.numberOffUnits*ones(1,7) 1 1 Sprung.numberOffUnits*ones(1,7) 1 1 Axle.NumberOffSteer*ones(1,6)],...
+    {'' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' ''},...
+    Combination.dollys, Project.savePath, Project.truckSimRunsPath, Project.runKey,...
+    [3*ones(1,7) zeros(1,2) 3*ones(1,7) zeros(1,2) ones(1,6)]);
 
 if error == 1
     Time    = Data{1};      % convert to vector
@@ -79,13 +86,18 @@ else
     ladentext='_unladen';
 end
 
-LSSP = SPW_solve(X_Lin, Y_Lin, X_RP3{1}, Y_RP3{1}, X_RP4{1}, Y_RP4{1}, X_RP5{1}, Y_RP5{1}, 'LSSP', ladentext, savePath, runKey, plotOn, isSave); %inner path at centre of tyre contact (CTC) - RP2, RP4, RP6 is front outer corner
+%inner path at centre of tyre contact (CTC) - RP2, RP4, RP6 is front outer corner
+LSSP = SPW_solve(Project, Is, X_Lin, Y_Lin, X_RP3{1}, Y_RP3{1}, X_RP4{1}, Y_RP4{1}, X_RP5{1}, Y_RP5{1}, 'LSSP',...
+    ladentext); 
 
-[FS, MoD, DoM] = FS_solve(nVehUnits, dollys, X_StOut, Y_StOut, X_RP3, Y_RP3, X_RP4, Y_RP4, X_RP5, Y_RP5, ladentext, savePath, runKey, plotOn, isSave);
+[FS, MoD, DoM] = FS_solve(Sprung, Combination, Is, Project, X_StOut, Y_StOut, X_RP3, Y_RP3, X_RP4, Y_RP4, X_RP5, Y_RP5,...
+    ladentext);
 
-[TS] = TS_solve(nVehUnits, dollys, VehWidth, SteerWidth, X_StOut, Y_StOut, X_RP6, Y_RP6, X_RP7, Y_RP7, X_RP8, Y_RP8, X_RP9, Y_RP9, ladentext, savePath, runKey, plotOn, isSave); 
+[TS] = TS_solve(Sprung, Combination, Axle, Project, Is, X_StOut, Y_StOut, X_RP6, Y_RP6, X_RP7, Y_RP7,...
+    X_RP8, Y_RP8, X_RP9, Y_RP9, ladentext); 
 
-STFD = STFD_solve(Time, nSteer, muPeakSteer, Fx_L, Fy_L, Fz_L, Fx_R, Fy_R, Fz_R, ladentext, savePath, runKey, plotOn, isSave);
+STFD = STFD_solve(Time, Axle.NumberOffSteer, muPeakSteer, Fx_L, Fy_L, Fz_L, Fx_R, Fy_R, Fz_R, ladentext,...
+    Project.savePath, Project.runKey, Is.plotOn, Is.save);
 
 % extra calc to get maximum inner radius of the road
 % LSOT = SPW_solve(X_Lin, Y_Lin, X_StOut, Y_StOut, 'Low-Speed Off-tracking (60 m radius)', savePath, runKey, plotOn) %inner path at centre of tyre contact (CTC)

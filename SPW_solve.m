@@ -1,4 +1,5 @@
-function [SPWmax] = SPW_solve(PinnerX, PinnerY, PouterXvec1, PouterYvec1, PouterXvec2, PouterYvec2, PouterXvec3, PouterYvec3, plotTitle, ladentext, savePath, runKey, plotOn, isSave)
+function [SPWmax] = SPW_solve(Project, Is, PinnerX, PinnerY, PouterXvec1, PouterYvec1, PouterXvec2, PouterYvec2,...
+    PouterXvec3, PouterYvec3, plotTitle, ladentext)
 
 SPWmax = 0;
 SPW = SPWmax;
@@ -79,7 +80,7 @@ for ii=1:3,
 end
 % SPWmax = SPWmax   % to print result
 
-if plotOn
+if Is.plotOn
     figure('name', 'LSSP')
 %     figure(1)
 %     if strcmp(plotTitle, 'LSSP')
@@ -102,7 +103,7 @@ if plotOn
     plot(PouterXvec3, PouterYvec3, 'Color', getColour(4))
     plot(Xbisetor, Ybisetor, '-or')
     set(gca,'DataAspectRatio',[1 1 1]) % to get image to scale
-    XplotMin = floor(PinnerX(1)/5)*5;
+    XplotMin = -10; %floor(PinnerX(1)/5)*5; * Changed for a more focused graph
     XplotMax = ceil(max(PinnerX)/5+1)*5;
     YplotMin = floor(min(PouterY)/5)*5;
     YplotMax = YplotMin + (XplotMax - XplotMin);
@@ -112,15 +113,15 @@ if plotOn
     ylabel('Y [m]')
     text(XplotMin + (XplotMax - XplotMin)*.3, YplotMin + (YplotMax - YplotMin)*.45,['max SPW = ' num2str(ceil(SPWmax*10)/10,'%5.1f') ' m'])
     legTitles = {'inner path'; 'outer p1'; 'outer p2'; 'outer p3'; 'maximum width'};
-    legend(legTitles, 'Location', 'Best');
+    legend(legTitles, 'Location', 'northeastoutside'); legend('boxoff');
     
     set(gcf,'PaperPosition',[0 0 16 11])            
     set(gca,'Xgrid','on');
     set(gca,'Ygrid','on');
     set(gca,'box','on')
     
-    if isSave
-        savePlot(savePath, runKey, [plotTitle ladentext])
+    if Is.save
+        savePlot(Project.savePath, Project.runKey, [plotTitle ladentext])
     end
     
     title([plotTitle ladentext])

@@ -4,21 +4,21 @@
 %Ver 2.0
 %   -> Evalate Ay and not AyBf_SM. Change range to 0.19 to 0.21 g. 2016/11/04 FK
 
-function [Dmin] = YawD_solve(nVehUnits, savePath, runsPath, runKey, matKey, plotOn, isSave)
+function [Dmin] = YawD_solve(Sprung, Project, Is, MatKey)
 
 if nargin == 0  % i.e. program run directly from here
     % Example inputs: 
     % -----------------------------------------------------------------
-    nVehUnits = 6;
-    savePath = 'C:\Users\A0006942\Documents\PBS calculation results\20151209-Wits-PBS assess-Unitrans-AfritBABquad-Volvo FH86T6HT ver1';
-    runsPath = 'C:\Users\Public\Documents\TruckSim_Data\Runs';
-    runKey ='AfritBABquad-Volvo FH86T6HT';
-    plotOn = true;
+    Sprung.numberOffUnits = 6;
+    Project.savePath = 'C:\Users\A0006942\Documents\PBS calculation results\20151209-Wits-PBS assess-Unitrans-AfritBABquad-Volvo FH86T6HT ver1';
+    Project.truckSimRunsPath = 'C:\Users\Public\Documents\TruckSim_Data\Runs';
+    Project.runKey ='AfritBABquad-Volvo FH86T6HT';
+    Is.plotOn = true;
     
     % -----------------------------------------------------------------
 end
 
-[Data, errorx] = readData(matKey, {'Art_H' 'ArtR_H' 'AVz' 'Ay'}, [nVehUnits-1 nVehUnits-1 nVehUnits 1], {'' '' '_' ''}, [], savePath, runsPath, runKey, zeros(1,4));
+[Data, errorx] = readData(MatKey, {'Art_H' 'ArtR_H' 'AVz' 'Ay'}, [Sprung.numberOffUnits-1 Sprung.numberOffUnits-1 Sprung.numberOffUnits 1], {'' '' '_' ''}, [], Project.savePath, Project.truckSimRunsPath, Project.runKey, zeros(1,4));
 
 if errorx == 1
     Time    = Data{1};      % convert to vector
@@ -43,13 +43,13 @@ end
 A1threshold = 0.25;  % find A1 by looking for first peak with value higher than 1 
                   % - this is not very robust
 
-if plotOn
+if Is.plotOn
     figure('name', 'YawD')
 
     hold on
     legTitles = {};
 
-    for i = 1:nVehUnits
+    for i = 1:Sprung.numberOffUnits
         plot(Time, AVz{i}, 'Color', getColour(i));   % plot next line
         legTitles = [legTitles; ['unit ' int2str(i)]];
     end
@@ -57,17 +57,17 @@ if plotOn
     xlabel('Time [sec]')
     ylabel('Yaw Rate [deg/s]')
     
-    legend(legTitles, 'Location', 'NE');
+    legend(legTitles, 'Location', 'northeastoutside'); legend('boxoff');
 end
 
-for i = 1:nVehUnits
-    Yloc = max(AVz{1})*(1 - i/(nVehUnits+1));
-    D(i) = YD(AVz{i}, Time, A1threshold, i, Yloc, plotOn);
+for i = 1:Sprung.numberOffUnits
+    Yloc = max(AVz{1})*(1 - i/(Sprung.numberOffUnits+1));
+    D(i) = YD(AVz{i}, Time, A1threshold, i, Yloc, Is.plotOn);
 end
 
 Dmin = min(D);
 
-if plotOn
+if Is.plotOn
     text(3, max(AVz{1})*0.8,['D_m_i_n = ' num2str(floor(Dmin*100)/100)])
     
     temp=axis;
@@ -78,8 +78,8 @@ if plotOn
     set(gca,'Xgrid','on');
     set(gca,'Ygrid','on');
     
-    if isSave
-        savePlot(savePath, runKey, 'YawD')
+    if Is.save
+        savePlot(Project.savePath, Project.runKey, 'YawD')
     end
     
     title('Yaw Damping')

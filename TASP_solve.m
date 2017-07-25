@@ -1,24 +1,26 @@
-function [SW99] = TASP_solve(nVehUnits, dollys, savePath, runsPath, runKey, matKey, plotOn, isSave)   % note nVehUnits is a count of the num with RPs recorded
+function [SW99] = TASP_solve(Sprung, Combination, Project, MatKey, Is)
+
+% note Sprung.numberOffUnits is a count of the num with RPs recorded i.e. dolly's are excluded
 
 if nargin == 0  % i.e. program run directly from here
-    % Example inputs: 
     % -----------------------------------------------------------------
     % Example inputs:
     % -----------------------------------------------------------------
-    nVehUnits = 3;
-    dollys = [];     % vehicle unit numbers with no reference points (dolly's do not have RPs)
-    savePath = 'C:\Users\A0006942\Documents\Delete';
-    runsPath = 'C:\Dropbox\trucksimDatabase_JAD\Runs';
-    runKey ='Test';
-    matKey = 'TASP_FL';
-    plotOn = true;
+    Sprung.numberOffUnits = 3;
+    Combination.dollys = [];     % vehicle unit numbers with no reference points (dolly's do not have RPs)
+    Project.savePath = 'C:\Users\A0006942\Documents\Delete';
+    Project.truckSimRunsPath = 'C:\Dropbox\trucksimDatabase_JAD\Runs';
+    Project.runKey ='Test';
+    MatKey = 'TASP_FL';
+    Is.plotOn = true;
     % -----------------------------------------------------------------
 end
 
 
-[Data, error] = readData(matKey, {'X_RP1' 'X_RP2' 'X_RP6' 'X_RP7' 'X_RP8' 'X_RP9' ...
-    'Y_RP1' 'Y_RP2' 'Y_RP6' 'Y_RP7' 'Y_RP8' 'Y_RP9'}, nVehUnits*ones(1,12),...
-    {'' '' '' '' '' '' '' '' '' '' '' ''}, dollys, savePath, runsPath, runKey, zeros(1, 12));
+[Data, error] = readData(MatKey, {'X_S1' 'X_S2' 'X_S6' 'X_S7' 'X_S8' 'X_S9' ...
+    'Y_S1' 'Y_S2' 'Y_S6' 'Y_S7' 'Y_S8' 'Y_S9'}, Sprung.numberOffUnits*ones(1,12),...
+    {'' '' '' '' '' '' '' '' '' '' '' ''}, Combination.dollys, Project.savePath, Project.truckSimRunsPath,...
+    Project.runKey, 3*ones(1, 12));
 
 if error == 1
     Time    = Data{1};      % convert to vector
@@ -48,7 +50,7 @@ end
 %   -- 7
 %   -- 8
 %   -- 9
-%Note: dollies have no RP outputs
+% Note: dollies have no RP outputs
 
 % only consider points between the lead in and lead out sections
 LenStart = 200;    % [m] lead in
@@ -71,9 +73,9 @@ SW = [];
 for i = iStart:iEnd
     
     iL = 1;
-    for iVU = 1:nVehUnits
+    for iVU = 1:Sprung.numberOffUnits
         
-        if sum(iVU == dollys(:)) == 0       % only evaluated if veh unit number not in dollys vector
+        if sum(iVU == Combination.dollys(:)) == 0       % only evaluated if veh unit number not in dollys vector
             iRP1 = indClosestX(i, X_RP1{1}(i), X_RP1{iVU});    % get i for when this RP on this veh unit was at this X position
             iRP2 = indClosestX(i, X_RP1{1}(i), X_RP2{iVU});
 
@@ -93,9 +95,9 @@ for i = iStart:iEnd
     Lx(i-iStart+1) = LxTemp(iLmax);      % -iStart-1 to start at 1
     
     iR = 1;
-    for iVU = 1:nVehUnits
+    for iVU = 1:Sprung.numberOffUnits
         
-        if sum(iVU == dollys(:)) == 0       % only evaluated if veh unit number not in dollys vector
+        if sum(iVU == Combination.dollys(:)) == 0       % only evaluated if veh unit number not in dollys vector
             iRP6 = indClosestX(i, X_RP1{1}(i), X_RP6{iVU});    % get i for when this RP on this veh unit was at this X position
             iRP7 = indClosestX(i, X_RP1{1}(i), X_RP7{iVU});
             iRP8 = indClosestX(i, X_RP1{1}(i), X_RP8{iVU});
@@ -130,17 +132,17 @@ end
 
 TSW = max(SW);
 SW = sort(SW);
-SW99 = SW(ceil(length(SW)/100*99)); %get 99th percentile
+SW99 = SW(ceil(length(SW)/100*99)); % get 99th percentile
 
-if plotOn
+if Is.plotOn
     figure('name', 'TASP')
     
     hold on
     legTitles = {};
 
-    for i = 1:nVehUnits             % plot: X_RP, Y_RP
+    for i = 1:Sprung.numberOffUnits             % plot: X_RP, Y_RP
 
-        if sum(i == dollys(:)) == 0                           % only evaluated if veh unit number not in dollys vector
+        if sum(i == Combination.dollys(:)) == 0                           % only evaluated if veh unit number not in dollys vector
             plot(X_RP1{i}, Y_RP1{i}, 'Color', getColour(i));
             plot(X_RP2{i}, Y_RP2{i}, 'Color', getColour(i));
             plot(X_RP6{i}, Y_RP6{i}, 'Color', getColour(i));
@@ -176,8 +178,8 @@ if plotOn
     set(gca,'Xgrid','on');
     set(gca,'Ygrid','on');
     
-    if isSave
-        savePlot(savePath, runKey, 'TASP')
+    if Is.save
+        savePlot(Project.savePath, Project.runKey, 'TASP')
     end
     
     title('Tracking Ability on a Straight Path')

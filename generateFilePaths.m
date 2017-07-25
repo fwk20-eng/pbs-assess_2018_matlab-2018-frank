@@ -47,25 +47,25 @@ checkOverwrite(Project.savePath, Project.resultsFileName); %Note: xlswrite1 cann
 
 if ~Is.fullPBS
     if Is.lst
-        MatKey.Extraction = MatKey.lst;
+        MatKey.Extraction = MatKey.lst{1};
     elseif Is.lsunt
-        MatKey.Extraction = MatKey.lsunt;
+        MatKey.Extraction = MatKey.lsunt{1};
     elseif Is.yawD
-        MatKey.Extraction = MatKey.yawD;
+        MatKey.Extraction = MatKey.yawD{1};
     elseif Is.ra
-        MatKey.Extraction = MatKey.ra;
+        MatKey.Extraction = MatKey.ra{1};
     elseif Is.hsto
-        MatKey.Extraction = MatKey.hsto;
+        MatKey.Extraction = MatKey.hsto{1};
     elseif Is.tasp
-        MatKey.Extraction = MatKey.tasp;
+        MatKey.Extraction = MatKey.tasp{1};
     elseif Is.srt
-        MatKey.Extraction = MatKey.srt;
+        MatKey.Extraction = MatKey.srt{1};
     elseif Is.long % Use LST if long is being run alone
-        MatKey.Extraction = MatKey.long;
+        MatKey.Extraction = MatKey.long{1};
     end
 else
     % If all manoeuvres are being run at the same time, use the LST maneouvre
-    MatKey.Extraction = MatKey.lst;
+    MatKey.Extraction = MatKey.lst{1};
 end
 
 %% Generating par file filenames
@@ -78,7 +78,7 @@ ParDetails.allParLadenFileName = strcat(Project.runKey, '_', MatKey.Extraction, 
 % Only run the unladen LST maneouve if it is selected, otherwise unladen parameters are not required
 if Is.lsunt
     % Unladen par files from the LSunT manoeuvre
-    ParDetails.endParUnladenFileName = strcat(Project.runKey, '_', MatKey.lsunt, '_end.par');
-    ParDetails.allParUnladenFileName = strcat(Project.runKey, '_', MatKey.lsunt, '_all.par');
+    ParDetails.endParUnladenFileName = strcat(Project.runKey, '_', MatKey.lsunt{1}, '_end.par');
+    ParDetails.allParUnladenFileName = strcat(Project.runKey, '_', MatKey.lsunt{1}, '_all.par');
 end
 end
