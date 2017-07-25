@@ -93,6 +93,7 @@ function [Project, ParDetails, Sprung, Axle, Hitch, Engine, Report, Dimensions, 
     PostProcessMultiChoice(Is, Project, Combination, MatKey, Report)
 %% Preamble
 %% Generate the required file paths and perform the necessary checks for the assessment
+
 [Project, ParDetails, Is] = generateFilePaths(Project, MatKey, Is);
 
 % createRunLog(Is, Project);
@@ -108,7 +109,7 @@ warning off
 g = 9.81; % [g] CONFIRM WITH FRANK IF THIS IS NECESSARY
 nLevels = 4;    % PBS levels - should correspond to size of cell arrays in setLims function
 radial = 1; %radial = 1 for radial tyres else = 0 if bias ply
-muPeakSteer = 1;       % not sure why but TS also uses 1.0 for their STFD calcs
+muPeakSteer = 0.8;       % Updated to 0.8 according to NTC rules. Originally set to 1 for corroboration purposes.
 RAinputAy = 0.15;      % [g] normally 0.15 for RA test completed at 88km/h %% CONFIRM WITH FRANK IF THIS IS NECESSARY
 SRTrollThresh = 30;    % PBS rules
 %%	Execute PBS manoeuvres if required
@@ -118,53 +119,86 @@ if Is.pbs
     fullName = setFullNames();
     [Lim, LimReport] = setLims(Is);
     
-    [mSprung, XcgSprung, HcgSprung] = detSprung(Sprung.MassArray, Sprung.MassCoGxPosition, Sprung.MassCoGzPosition, PayloadLaden.MassCell, PayloadLaden.CoGxPositionCell, PayloadLaden.CoGzPositionCell); % Determine sprung mass properties of each vehicle unit
+    % Determine sprung mass properties of each vehicle unit
+    [mSprung, XcgSprung, HcgSprung] = detSprung(Sprung.MassArray, Sprung.MassCoGxPosition, Sprung.MassCoGzPosition,...
+        PayloadLaden.MassCell, PayloadLaden.CoGxPositionCell, PayloadLaden.CoGzPositionCell); 
     
-    [mSprungU, XcgSprungU, HcgSprungU] = detSprung(Sprung.MassArray, Sprung.MassCoGxPosition, Sprung.MassCoGzPosition, PayloadUnladen.MassCell, PayloadUnladen.CoGxPositionCell, PayloadUnladen.CoGzPositionCell); % Determine sprung mass properties of each vehicle unit in unloaded configuration
+    % Determine sprung mass properties of each vehicle unit in unloaded configuration
+    [mSprungU, XcgSprungU, HcgSprungU] = detSprung(Sprung.MassArray, Sprung.MassCoGxPosition, Sprung.MassCoGzPosition,...
+        PayloadUnladen.MassCell, PayloadUnladen.CoGxPositionCell, PayloadUnladen.CoGzPositionCell); 
     
-    [mTotal x z] = determineCOG(Sprung.MassArray, Sprung.MassCoGxPosition, Sprung.MassCoGzPosition, Axle.UnsprungMassArray, Axle.XPositionArray, Axle.ZPositionArray, Axle.Grouping, PayloadLaden.MassCell, PayloadLaden.CoGxPositionCell, PayloadLaden.CoGzPositionCell); % Determine sprung mass properties of each vehicle unit
+    % Determine sprung mass properties of each vehicle unit
+    [mTotal x z] = determineCOG(Sprung.MassArray, Sprung.MassCoGxPosition, Sprung.MassCoGzPosition,...
+        Axle.UnsprungMassArray, Axle.XPositionArray, Axle.ZPositionArray, Axle.Grouping, PayloadLaden.MassCell,...
+        PayloadLaden.CoGxPositionCell, PayloadLaden.CoGzPositionCell); 
     
-    Axle1 = AxleLoade(0, Axle.UnsprungMassArray, Axle.XPositionArray, Axle.ZPositionArray, Hitch.XPositionArray, Hitch.ZPositionArray, mSprung, XcgSprung, HcgSprung, Axle.Grouping, Combination.loadshare1, Hitch.LoadCoupledArray); %Loaded axles loads for normal operation
-    Axle2 = AxleLoade(0, Axle.UnsprungMassArray, Axle.XPositionArray, Axle.ZPositionArray, Hitch.XPositionArray, Hitch.ZPositionArray, mSprung, XcgSprung, HcgSprung, Axle.Grouping, Combination.loadshare2, Hitch.LoadCoupledArray); %Loaded axles loads for Startability
+    % Loaded axles loads for normal operation
+    Axle1 = AxleLoade(0, Axle.UnsprungMassArray, Axle.XPositionArray, Axle.ZPositionArray, Hitch.XPositionArray,...
+        Hitch.ZPositionArray, mSprung, XcgSprung, HcgSprung, Axle.Grouping, Combination.loadshare1,...
+        Hitch.LoadCoupledArray); 
+    % Loaded axles loads for Startability
+    Axle2 = AxleLoade(0, Axle.UnsprungMassArray, Axle.XPositionArray, Axle.ZPositionArray, Hitch.XPositionArray,...
+        Hitch.ZPositionArray, mSprung, XcgSprung, HcgSprung, Axle.Grouping, Combination.loadshare2,...
+        Hitch.LoadCoupledArray); 
     
+    % Unloaded axles loads for normal operation
+    AxleU1 = AxleLoade(0, Axle.UnsprungMassArray, Axle.XPositionArray, Axle.ZPositionArray, Hitch.XPositionArray,...
+        Hitch.ZPositionArray, mSprungU, XcgSprungU, HcgSprungU, Axle.Grouping, Combination.loadshare1,...
+        Hitch.LoadCoupledArray); 
     
-    AxleU1 = AxleLoade(0, Axle.UnsprungMassArray, Axle.XPositionArray, Axle.ZPositionArray, Hitch.XPositionArray, Hitch.ZPositionArray, mSprungU, XcgSprungU, HcgSprungU, Axle.Grouping, Combination.loadshare1, Hitch.LoadCoupledArray); %Unloaded axles loads for normal operation
-    AxleU2 = AxleLoade(0, Axle.UnsprungMassArray, Axle.XPositionArray, Axle.ZPositionArray, Hitch.XPositionArray, Hitch.ZPositionArray, mSprungU, XcgSprungU, HcgSprungU, Axle.Grouping, Combination.loadshare2, Hitch.LoadCoupledArray); %Unloaded axle loads for Startability, which is not required
+    %Unloaded axle loads for Startability, which is not required
+    AxleU2 = AxleLoade(0, Axle.UnsprungMassArray, Axle.XPositionArray, Axle.ZPositionArray, Hitch.XPositionArray,...
+        Hitch.ZPositionArray, mSprungU, XcgSprungU, HcgSprungU, Axle.Grouping, Combination.loadshare2,...
+        Hitch.LoadCoupledArray); 
     
+    %Raw axle loading values
+    AxleLoading = [[1:Axle.NumberOff]; Combination.loadshare1; Axle1; AxleU1; Combination.loadshare2; Axle2; AxleU2];
     
-    AxleLoading = [[1:Axle.NumberOff]; Combination.loadshare1; Axle1; AxleU1; Combination.loadshare2; Axle2; AxleU2];%Raw axle loading values
-    roundAxleLoading = [[1:Axle.NumberOff]; Combination.loadshare1; round(Axle1,0); round(AxleU1,0); Combination.loadshare2; round(Axle2,0); round(AxleU2,0)];%Rounded axle loadings
+    %Rounded axle loadings
+    roundAxleLoading = [[1:Axle.NumberOff]; Combination.loadshare1; round(Axle1,0); round(AxleU1,0);...
+        Combination.loadshare2; round(Axle2,0); round(AxleU2,0)];
     
     if Is.long
         if Is.longSolveWithGradient
-            [r.STA, r.GRAa, r.GRAb, r.ACC] = LONG_solve_gradient(mTotal, Combination.frontalAreaForDrag, radial, Combination.ch, Combination.cd, Combination.ce, Engine.gears, Engine.eff_gear, Engine.gearsStart, Engine.eff_gearStart, Engine.eff_diff, Engine.dif, Engine.eff_diffStart, Engine.difStart, Engine.Torquerpm, Engine.TorqueNm, Engine.engageTrpm, Engine.engageTNm, Engine.changeT, Tyre.RollingRadius, Engine.Ie, Engine.It, Axle.Driven, Engine.gearshiftregime, Project.savePath, Project.runKey, Is.plotOn, Is.save, Axle.UnsprungMassArray, Axle.XPositionArray, Axle.ZPositionArray, Hitch.XPositionArray, Hitch.ZPositionArray, mSprung, XcgSprung, HcgSprung, Axle.Grouping, Combination.loadshare1, Combination.loadshare2, Hitch.LoadCoupledArray);
+            [r.STA, r.GRAa, r.GRAb, r.ACC] = LONG_solve_gradient(mTotal, Combination.frontalAreaForDrag, radial,...
+                Combination.ch, Combination.cd, Combination.ce, Engine.gears, Engine.eff_gear, Engine.gearsStart,...
+                Engine.eff_gearStart, Engine.eff_diff, Engine.dif, Engine.eff_diffStart, Engine.difStart,...
+                Engine.Torquerpm, Engine.TorqueNm, Engine.engageTrpm, Engine.engageTNm, Engine.changeT,...
+                Tyre.RollingRadius, Engine.Ie, Engine.It, Axle.Driven, Engine.gearshiftregime, Project.savePath,...
+                Project.runKey, Is.plotOn, Is.save, Axle.UnsprungMassArray, Axle.XPositionArray, Axle.ZPositionArray,...
+                Hitch.XPositionArray, Hitch.ZPositionArray, mSprung, XcgSprung, HcgSprung, Axle.Grouping,...
+                Combination.loadshare1, Combination.loadshare2, Hitch.LoadCoupledArray);
         else
-            [r.STA, r.GRAa, r.GRAb, r.ACC] = LONG_solve(mTotal,Axle1,Axle2, Combination.frontalAreaForDrag, radial, Combination.ch, Combination.cd, Combination.ce, Engine.gears, Engine.eff_gear, Engine.gearsStart, Engine.eff_gearStart, Engine.eff_diff, Engine.dif, Engine.eff_diffStart, Engine.difStart, Engine.Torquerpm, Engine.TorqueNm, Engine.engageTrpm, Engine.engageTNm, Engine.changeT, Tyre.RollingRadius, Engine.Ie, Engine.It, Axle.Driven, Engine.gearshiftregime, Project.savePath, Project.runKey, Is.plotOn, Is.save);
+            [r.STA, r.GRAa, r.GRAb, r.ACC] = LONG_solve(Combination, Engine, Tyre, Axle, Project, Is, mTotal,Axle1,...
+                Axle2, radial);
         end
     end
     if Is.yawD
-        r.YDC = YawD_solve(Sprung.numberOffUnits, Project.savePath, Project.truckSimRunsPath, Project.runKey, MatKey.yawD, Is.plotOn, Is.save);
+        r.YDC = YawD_solve(Sprung, Project, Is, MatKey.yawD);
     end
     if Is.hsto
-        r.HSTO = HSTO_solve(Axle.NumberOff, Combination.totalLength, Project.savePath, Project.truckSimRunsPath, Project.runKey, MatKey.hsto, Is.plotOn, Is.save, Dummy);
+        r.HSTO = HSTO_solve(Axle, Combination, Project, MatKey.hsto, Is, Dummy);
     end
     if Is.srt
-        [r.SRTt, r.SRTtrrcu] = SRTt_solve(Axle.NumberOff, Axle.NumberOffSteer, Lim.SRT(Combination.pbsLevelDesired), SRTrollThresh, mSprung, HcgSprung,  Hitch.RollCoupledArray, Combination.dollys, Project.savePath, Project.truckSimRunsPath, Project.runKey, MatKey.srt, Is.plotOn, Is.save, Dummy);
+        [r.SRTt, r.SRTtrrcu] = SRTt_solve(Combination, Axle, Hitch, Project, MatKey.srt, Is, Dummy,...
+            Lim.SRT(Combination.pbsLevelDesired), SRTrollThresh, mSprung, HcgSprung);
         % SRT is required to determine the limits for the RA maneouvre, hence the RA manoeuvre can only be run along
         % with the SRT manoeuvre
         if Is.ra
             Lim.RA = setLimsRA(r);
-            r.RA = RA_solve(mSprung, HcgSprung, Hitch.RollCoupledArray, Combination.dollys, Project.savePath, Project.truckSimRunsPath, Project.runKey, MatKey.ra, Is.plotOn, Is.save);
+            r.RA = RA_solve(Combination, Hitch, Project, MatKey.ra, Is, mSprung, HcgSprung);
         end
     end
     if Is.tasp
-        r.TASP = TASP_solve(Sprung.numberOffUnits, Combination.dollys, Project.savePath, Project.truckSimRunsPath, Project.runKey, MatKey.tasp, Is.plotOn, Is.save);
+        r.TASP = TASP_solve(Sprung, Combination, Project, MatKey.tasp, Is);
     end
     if Is.lst
-        [r.LSSP, r.TS, r.FS, r.MoD, r.DoM, r.STFD] = LSTurn_solve(Sprung.numberOffUnits, Combination.dollys, Dimensions.MaxWidthLaden, Axle.SteerAxleOverallWidth, Axle.NumberOffSteer, muPeakSteer, true, Project.savePath, Project.truckSimRunsPath, Project.runKey, MatKey.lst, Is.plotOn, Is.save);
+        [r.LSSP, r.TS, r.FS, r.MoD, r.DoM, r.STFD] = LSTurn_solve(Sprung, Combination, Axle, Project,...
+            MatKey.lst, Is, muPeakSteer, true);
     end
     if Is.lsunt
-        [r.LSSPu,r.TSu,r.FSu,r.MoDu,r.DoMu,r.STFDu] = LSTurn_solve(Sprung.numberOffUnits, Combination.dollys, Dimensions.MaxWidthUnladen, Axle.SteerAxleOverallWidth, Axle.NumberOffSteer, muPeakSteer, false, Project.savePath, Project.truckSimRunsPath, Project.runKey, MatKey.lsunt, Is.plotOn, Is.save);
+        [r.LSSPu,r.TSu,r.FSu,r.MoDu,r.DoMu,r.STFDu] = LSTurn_solve(Sprung, Combination, Axle, Project,...
+            MatKey.lsunt, Is, muPeakSteer, false);
     end
     if Is.axle
       [Axle] = AXLE_solve(Axle, MatKey.axle, Project, Is);
@@ -214,8 +248,6 @@ if Is.pbs
     resultsWithLevel = generateResults(r, Lim, fullName, nLevels, Is);
     
     display(resultsWithLevel(:, 1:4));
-    %% Adding functionality to remove the .mat files from the runs directory
-    removeMFilesFromTruckSimRunsFolder(Project, Is);
     warning on
     
     if Is.log
