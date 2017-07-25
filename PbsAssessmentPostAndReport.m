@@ -1,8 +1,7 @@
-function PbsAssessmentPostAndReport(Is, Project, Combination, Report)
+function PbsAssessmentPostAndReport(Is, Project, Combination, Report, ResultCode)
 %% Adding the paths containing the required .m files
 addpath('C:\Dropbox\_Personal\Programming\Global_Matlab_Toolbox\Downloaded\latexTable');
-addpath('C:\Dropbox\PBS\MatLab\Automated PBS Assessment\Automated Post Process');
-
+addpath('C:\Dropbox\PBS\MatLab\_Global_Scripts\PBS_Data');
 %% Checking booleans
 Is = checkBooleans(Is);
 %% This has to go here to prevent the folder path being changed during a TD run
@@ -11,25 +10,25 @@ Project.runFolderPath = strcat(Project.resultsFolderPath, '\Version_', Project.r
 % These can be changed as you loop through a project if required
 
 if Is.carCarrier
-    if Is.yawD;     MatKey.yawD = 'YawD_FL';    end
-    if Is.ra;       MatKey.ra = 'RA_FL';        end
-    if Is.hsto;     MatKey.hsto = 'RA_FL';      end
-    if Is.srt;      MatKey.srt = 'Tilt_FL';     end
-    if Is.tasp;     MatKey.tasp = 'TASP_FL';    end
-    if Is.lst;      MatKey.lst = 'LST_FL';      end
-    if Is.lsunt;    MatKey.lsunt = 'LSunT';     end % unloaded is always the same in all cases
-    if Is.long;     MatKey.long = 'LST_FL';     end % use LST erd file if you are going to be calculating the longitudinal standards
-    if Is.axle; MatKey.axle = 'AXLE_FL';    end
+    if Is.yawD;     MatKey.yawD = {'YawD_FL', ResultCode.yawD};    end
+    if Is.ra;       MatKey.ra = {'RA_FL', ResultCode.ra};        end
+    if Is.hsto;     MatKey.hsto = {'RA_FL', ResultCode.ra};      end
+    if Is.srt;      MatKey.srt = {'SRT_FL', ResultCode.srt};     end
+    if Is.tasp;     MatKey.tasp = {'TASP_FL', ResultCode.tasp};    end
+    if Is.lst;      MatKey.lst = {'LST_FL', ResultCode.lst};      end
+    if Is.lsunt;    MatKey.lsunt = {'LSunT', ResultCode.lsunt};     end % unloaded is always the same in all cases
+    if Is.long;     MatKey.long = {'LST_FL', ResultCode.lst};     end % use LST erd file if you are going to be calculating the longitudinal standards
+    if Is.axle;     MatKey.axle = {'AXLE_FL', ResultCode.axle};    end
 else
-    if Is.yawD;     MatKey.yawD = 'YawD';       end
-    if Is.ra;       MatKey.ra = 'RA';           end
-    if Is.hsto;     MatKey.hsto = 'RA';         end
-    if Is.srt;      MatKey.srt = 'Tilt';        end
-    if Is.tasp;     MatKey.tasp = 'TASP';       end
-    if Is.lst;      MatKey.lst = 'LST';         end
-    if Is.lsunt;    MatKey.lsunt = 'LSunT';     end % unloaded is always the same in all cases
-    if Is.long;     MatKey.long = 'LST';        end % use LST erd file if you are going to be calculating the longitudinal standards
-    if Is.axle; MatKey.axle = 'AXLE';       end
+    if Is.yawD;     MatKey.yawD = {'YawD', ResultCode.yawD};       end
+    if Is.ra;       MatKey.ra = {'RA', ResultCode.ra};           end
+    if Is.hsto;     MatKey.hsto = {'RA', ResultCode.ra};         end
+    if Is.srt;      MatKey.srt = {'SRT', ResultCode.srt};        end
+    if Is.tasp;     MatKey.tasp = {'TASP', ResultCode.tasp};       end
+    if Is.lst;      MatKey.lst = {'LST', ResultCode.lst};         end
+    if Is.lsunt;    MatKey.lsunt = {'LSunT', ResultCode.lsunt};     end % unloaded is always the same in all cases
+    if Is.long;     MatKey.long = {'LST', ResultCode.lst};        end % use LST erd file if you are going to be calculating the longitudinal standards
+    if Is.axle;     MatKey.axle = {'AXLE', ResultCode.axle};       end
 end
 
 %%	Passing variables to PostProcess
@@ -39,15 +38,15 @@ end
 if Is.carCarrier
     Project.revision = strcat(Project.revision, '_TD');
     
-    if Is.yawD;     MatKey.yawD = 'YawD_TD';    end
-    if Is.ra;       MatKey.ra = 'RA_TD';        end
-    if Is.hsto;     MatKey.hsto = 'RA_TD';      end
-    if Is.srt;      MatKey.srt = 'Tilt_TD';     end
-    if Is.tasp;     MatKey.tasp = 'TASP_TD';    end
-    if Is.lst;      MatKey.lst = 'LST_TD';      end
-    if Is.lsunt;    MatKey.lsunt = 'LSunT';     end % unloaded is always the same in all cases
-    if Is.long;     MatKey.long = 'LST_TD';     end % use LST erd file if you are going to be calculating the longitudinal standards
-    if Is.axle;     MatKey.axle = 'AXLE_TD';    end
+    if Is.yawD;     MatKey.yawD = {'YawD_TD', ResultCode.yawD_TD};    end
+    if Is.ra;       MatKey.ra = {'RA_TD', ResultCode.ra_TD};        end
+    if Is.hsto;     MatKey.hsto = {'RA_TD', ResultCode.ra_TD};      end
+    if Is.srt;      MatKey.srt = {'SRT_TD', ResultCode.srt_TD};     end
+    if Is.tasp;     MatKey.tasp = {'TASP_TD', ResultCode.tasp_TD};    end
+    if Is.lst;      MatKey.lst = {'LST_TD', ResultCode.lst_TD};      end
+    if Is.lsunt;    MatKey.lsunt = {'LSunT', ResultCode.lsunt_TD};     end % unloaded is always the same in all cases
+    if Is.long;     MatKey.long = {'LST_TD', ResultCode.lst_TD};     end % use LST erd file if you are going to be calculating the longitudinal standards
+    if Is.axle;     MatKey.axle = {'AXLE_TD', ResultCode.axle_TD};    end
     
     [Topdeck.Project, ~, ~, ~, ~, ~, ~, ~, ~, ~, ~, Topdeck.resultsPbs, ~, ~, Topdeck.PayloadLaden, ~, ~, ~] = ...
         PostProcessMultiChoice(Is, Project, Combination, MatKey, Report);
