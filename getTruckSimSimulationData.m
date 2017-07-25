@@ -108,13 +108,13 @@ end
 
 %% Extract sprung mass properties
 Sprung.DescriptionArray = getSprungMassDescriptionArray(allParLadenFileData);
-Sprung.MassArray = getVariableValuesFromPar(endParLadenFileData, '\<M_SU');
-Sprung.MassCoGxPosition = getVariableValuesFromPar(endParLadenFileData, '\<LX_CG_SU');
-Sprung.MassCoGzPosition = getVariableValuesFromPar(endParLadenFileData, '\<H_CG_SU');
-Sprung.MassCoGyPosition = getVariableValuesFromPar(endParLadenFileData, '\<Y_CG_SU');
-Sprung.MOIx = getVariableValuesFromPar(endParLadenFileData,'\<IXX_SU');
-Sprung.MOIy = getVariableValuesFromPar(endParLadenFileData,'\<IYY_SU');
-Sprung.MOIz = getVariableValuesFromPar(endParLadenFileData,'\<IZZ_SU');
+Sprung.MassArray = getVariableValuesFromPar(endParLadenFileData, '^M_SU');
+Sprung.MassCoGxPosition = getVariableValuesFromPar(endParLadenFileData, '^LX_CG_SU');
+Sprung.MassCoGzPosition = getVariableValuesFromPar(endParLadenFileData, '^H_CG_SU');
+Sprung.MassCoGyPosition = getVariableValuesFromPar(endParLadenFileData, '^Y_CG_SU');
+Sprung.MOIx = getVariableValuesFromPar(endParLadenFileData,'^IXX_SU');
+Sprung.MOIy = getVariableValuesFromPar(endParLadenFileData,'^IYY_SU');
+Sprung.MOIz = getVariableValuesFromPar(endParLadenFileData,'^IZZ_SU');
 
 Sprung.numberOffUnits = length(Sprung.MassArray);
 
@@ -125,15 +125,15 @@ Sprung.MassCoGzPosition = Sprung.MassCoGzPosition.*0.001;
 %% Extract axle properties for post processor
 
 % Extracting raw axle data
-Axle.UnsprungMassArray = getVariableValuesFromPar(endParLadenFileData, '\<M_US');
-Axle.XPositionArray = getVariableValuesFromPar(endParLadenFileData, '\<LX_AXLE');
-Axle.ZPositionArray = getVariableValuesFromPar(endParLadenFileData, '\<H_CG_AXLE');
+Axle.UnsprungMassArray = getVariableValuesFromPar(endParLadenFileData, '^M_US');
+Axle.XPositionArray = getVariableValuesFromPar(endParLadenFileData, '^LX_AXLE');
+Axle.ZPositionArray = getVariableValuesFromPar(endParLadenFileData, '^H_CG_AXLE');
 
 % Axle track regular expression modified to ensure no erroneous values from initialisation equations
-Axle.TrackWidthArray = getVariableValuesFromPar(endParLadenFileData, '\<L_TRACK\(\d,\d\)\s');
+Axle.TrackWidthArray = getVariableValuesFromPar(endParLadenFileData, '^L_TRACK\(\d,\d\)\s');
 
 % Determine which axles are driven, this will not work if there are driven axles other than on the prime mover
-axlePowertrainTorqueLogicArray = getVariableValuesFromPar(endParLadenFileData, '\<R_DRIVE_SC');
+axlePowertrainTorqueLogicArray = getVariableValuesFromPar(endParLadenFileData, '^R_DRIVE_SC');
 
 % Extract tyre properties
 extractedTyreData = getAllParDataForEachAxleFromTyreData(allParLadenFileData, Sprung);
@@ -270,14 +270,18 @@ disp('Note: the code assumes all axles in the first axle group are steered');
 Tyre.sizes = extractedTyreData.Sizes;
 
 % Find the rolling radius from the first instance of rolling radius (steer tyre)## Should techically be the drive tyre
-tyreRollingRadiusArray = getVariableValuesFromPar(endParLadenFileData, '\<RRE');
+tyreRollingRadiusArray = getVariableValuesFromPar(endParLadenFileData, '^RRE(');
 Tyre.RollingRadius = tyreRollingRadiusArray(1);
 
 % Tyre widths no need to process for dummy axles, as the steer axle should always be axle 1
-Tyre.width = getVariableValuesFromPar(allParLadenFileData, '\<SET_THICKNESS_SGUI');
+GetTyreWidth.dataSetKeyCell = {'ENTER_PARSFILE Tires\Tire', ...
+    'EXIT_PARSFILE Tires\Tire'};
+GetTyreWidth.key = 'Y_LENGTH';
+GetTyreWidth.keySeperator = ' ';
+Tyre.width = getAllParDataForEachAxle(allParLadenFileData, GetTyreWidth, Sprung);
 
 % Calculating the overall steer axle width
-Axle.SteerAxleOverallWidth = Axle.TrackWidthArray(1) + Tyre.width(1);
+Axle.SteerAxleOverallWidth = Axle.TrackWidthArray(1) + str2double(Tyre.width{1}{1});
 
 % Converting to the correct units for the Post Processor
 Axle.XPositionArray = Axle.XPositionArray .* 0.001;
@@ -286,7 +290,7 @@ Tyre.RollingRadius = Tyre.RollingRadius .* 0.001;
 
 %% Dummy axle check for number of tyres
 % Find number of tyres from number of tyre model instances in the par file
-Tyre.NumberOff = length(getVariableValuesFromPar(endParLadenFileData, '\<OPT_TIRE_MODEL'));
+Tyre.NumberOff = length(getVariableValuesFromPar(endParLadenFileData, '^OPT_TIRE_MODEL'));
 if Dummy.isDummyAxle
     nDummyAxles = sum(Dummy.isRealAxleArray(:)) == 0;
     % The dummy tyre dataset is for single tyres therefore 2 tyres per axle
@@ -335,14 +339,22 @@ else
             if ~Combination.includedPayloads{iUnit}(iPayload)
                 % Move to next payload
                 iUnladenPayload = iUnladenPayload + 1;
-                PayloadUnladen.MassCell{iUnit}(iUnladenPayload) = PayloadLaden.MassCell{iUnit}(iPayload);
-                PayloadUnladen.CoGxPositionCell{iUnit}(iUnladenPayload) = PayloadLaden.CoGxPositionCell{iUnit}(iPayload);
-                PayloadUnladen.CoGyPositionCell{iUnit}(iUnladenPayload) = PayloadLaden.CoGyPositionCell{iUnit}(iPayload);
-                PayloadUnladen.CoGzPositionCell{iUnit}(iUnladenPayload) = PayloadLaden.CoGzPositionCell{iUnit}(iPayload);
-                PayloadUnladen.MOIxCell{iUnit}(iUnladenPayload) = PayloadLaden.MOIxCell{iUnit}(iPayload);
-                PayloadUnladen.MOIyCell{iUnit}(iUnladenPayload) = PayloadLaden.MOIyCell{iUnit}(iPayload);
-                PayloadUnladen.MOIzCell{iUnit}(iUnladenPayload) = PayloadLaden.MOIzCell{iUnit}(iPayload);
-                PayloadUnladen.DescriptionCell{iUnit}(iUnladenPayload) = PayloadLaden.DescriptionCell{iUnit}(iPayload);
+                PayloadUnladen.MassCell{iUnit} = [PayloadUnladen.MassCell{iUnit} ...
+                    PayloadLaden.MassCell{iUnit}(iPayload)];
+                PayloadUnladen.CoGxPositionCell{iUnit} = [PayloadUnladen.CoGxPositionCell{iUnit} ...
+                    PayloadLaden.CoGxPositionCell{iUnit}(iPayload)];
+                PayloadUnladen.CoGyPositionCell{iUnit} = [PayloadUnladen.CoGyPositionCell{iUnit} ...
+                    PayloadLaden.CoGyPositionCell{iUnit}(iPayload)];
+                PayloadUnladen.CoGzPositionCell{iUnit} = [PayloadUnladen.CoGzPositionCell{iUnit} ...
+                    PayloadLaden.CoGzPositionCell{iUnit}(iPayload)];
+                PayloadUnladen.MOIxCell{iUnit} = [PayloadUnladen.MOIxCell{iUnit} ...
+                    PayloadLaden.MOIxCell{iUnit}(iPayload)];
+                PayloadUnladen.MOIyCell{iUnit} = [PayloadUnladen.MOIyCell{iUnit} ...
+                    PayloadLaden.MOIyCell{iUnit}(iPayload)];
+                PayloadUnladen.MOIzCell{iUnit} = [PayloadUnladen.MOIzCell{iUnit} ...
+                    PayloadLaden.MOIzCell{iUnit}(iPayload)];
+                PayloadUnladen.DescriptionCell{iUnit} = [PayloadUnladen.DescriptionCell{iUnit} ...
+                    PayloadLaden.DescriptionCell{iUnit}(iPayload)];
             end
         end
     end
@@ -350,17 +362,20 @@ end
 %% Extract reference points
 % Reference points are extracted into a cell where each row is a unit. Column 1 = X, Column 2 = Y, Column 3 = Z. Each
 % column is a column array of the X, Y or Z reference points for that particular unit.
-Dimensions.RefPointsLadenCell = getReferencePoints(endParLadenFileData, Sprung.numberOffUnits);
+Dimensions.RefPointsLadenCell = getReferencePoints(allParLadenFileData, Sprung);
 
 if Is.lsunt
-    Dimensions.RefPointsUnladenCell = getReferencePoints(endParUnladenFileData, Sprung.numberOffUnits);
+    Dimensions.RefPointsUnladenCell = getReferencePoints(allParUnladenFileData, Sprung);
 end
 %% Determining maximum vehicle width in the laden and unladen condition condition
 % The maximim width of the vehicle is found from the reference point at the widest point on the combination.
 
-Dimensions.MaxWidthLaden = getMaxVehicleWidth(Dimensions.RefPointsLadenCell, Sprung.numberOffUnits);
+% This is now no longer required since the max width is entered manually. The widest point may not necessarily be a
+% reference point.
 
-if Is.lsunt
-Dimensions.MaxWidthUnladen = getMaxVehicleWidth(Dimensions.RefPointsUnladenCell, Sprung.numberOffUnits);
-end
+% Dimensions.MaxWidthLaden = getMaxVehicleWidth(Dimensions.RefPointsLadenCell, Sprung.numberOffUnits);
+% 
+% if Is.lsunt
+% Dimensions.MaxWidthUnladen = getMaxVehicleWidth(Dimensions.RefPointsUnladenCell, Sprung.numberOffUnits);
+% end
 end

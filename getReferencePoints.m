@@ -14,18 +14,29 @@
 % 
 %% Change Log
 %
+% [1.0.0] - 2017-07-11
+%
+% * Updated for TruckSim 2017.1
+%
 % [0.1.0] - 2017-04-29
 % 
 % Added
 % 
 % * First code
 
-function [referencePointsCell] = getReferencePoints(endParFileData, nUnits)
+function [referencePointsCell] = getReferencePoints(allParFileData, Sprung)
 
-for iUnit = 1 : nUnits
-    referencePointsCell{iUnit,1} = getVariableValuesFromPar(endParFileData, strcat('\<X_RP(', num2str(iUnit)))';
-    referencePointsCell{iUnit,2} = getVariableValuesFromPar(endParFileData, strcat('\<Y_RP(', num2str(iUnit)))';
-    referencePointsCell{iUnit,3} = getVariableValuesFromPar(endParFileData, strcat('\<H_RP(', num2str(iUnit)))';
+motionSensorData = spliceAllPar(allParFileData, {'ENTER_PARSFILE Output\Sensors\MoSen', ...
+    'EXIT_PARSFILE Output\Sensors\MoSen'});
+
+for iUnit = 1 : Sprung.numberOffUnits
+    xSensor = getVariableValuesFromPar(motionSensorData{iUnit}, '\<X_S')';
+    ySensor = getVariableValuesFromPar(motionSensorData{iUnit}, '\<Y_S')';
+    zSensor = getVariableValuesFromPar(motionSensorData{iUnit}, '\<Z_S')';
+    
+    referencePointsCell{iUnit,1} = xSensor(1:9);
+    referencePointsCell{iUnit,2} = ySensor(1:9);
+    referencePointsCell{iUnit,3} = zSensor(1:9);
 end
 
 end

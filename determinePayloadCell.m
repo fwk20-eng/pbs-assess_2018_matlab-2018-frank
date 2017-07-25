@@ -15,6 +15,11 @@
 % 
 %% Change Log
 %
+% [0.6.0]
+%
+% * Updated to TruckSim 2017.1 variables
+%
+%
 % [0.5.0] - 2017-05-09
 %
 % *Added*
@@ -65,7 +70,7 @@ for iUnit = 1:nUnits
 
     payloadCoGxPositionArray = getVariableValuesFromPar(endParFileData, sprintf('%s%i', '\<LX_CG_PL(', iUnit));
     payloadCoGyPositionArray = getVariableValuesFromPar(endParFileData, sprintf('%s%i', '\<Y_CG_PL(', iUnit));
-    payloadCoGzPositionArray = getVariableValuesFromPar(endParFileData, sprintf('%s%i', '\<H_CG_PL(', iUnit));
+    payloadCoGzPositionArray = getVariableValuesFromPar(endParFileData, sprintf('%s%i', '\<Z_CG_PL(', iUnit));
     
     payloadMOIxArray = getVariableValuesFromPar(endParFileData, sprintf('%s%i', '\<IXX_PL(', iUnit));
     payloadMOIyArray = getVariableValuesFromPar(endParFileData, sprintf('%s%i', '\<IYY_PL(', iUnit));

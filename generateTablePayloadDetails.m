@@ -29,6 +29,7 @@ function PBSreportTable = generateTablePayloadDetails(Sprung, Payload, caption, 
 % * B-Double
 
 %% Removing trucksim modifiers from payload
+
 payloadDetailsForReport = editCombinationCellSplitText(Payload.DescriptionCell, {' (',' ['}, 1);
 
 %% Extracting table contents
