@@ -13,10 +13,6 @@ if nargin == 0  % i.e. no inputs given then use inputs below
     % Redo
     % -----------------------------------------------------------------
 end
-%% Engine parameter edits for NTC longitudinal standards
-Engine.engageTrpm = 1005;
-Engine.engageTNm = 1126;
-Engine.Ie = 0.97;
 
 %%
 %Startability
