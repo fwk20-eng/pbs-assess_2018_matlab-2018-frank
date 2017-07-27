@@ -57,7 +57,7 @@ if Hitch.ZPositionArray ~= hitchZPositionArrayCheck
     error('%s','Manual Error: The hitch position in the sprung mass of the trailing unit is incorrect');
 end
 
-Hitch.DatasetArray = getDatasetNameFromPar(allParFileData, 'LOG_ENTRY Used Dataset: Hitch: Joint Assembly', '; ');
+Hitch.DatasetArray = getDatasetNameFromPar(allParFileData, 'LOG_ENTRY Used Dataset: Hitch: Joint Assembly', '} ');
 
 % Determining the number of hitches
 nHitches = length(Hitch.DatasetArray);
