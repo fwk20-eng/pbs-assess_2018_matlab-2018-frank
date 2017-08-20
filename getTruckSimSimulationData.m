@@ -11,6 +11,10 @@
 %
 %% Change Log
 %
+% [0.8.8] 2017-08-01
+%
+% * Automatically determine the vehicle string from the extracted TruckSim data
+%
 % [0.7.0] 2017-06-04
 %
 % *Fixed*
@@ -87,7 +91,7 @@
 % * [x] xLoad - all units [LX_CG_PL]
 % * [x] zLoad - all units [H_CG_PL]
 
-function [Tyre, Axle, Hitch, Sprung, Dimensions, PayloadLaden, PayloadUnladen, Dummy] = ...
+function [Tyre, Axle, Hitch, Sprung, Dimensions, PayloadLaden, PayloadUnladen, Dummy, Combination] = ...
     getTruckSimSimulationData(ParDetails, Is, Combination)
 %% Reading par file data
 endParLadenFileFullPath = strcat(ParDetails.parFileFolderPath, '\', ParDetails.endParLadenFileName);
@@ -136,7 +140,7 @@ Axle.TrackWidthArray = getVariableValuesFromPar(endParLadenFileData, '^L_TRACK\(
 axlePowertrainTorqueLogicArray = getVariableValuesFromPar(endParLadenFileData, '^R_DRIVE_SC');
 
 % Extract tyre properties
-extractedTyreData = getAllParDataForEachAxleFromTyreData(allParLadenFileData, Sprung);
+ExtractedTyreData = getAllParDataForEachAxleFromTyreData(allParLadenFileData, Sprung);
 
 %% Extracting dataset names
 % Axle type
@@ -228,8 +232,8 @@ if Dummy.isDummyAxle
     axlePowertrainTorqueLogicArray = removeDummyAxlesFromArray(axlePowertrainTorqueLogicArray, ...
         cell2mat(Dummy.isRealAxleCell{1}));
     
-    extractedTyreData.Sizes = removeDummyAxlesFromCombinationCell(extractedTyreData.Sizes, Dummy.isRealAxleCell);
-    extractedTyreData.Datasets = removeDummyAxlesFromCombinationCell(extractedTyreData.Datasets, Dummy.isRealAxleCell);
+    ExtractedTyreData.Sizes = removeDummyAxlesFromCombinationCell(ExtractedTyreData.Sizes, Dummy.isRealAxleCell);
+    ExtractedTyreData.Datasets = removeDummyAxlesFromCombinationCell(ExtractedTyreData.Datasets, Dummy.isRealAxleCell);
 end
 
 %% Extracting additional data from the dataset names once they have been processed for dummy axles
@@ -267,7 +271,7 @@ Axle.NumberOffSteer = length(Axle.Grouping(1));
 disp('Note: the code assumes all axles in the first axle group are steered');
 
 % Tyre sizes
-Tyre.sizes = extractedTyreData.Sizes;
+Tyre.sizes = ExtractedTyreData.Sizes;
 
 % Find the rolling radius from the first instance of rolling radius (steer tyre)## Should techically be the drive tyre
 tyreRollingRadiusArray = getVariableValuesFromPar(endParLadenFileData, '^RRE(');
@@ -367,15 +371,11 @@ Dimensions.RefPointsLadenCell = getReferencePoints(allParLadenFileData, Sprung);
 if Is.lsunt
     Dimensions.RefPointsUnladenCell = getReferencePoints(allParUnladenFileData, Sprung);
 end
-%% Determining maximum vehicle width in the laden and unladen condition condition
-% The maximim width of the vehicle is found from the reference point at the widest point on the combination.
 
-% This is now no longer required since the max width is entered manually. The widest point may not necessarily be a
-% reference point.
+%% Determining the vehicle string
+Combination = getVehicleString(Axle, Tyre, Hitch, Sprung, Combination);
 
-% Dimensions.MaxWidthLaden = getMaxVehicleWidth(Dimensions.RefPointsLadenCell, Sprung.numberOffUnits);
-% 
-% if Is.lsunt
-% Dimensions.MaxWidthUnladen = getMaxVehicleWidth(Dimensions.RefPointsUnladenCell, Sprung.numberOffUnits);
-% end
+%% Determining the vehicle classification
+Combination = getVehicleClassification(Axle, Tyre, Hitch, Sprung, Combination);
+
 end

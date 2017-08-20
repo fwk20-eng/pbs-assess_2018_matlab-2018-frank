@@ -32,7 +32,7 @@ if Is.long
 end
 if Is.srt
     results = Appender(results, fullName.SRTt       , 'g'       , r.SRTt   , checkLevel('>', r.SRTt, Lim.SRT, nLevels), Lim.SRT);
-    results = Appender(results, fullName.SRTtrrcu   , 'g'       , r.SRTtrrcu   , '-', []);
+    results = Appender(results, fullName.SRTtrrcu   , 'g'       , r.SRTtrrcu   , checkLevel('>', r.SRTtrrcu, Lim.SRT, nLevels), Lim.SRT);
 end
 if Is.yawD
     results = Appender(results, fullName.YDC        , '-'       , r.YDC    , checkLevel('>', r.YDC, Lim.YDC, nLevels), Lim.YDC);

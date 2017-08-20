@@ -8,8 +8,9 @@ for i = 1:Sprung.numberOffUnits
         [minY8(i), indTS8(i)] = min(Y_RP8{i});             % find minimums
         [minY9(i), indTS9(i)] = min(Y_RP9{i});             % find minimums        
         
+        % Take into account vehicle width. Note that the reference point outputs are in m, hence divided by 2000
         TS(i) = abs(min( [minY6(i), minY7(i), minY8(i), minY9(i)])) - ...
-            (Combination.maxWidth-Axle.SteerAxleOverallWidth)/2000;                
+            (max(Combination.maxWidth)-Axle.SteerAxleOverallWidth)/2000;                
     end
 end
 
@@ -22,7 +23,7 @@ if Is.plotOn
     legTitles = {};
     XDimensions.MaxWidthLaden = [floor(X_RP6{Sprung.numberOffUnits}(1)*5)/5-5 25];
 
-    plot(X_StOut, Y_StOut+(Combination.maxWidth-Axle.SteerAxleOverallWidth)/2000, 'Color', getColour(1))
+    plot(X_StOut, Y_StOut+(max(Combination.maxWidth)-Axle.SteerAxleOverallWidth)/2000, 'Color', getColour(1))
     legTitles = [legTitles; 'steer'];
 
     plot(XDimensions.MaxWidthLaden, [0 0], '--b')
@@ -32,29 +33,29 @@ if Is.plotOn
     for i = 1:Sprung.numberOffUnits                                             % plot: X_RP6789, Y_RP6789
         if sum(i == Combination.dollys(:)) == 0                                 % only evaluated if veh unit number not in dollys vector
             ind=ind+1;
-            plot(X_RP6{i}, Y_RP6{i}+(Combination.maxWidth-Axle.SteerAxleOverallWidth)/2000, 'Color', getColour(ind));      % plot next line
+            plot(X_RP6{i}, Y_RP6{i}+(max(Combination.maxWidth)-Axle.SteerAxleOverallWidth)/2000, 'Color', getColour(ind));      % plot next line
             ind=ind+1;
-            plot(X_RP7{i}, Y_RP7{i}+(Combination.maxWidth-Axle.SteerAxleOverallWidth)/2000, 'Color', getColour(ind));      % plot next line
+            plot(X_RP7{i}, Y_RP7{i}+(max(Combination.maxWidth)-Axle.SteerAxleOverallWidth)/2000, 'Color', getColour(ind));      % plot next line
             ind=ind+1;            
-            plot(X_RP8{i}, Y_RP8{i}+(Combination.maxWidth-Axle.SteerAxleOverallWidth)/2000, 'Color', getColour(ind));      % plot next line
+            plot(X_RP8{i}, Y_RP8{i}+(max(Combination.maxWidth)-Axle.SteerAxleOverallWidth)/2000, 'Color', getColour(ind));      % plot next line
             ind=ind+1;            
-            plot(X_RP9{i}, Y_RP9{i}+(Combination.maxWidth-Axle.SteerAxleOverallWidth)/2000, 'Color', getColour(ind));      % plot next line            
+            plot(X_RP9{i}, Y_RP9{i}+(max(Combination.maxWidth)-Axle.SteerAxleOverallWidth)/2000, 'Color', getColour(ind));      % plot next line            
             legTitles = [legTitles; ['unit ' int2str(i) ' p1']; ['unit ' int2str(i) ' p2']; ['unit ' int2str(i) ' p3']; ['unit ' int2str(i) ' p4'] ];
         end
     end
     
     for i = 1:Sprung.numberOffUnits                                             % plot: X_RP6789, Y_RP6789
         if sum(i == Combination.dollys(:)) == 0                                 % only evaluated if veh unit number not in dollys vector
-            plot(X_RP6{i}(indTS6(i)), Y_RP6{i}(indTS6(i))+(Combination.maxWidth-Axle.SteerAxleOverallWidth)/2000, 'or'); % plot peaks            
-            plot(X_RP7{i}(indTS7(i)), Y_RP7{i}(indTS7(i))+(Combination.maxWidth-Axle.SteerAxleOverallWidth)/2000, 'or'); % plot peaks            
-            plot(X_RP8{i}(indTS8(i)), Y_RP8{i}(indTS8(i))+(Combination.maxWidth-Axle.SteerAxleOverallWidth)/2000, 'or'); % plot peaks
-            plot(X_RP9{i}(indTS9(i)), Y_RP9{i}(indTS9(i))+(Combination.maxWidth-Axle.SteerAxleOverallWidth)/2000, 'or'); % plot peaks
+            plot(X_RP6{i}(indTS6(i)), Y_RP6{i}(indTS6(i))+(max(Combination.maxWidth)-Axle.SteerAxleOverallWidth)/2000, 'or'); % plot peaks            
+            plot(X_RP7{i}(indTS7(i)), Y_RP7{i}(indTS7(i))+(max(Combination.maxWidth)-Axle.SteerAxleOverallWidth)/2000, 'or'); % plot peaks            
+            plot(X_RP8{i}(indTS8(i)), Y_RP8{i}(indTS8(i))+(max(Combination.maxWidth)-Axle.SteerAxleOverallWidth)/2000, 'or'); % plot peaks
+            plot(X_RP9{i}(indTS9(i)), Y_RP9{i}(indTS9(i))+(max(Combination.maxWidth)-Axle.SteerAxleOverallWidth)/2000, 'or'); % plot peaks
         end
     end
 
     XentryTan = [floor(X_RP6{Sprung.numberOffUnits}(1)*5)/5-5 30];
     YentryTan = [Y_StOut(1) Y_StOut(1)]; 
-    plot(XentryTan, YentryTan+(Combination.maxWidth-Axle.SteerAxleOverallWidth)/2000, '--r')
+    plot(XentryTan, YentryTan+(max(Combination.maxWidth)-Axle.SteerAxleOverallWidth)/2000, '--r')
            
     axis 'auto x'
     lims=axis;

@@ -16,6 +16,12 @@
 %
 %% Change Log
 %
+% [0.3.0]
+%
+% *Fixed*
+%
+% * 
+%
 % [0.2.0]
 %
 % *Fixed*
@@ -28,8 +34,8 @@
 %
 % * First code
 
-function PBSreportTable = generateTableReferencePoints(referencePointNames, refPointsLadenCell, Sprung, Hitch,...
-    tableCaption, tableLabel)
+function PBSreportTable = generateTableReferencePoints(referencePointNames, refPointsLadenCell, Sprung, tableCaption,...
+    tableLabel)
 %% Table 11:  ReferencePoints (Laden)
 % Extracting table contents
 
@@ -44,12 +50,6 @@ for iUnit = 1 : Sprung.numberOffUnits
     iXref = refPointsLadenCell{iUnit,1}(1:9);
     iYref = refPointsLadenCell{iUnit,2}(1:9);
     iZref = refPointsLadenCell{iUnit,3}(1:9);
-    
-    % Adding hitch height to reference points for trailers due to a bug in TruckSim 8.2a
-    if iUnit > 1
-        % Looks at hitch height of previous unit as this is the connection point
-         iZref = refPointsLadenCell{iUnit,3}(1:9) + Hitch.ZPositionArray(iUnit - 1)*1000;
-    end
     
     sLeftRight = {'Left'; 'Left'; 'Right'; 'Right'; 'Right'; 'Right'; 'Right'; 'Right'; 'Right'};
     sManoeuvre = {'TASP'; 'TASP'; 'FS'; 'FS'; 'FS'; 'TASP \& TS'; 'TASP \& TS'; 'TASP \& TS'; 'TASP \& TS'};
