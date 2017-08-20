@@ -89,7 +89,8 @@
 % 1. List of inputs from TruckSim listed in "Inputs required from TruckSim.xls" file in this folder
 
 %% Beginning of function
-function [Project, ParDetails, Sprung, Axle, Hitch, Engine, Report, Dimensions, fullName, Lim, LimReport, resultsPbs, nLevels, Is, PayloadLaden, Axle1, AxleU1, Tyre] =...
+function [Project, ParDetails, Sprung, Axle, Hitch, Engine, Report, Dimensions, fullName, Lim, LimReport, resultsPbs,...
+    nLevels, Is, PayloadLaden, Axle1, AxleU1, Tyre, Combination] =...
     PostProcessMultiChoice(Is, Project, Combination, MatKey, Report)
 %% Preamble
 %% Generate the required file paths and perform the necessary checks for the assessment
@@ -99,7 +100,7 @@ function [Project, ParDetails, Sprung, Axle, Hitch, Engine, Report, Dimensions, 
 % createRunLog(Is, Project);
 copyTruckSimRunFiles(MatKey, Project, Is);
 
-[Tyre, Axle, Hitch, Sprung, Dimensions, PayloadLaden, PayloadUnladen, Dummy] =...
+[Tyre, Axle, Hitch, Sprung, Dimensions, PayloadLaden, PayloadUnladen, Dummy, Combination] =...
     getTruckSimSimulationData(ParDetails, Is, Combination);
 
 [Engine] = getEngineData(Combination.engineModel, Combination.gearboxModel, Tyre.NumberOff);
@@ -246,6 +247,9 @@ if Is.pbs
     disp('-------------------------------------------------------------------------------------')
     resultsPbs = r;
     resultsWithLevel = generateResults(r, Lim, fullName, nLevels, Is);
+   
+% Implimentation of determining PBS level
+    Combination = getPBSLevel(Combination, resultsWithLevel);
     
     display(resultsWithLevel(:, 1:4));
     warning on
