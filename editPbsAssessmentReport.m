@@ -74,6 +74,8 @@ end
 
 ResultsTable.booktabs = 1;
 ResultsTable.tableBorders = 0;
+ResultsTable.footNotes = {'\item[1] MoD/DoM performance relaxation approved by the SMART Truck Review Panel for vehicles assessed and operating in South Africa';
+    '\item[2] TASP performance relaxation approved by the SMART Truck Review Panel for vehicles assessed and operating in South Africa'};
 ResultsTable.tableCaption = 'PBS Assessment Results';
 ResultsTable.tableLabel = 'Results';
 resultsTableLatexCode = latexTable(ResultsTable);
