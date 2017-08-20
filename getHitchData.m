@@ -63,11 +63,11 @@ Hitch.DatasetArray = getDatasetNameFromPar(allParFileData, 'LOG_ENTRY Used Datas
 nHitches = length(Hitch.DatasetArray);
 
 % Determining whether the hitches are rollCoupled
-Hitch.RollCoupledArray = ones(nHitches);
+Hitch.RollCoupledArray = ones(1, nHitches);
 
 % Hitches are hardcoded to be load coupled for now 
 % TODO: Code function to determine if load coupled or not (depending on presence of a dolly)
-Hitch.LoadCoupledArray = ones(nHitches);
+Hitch.LoadCoupledArray = ones(1, nHitches);
 
 % Loop through each hitch. If the roll stiffness model is 'zero Roll Stiffness', then a pintle hitch is being used to
 % connect the units and no roll is transferred between the units
