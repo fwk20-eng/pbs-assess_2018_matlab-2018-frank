@@ -38,11 +38,14 @@ Table.primeMoverSummary = generateTablePrimeMoverSummary(Engine, Sprung);
 Table.engineTorqueCurve = generateTableEngineTorqueCurve(Engine);
 Table.gearboxTransmission = generateTableGearboxTransmission(Engine);
 Table.ladenReferencePoints = generateTableReferencePoints(Report.ladenReferencePointNames, ...
-    Dimensions.RefPointsLadenCell, Sprung, Hitch,...
+    Dimensions.RefPointsLadenCell, Sprung,...
     'Reference Points for Laden Combination','ReferencePointsForLadenCombination');
 Table.unladenReferencePoints = generateTableReferencePoints(Report.unladenReferencePointNames, ...
-    Dimensions.RefPointsUnladenCell, Sprung, Hitch,...
+    Dimensions.RefPointsUnladenCell, Sprung,...
     'Reference Points for Unladen Combination','ReferencePointsForUnladenCombination');
+% Passing back multiple tables, hence pass the structure through and do not create a structure within a structure as
+% then the code will not be able to write the tables
+ComTable = generateTableCommissioning(Axle, Sprung, Tyre, Hitch, Combination);
 
 % Generate results tables
 Report.pbsResultsTable = generateTableResults(fullName, Lim, LimReport, rounder(resultsPbs), Report, nLevels, Is);
@@ -79,7 +82,10 @@ if Is.carCarrier
 end
 
 % Generate the latex tables and save in the PBS assessment tex folder
-generateLatexTablesForPBSreport(Table, 'CombinationTables.tex', pbsAssessCopyToFullPath); %
+generateLatexTablesForPBSreport(Table, 'CombinationTables.tex', pbsAssessCopyToFullPath);
+
+% Generate commissioning tables in a seperate tex tile
+generateLatexTablesForPBSreport(ComTable, 'CommissioningTables.tex', pbsAssessCopyToFullPath);
 
 % Modify the PBS assessment parameters and save to a new file
 Report.pbsAssessmentMainTexFilePath = strcat(pbsAssessCopyToFullPath, '\PBS_Assessment.tex');
@@ -88,20 +94,61 @@ Report.pbsAssessmentResultsTexFilePath = strcat(pbsAssessCopyToFullPath, '\tex\C
 % Renamed tex filename for assessment
 date = strsplit(datestr(now,'yyyy-mm-dd'),'-');
 
-renamedTexFileName = strcat(date{1}, date{2}, date{3}, '_WITS_PBS-Assessment_', Project.key, '_V', Report.reportRevision);
+renamedTexFileName = strcat(date{1}, date{2}, date{3}, '_WITS_PBS-Assessment_', Project.key, '_V',...
+    Report.reportRevision);
 Report.pbsAssessmentRenamedTexFilePath = strcat(pbsAssessCopyToFullPath, '\', renamedTexFileName, '.tex');
+
+%% Combining parameters for the report where necessary
+
+% Trailer overhangs
+for iTrailer = 2:Sprung.numberOffUnits
+    frontOverhangDescription = ['\\newcommand\{\\tl' num2words((iTrailer - 1), 'case', 'sentence') 'FrontOverhang\}'];
+    rearOverhangDescription = ['\\newcommand\{\\tl' num2words((iTrailer - 1), 'case', 'sentence') 'RearOverhang\}'];
+    
+    if Combination.frontalOverhangs(iTrailer) == 0
+    frontOverhang = [num2str(Combination.frontalOverhangs(iTrailer)) '~mm (no overhang)'];        
+    else
+    frontOverhang = [num2str(Combination.frontalOverhangs(iTrailer)) '~mm (' ...
+        num2str(Combination.frontalOverhangsRelativeToDatum(iTrailer)) '~mm forward of the hitch point)'];
+    end
+    
+    
+    if Combination.rearOverhangs(iTrailer) == 0
+    rearOverhang = [num2str(Combination.rearOverhangs(iTrailer)) '~mm (no overhang)'];        
+    else
+    rearOverhang = [num2str(Combination.rearOverhangs(iTrailer)) '~mm (' ...
+        num2str(Combination.rearOverhangsRelativeToDatum(iTrailer)) '~mm rear of the hitch point)'];
+    end
+    
+    if iTrailer == 2 % Create
+    overhangDetails = {...
+        frontOverhangDescription, frontOverhang;
+        rearOverhangDescription, rearOverhang};
+    else % Append
+    overhangDetails = [overhangDetails;
+        {frontOverhangDescription, frontOverhang};
+        {rearOverhangDescription, rearOverhang}];
+    end
+end
 
 % Add additional report modifiers according to extracted PBS data
 additionalModifiers = {...
     '\\newcommand\{\\combOverallLength\}', strcat(num2str(Combination.totalLength*0.001, '%0.3f'), '~m');
-    '\\newcommand\{\\combMaxHt\}', strcat(num2str(Combination.maxHeight*0.001, '%0.3f'), '~m');
-    '\\newcommand\{\\combMaxWidth\}', strcat(num2str(Combination.maxWidth*0.001, '%0.3f'), '~m');
+    '\\newcommand\{\\combMaxHt\}', strcat(num2str(max(Combination.maxHeight)*0.001, '%0.3f'), '~m');
+    '\\newcommand\{\\combMaxWidth\}', strcat(num2str(max(Combination.maxWidth)*0.001, '%0.3f'), '~m');
     '\\newcommand\{\\desiredPBSLevel\}', num2str(Combination.pbsLevelDesired);
-    '\\newcommand\{\\combAxles\}', num2str(Axle.NumberOff);  
+    '\\newcommand\{\\combAxles\}', num2str(Axle.NumberOff);
     '\\newcommand\{\\combGCM\}', strcat(num2str(sum(Axle1)), '~kg');
     '\\newcommand\{\\combPayload\}', strcat(num2str(sum(cell2mat(PayloadLaden.MassCell).*...
     cell2mat(Combination.includedPayloads))), '~kg');
+    '\\newcommand\{\\combVehStr}', convertToRegExSafeText(Combination.combinationVehicleString);
+    '\\newcommand\{\\combClassification\}', Combination.combinationClassification;
+    '\\newcommand\{\\combPbsLevelExec\}', Combination.pbsPerformanceResult;
+    '\\newcommand\{\\combPbsLevel\}', Combination.pbsPerformanceResult;
     };
+
+additionalModifiers = [additionalModifiers; overhangDetails];
+
 
 Report.modifiers = [Report.modifiers; additionalModifiers];
     
