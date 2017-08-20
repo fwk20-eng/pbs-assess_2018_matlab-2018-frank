@@ -36,21 +36,21 @@ pbsResultsTable = AppenderReport(pbsResultsTable, fullName.SRTtrrcu   , 'g'     
 pbsResultsTable = AppenderReport(pbsResultsTable, fullName.YDC        , '-'       , num2str(r.YDC)    , checkLevel('>', r.YDC, Lim.YDC, nLevels), LimReport.YDC);
 pbsResultsTable = AppenderReport(pbsResultsTable, fullName.RA         , '-'       , num2str(r.RA)     , checkLevel('<', r.RA, Lim.RA, nLevels), LimReport.RA);
 pbsResultsTable = AppenderReport(pbsResultsTable, fullName.HSTO       , 'm'       , num2str(r.HSTO)   , checkLevel('<', r.HSTO, Lim.HSTO, nLevels), LimReport.HSTO);
-pbsResultsTable = AppenderReport(pbsResultsTable, fullName.TASP       , 'm'       , num2str(r.TASP)   , checkLevel('<', r.TASP, Lim.TASP, nLevels), LimReport.TASP);
+pbsResultsTable = AppenderReport(pbsResultsTable, [fullName.TASP '\tnote{2}']       , 'm'       , num2str(r.TASP)   , checkLevel('<', r.TASP, Lim.TASP, nLevels), LimReport.TASP);
 pbsResultsTable = AppenderReport(pbsResultsTable, fullName.LSSP       , 'm'       , num2str(r.LSSP)   , checkLevel('<', r.LSSP, Lim.LSSP, nLevels), LimReport.LSSP);
 pbsResultsTable = AppenderReport(pbsResultsTable, fullName.TS         , 'm'       , num2str(r.TS)     , checkLevel('<', r.TS, Lim.TS, nLevels), LimReport.TS);
 pbsResultsTable = AppenderReport(pbsResultsTable, fullName.FS         , 'm'       , num2str(r.FS)     , checkLevel('<', r.FS, Lim.FS, nLevels), LimReport.FS);
 if Is.semi %doesnt add MoD, DoM if it is not a SemiTrailer
-    pbsResultsTable = AppenderReport(pbsResultsTable, fullName.MoD    , 'm', num2str(r.MoD)    , checkLevel('<', r.MoD, Lim.MoD, nLevels), LimReport.MoD);
-    pbsResultsTable = AppenderReport(pbsResultsTable, fullName.DoM    , 'm', num2str(r.DoM)    , checkLevel('<', r.DoM, Lim.DoM, nLevels), LimReport.DoM);
+    pbsResultsTable = AppenderReport(pbsResultsTable, [fullName.MoD '\tnote{1}']    , 'm', num2str(r.MoD)    , checkLevel('<', r.MoD, Lim.MoD, nLevels), LimReport.MoD);
+    pbsResultsTable = AppenderReport(pbsResultsTable, [fullName.DoM '\tnote{1}']    , 'm', num2str(r.DoM)    , checkLevel('<', r.DoM, Lim.DoM, nLevels), LimReport.DoM);
 end
 pbsResultsTable = AppenderReport(pbsResultsTable, fullName.STFD   , '\%', num2str(r.STFD)   , checkLevel('<', r.STFD, Lim.STFD, nLevels), LimReport.STFD);
 pbsResultsTable = AppenderReport(pbsResultsTable, fullName.LSSPu  , 'm', num2str(r.LSSPu)  , checkLevel('<', r.LSSPu, Lim.LSSP, nLevels), LimReport.LSSP);
 pbsResultsTable = AppenderReport(pbsResultsTable, fullName.TSu    , 'm', num2str(r.TSu)    , checkLevel('<', r.TSu, Lim.TS, nLevels), LimReport.TS);
 pbsResultsTable = AppenderReport(pbsResultsTable, fullName.FSu    , 'm', num2str(r.FSu)   , checkLevel('<', r.FSu, Lim.FS, nLevels), LimReport.FS);
 if Is.semi %Doesnt add MoDu, DoMu if it is not a SemiTrailer
-    pbsResultsTable = AppenderReport(pbsResultsTable, fullName.MoDu   , 'm', num2str(r.MoDu)   , checkLevel('<', r.MoDu, Lim.MoD, nLevels), LimReport.MoD);
-    pbsResultsTable = AppenderReport(pbsResultsTable, fullName.DoMu   , 'm', num2str(r.DoMu)   , checkLevel('<', r.DoMu, Lim.DoM, nLevels), LimReport.DoM);
+    pbsResultsTable = AppenderReport(pbsResultsTable, [fullName.MoDu '\tnote{1}']   , 'm', num2str(r.MoDu)   , checkLevel('<', r.MoDu, Lim.MoD, nLevels), LimReport.MoD);
+    pbsResultsTable = AppenderReport(pbsResultsTable, [fullName.DoMu '\tnote{1}']   , 'm', num2str(r.DoMu)   , checkLevel('<', r.DoMu, Lim.DoM, nLevels), LimReport.DoM);
 end
 pbsResultsTable = AppenderReport(pbsResultsTable, fullName.STFDu  , '\%', num2str(r.STFDu)  , checkLevel('<', r.STFDu, Lim.STFD, nLevels), LimReport.STFD);
 

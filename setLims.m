@@ -18,7 +18,7 @@ end
 
 Lim.YDC = [0.15 0.15 0.15 0.15];
 Lim.HSTO = [0.6 0.8 1.0 1.2];
-Lim.TASP = [2.9 3.0 3.1 3.3];
+Lim.TASP = [2.95 3.05 3.15 3.35];
 Lim.LSSP = [7.4 8.7 10.6 13.7];
 Lim.TS = [0.30 0.35 0.35 0.50];
 Lim.MoD = [0.55 0.55 0.55 0.55];
@@ -45,7 +45,7 @@ end
 LimReport.YDC =     {'$\geq$0.15' '$\geq$0.15' '$\geq$0.15' '$\geq$0.15'};
 LimReport.RA = {'$\leq\dagger$' '$\leq\dagger$' '$\leq\dagger$' '$\leq\dagger$'};
 LimReport.HSTO =    {'$\leq$0.6' '$\leq$0.8' '$\leq$1.0' '$\leq$1.2'};
-LimReport.TASP =    {'$\leq$2.9' '$\leq$3.0' '$\leq$3.1' '$\leq$3.3'};
+LimReport.TASP =    {'$\leq$2.95' '$\leq$3.05' '$\leq$3.15' '$\leq$3.35'};
 LimReport.LSSP =    {'$\leq$7.4' '$\leq$8.7' '$\leq$10.6' '$\leq$13.7'};
 LimReport.TS =      {'$\leq$0.3' '$\leq$0.35' '$\leq$0.35' '$\leq$0.50'};
 LimReport.MoD =     {'$\leq$0.55' '$\leq$0.55' '$\leq$0.55' '$\leq$0.55'};
