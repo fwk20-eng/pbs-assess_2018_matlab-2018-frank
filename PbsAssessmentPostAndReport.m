@@ -9,31 +9,20 @@ Project.runFolderPath = strcat(Project.resultsFolderPath, '\Version_', Project.r
 %% Setting matlab keys for run
 % These can be changed as you loop through a project if required
 
-if Is.carCarrier
-    if Is.yawD;     MatKey.yawD = {'YawD_FL', ResultCode.yawD};    end
-    if Is.ra;       MatKey.ra = {'RA_FL', ResultCode.ra};        end
-    if Is.hsto;     MatKey.hsto = {'RA_FL', ResultCode.ra};      end
-    if Is.srt;      MatKey.srt = {'SRT_FL', ResultCode.srt};     end
-    if Is.tasp;     MatKey.tasp = {'TASP_FL', ResultCode.tasp};    end
-    if Is.lst;      MatKey.lst = {'LST_FL', ResultCode.lst};      end
-    if Is.lsunt;    MatKey.lsunt = {'LSunT', ResultCode.lsunt};     end % unloaded is always the same in all cases
-    if Is.long;     MatKey.long = {'LST_FL', ResultCode.lst};     end % use LST erd file if you are going to be calculating the longitudinal standards
-    if Is.axle;     MatKey.axle = {'AXLE_FL', ResultCode.axle};    end
-else
-    if Is.yawD;     MatKey.yawD = {'YawD', ResultCode.yawD};       end
-    if Is.ra;       MatKey.ra = {'RA', ResultCode.ra};           end
-    if Is.hsto;     MatKey.hsto = {'RA', ResultCode.ra};         end
-    if Is.srt;      MatKey.srt = {'SRT', ResultCode.srt};        end
-    if Is.tasp;     MatKey.tasp = {'TASP', ResultCode.tasp};       end
-    if Is.lst;      MatKey.lst = {'LST', ResultCode.lst};         end
-    if Is.lsunt;    MatKey.lsunt = {'LSunT', ResultCode.lsunt};     end % unloaded is always the same in all cases
-    if Is.long;     MatKey.long = {'LST', ResultCode.lst};        end % use LST erd file if you are going to be calculating the longitudinal standards
-    if Is.axle;     MatKey.axle = {'AXLE', ResultCode.axle};       end
-end
+if Is.yawD;     MatKey.yawD = {'YawD', ResultCode.yawD};       end
+if Is.ra;       MatKey.ra = {'RA', ResultCode.ra};           end
+if Is.hsto;     MatKey.hsto = {'RA', ResultCode.ra};         end
+if Is.srt;      MatKey.srt = {'SRT', ResultCode.srt};        end
+if Is.tasp;     MatKey.tasp = {'TASP', ResultCode.tasp};       end
+if Is.lst;      MatKey.lst = {'LST', ResultCode.lst};         end
+if Is.lsunt;    MatKey.lsunt = {'LSunT', ResultCode.lsunt};     end % unloaded is always the same in all cases
+if Is.long;     MatKey.long = {'LST', ResultCode.lst};        end % use LST erd file if you are going to be calculating the longitudinal standards
+if Is.axle;     MatKey.axle = {'AXLE', ResultCode.axle};       end
 
 %%	Passing variables to PostProcess
 [Project, ParDetails, Sprung, Axle, Hitch, Engine, Report, Dimensions, fullName, Lim, LimReport, resultsPbs, nLevels,...
-    Is, PayloadLaden, Axle1, AxleU1, Tyre] = PostProcessMultiChoice(Is, Project, Combination, MatKey, Report);
+    Is, PayloadLaden, Axle1, AxleU1, Tyre, Combination] =...
+    PostProcessMultiChoice(Is, Project, Combination, MatKey, Report);
 
 if Is.carCarrier
     Project.revision = strcat(Project.revision, '_TD');
@@ -48,16 +37,16 @@ if Is.carCarrier
     if Is.long;     MatKey.long = {'LST_TD', ResultCode.lst_TD};     end % use LST erd file if you are going to be calculating the longitudinal standards
     if Is.axle;     MatKey.axle = {'AXLE_TD', ResultCode.axle_TD};    end
     
-    [Topdeck.Project, ~, ~, ~, ~, ~, ~, ~, ~, ~, ~, Topdeck.resultsPbs, ~, ~, Topdeck.PayloadLaden, ~, ~, ~] = ...
+    [Topdeck.Project, ~, ~, ~, ~, ~, ~, ~, ~, ~, ~, Topdeck.resultsPbs, ~, ~, Topdeck.PayloadLaden, ~, ~, ~, ~] = ...
         PostProcessMultiChoice(Is, Project, Combination, MatKey, Report);
     
-%%	Writting reslts and combination parameters to report if a full assessment is being conducted
-if Is.fullPBS
-    writeToLatexPbsAssessment(Project, Combination, ParDetails, Sprung, Axle, Hitch, Engine, Report, Dimensions,...
-        fullName, Lim, LimReport, resultsPbs, nLevels, Is, PayloadLaden, Axle1, AxleU1, Tyre, Topdeck);
-end
+    %%	Writting reslts and combination parameters to report if a full assessment is being conducted
+    if Is.fullPBS
+        writeToLatexPbsAssessment(Project, Combination, ParDetails, Sprung, Axle, Hitch, Engine, Report, Dimensions,...
+            fullName, Lim, LimReport, resultsPbs, nLevels, Is, PayloadLaden, Axle1, AxleU1, Tyre, Topdeck);
+    end
 else
-%%	Writting reslts and combination parameters to report if a full assessment is being conducted
+    %%	Writting reslts and combination parameters to report if a full assessment is being conducted
     if Is.fullPBS
         writeToLatexPbsAssessment(Project, Combination, ParDetails, Sprung, Axle, Hitch, Engine, Report, Dimensions,...
             fullName, Lim, LimReport, resultsPbs, nLevels, Is, PayloadLaden, Axle1, AxleU1, Tyre);
