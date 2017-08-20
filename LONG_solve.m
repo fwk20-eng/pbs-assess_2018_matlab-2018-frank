@@ -88,7 +88,7 @@ FA=drag(Combination.frontalAreaForDrag,Combination.cd,v,Combination.ce);
 grad=[0:0.1:30];
 contin=1;
 i=0;
-Frr=rolling(0,sum(mTotal),Combination.ch,radial);
+Frr=rolling(v,sum(mTotal),Combination.ch,radial);
 while contin
     i=i+1;
     th=atan(grad(i)/100);
