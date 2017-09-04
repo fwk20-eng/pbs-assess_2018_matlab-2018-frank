@@ -28,12 +28,17 @@
 % Is.plotOn = 1;
 % Is.save = 0;
 
-function [Axle] = AXLE_solve(Axle, MatKey, Project, Is)
+function [Axle] = AXLE_solve(Axle, MatKey, Project, Is, Dummy)
 
-% Extract the required data
-[Data, errorx] = readData(MatKey, {'Fz_AXL'}, [Axle.NumberOff], {''}, [], Project.savePath, Project.truckSimRunsPath,...
-    Project.runKey, [1]);
-
+if Dummy.isDummyAxle
+    % If a dummy axle is present, the number of axles will not match the last axle index
+    [Data, errorx] = readDataWithDummyAxles(MatKey, {'Fz_AXL'}, {Dummy.isRealAxleIndex}, {''}, [], Project.savePath, Project.truckSimRunsPath,...
+        Project.runKey, [1]);
+else
+    % Extract the required data
+    [Data, errorx] = readData(MatKey, {'Fz_AXL'}, [Axle.NumberOff], {''}, [], Project.savePath, Project.truckSimRunsPath,...
+        Project.runKey, [1]);
+end
 % Initialising the cell array of strings for the axle loads
 fzAxle = {};
 Axle.truckSimLoads = [];
