@@ -11,7 +11,11 @@
 %
 %% Change Log
 %
-% [0.8.8] 2017-08-01
+% [0.9.0] 2017-08-20
+%
+% * Added support for dolly combinations
+%
+% [0.8.0] 2017-08-01
 %
 % * Automatically determine the vehicle string from the extracted TruckSim data
 %
@@ -123,8 +127,8 @@ Sprung.MOIz = getVariableValuesFromPar(endParLadenFileData,'^IZZ_SU');
 Sprung.numberOffUnits = length(Sprung.MassArray);
 
 % Converting to the correct units for the Post Processor
-Sprung.MassCoGxPosition = Sprung.MassCoGxPosition.*0.001;
-Sprung.MassCoGzPosition = Sprung.MassCoGzPosition.*0.001;
+Sprung.MassCoGxPosition = Sprung.MassCoGxPosition .* 0.001;
+Sprung.MassCoGzPosition = Sprung.MassCoGzPosition .* 0.001;
 
 %% Extract axle properties for post processor
 
@@ -139,8 +143,8 @@ Axle.TrackWidthArray = getVariableValuesFromPar(endParLadenFileData, '^L_TRACK\(
 % Determine which axles are driven, this will not work if there are driven axles other than on the prime mover
 axlePowertrainTorqueLogicArray = getVariableValuesFromPar(endParLadenFileData, '^R_DRIVE_SC');
 
-% Extract tyre properties
-ExtractedTyreData = getAllParDataForEachAxleFromTyreData(allParLadenFileData, Sprung);
+% Extract tyre properties and determine which units are dolly's
+[ExtractedTyreData, Combination.dollys] = getAllParDataForEachAxleFromTyreData(allParLadenFileData, Sprung);
 
 %% Extracting dataset names
 % Axle type
@@ -249,8 +253,8 @@ Axle.suspensionKinematicsReportName = editCombinationCellSplitText(Axle.suspensi
 Axle.complianceReportName = editCombinationCellSplitText(Axle.complianceDatasetName,...
     {' (',' ['}, 1);
 
-Axle.springReportModel = editCombinationCellSplitText(Axle.springDatasetName, {' (',' ['}, 1);
-Axle.damperReportModel = editCombinationCellSplitText(Axle.damperDatasetName, {' (',' ['}, 1);
+Axle.springReportModel = editCombinationCellSplitText(Axle.springDatasetName, {' (', ' ['}, 1);
+Axle.damperReportModel = editCombinationCellSplitText(Axle.damperDatasetName, {' (', ' ['}, 1);
 
 Axle.rollCentreHeight = editCombinationCellRegexpBetweenText(Axle.rollCentreDatasetName, ':\s+', '\smm');
 %% Additional axle and tyre properties
@@ -303,7 +307,7 @@ if Dummy.isDummyAxle
 end
 
 %% Extract hitch properties
-[Hitch] = getHitchData(endParLadenFileData, allParLadenFileData);
+[Hitch] = getHitchData(endParLadenFileData, allParLadenFileData, Combination);
 
 % Converting to the correct units for the Post Processor
 Hitch.XPositionArray = Hitch.XPositionArray .* 0.001;
@@ -326,7 +330,7 @@ else
     nUnits = length(Combination.includedPayloads);
     for iUnit = 1 : nUnits
         iUnladenPayload = 0;
-        
+
         % Initialising unladen cell
         PayloadUnladen.MassCell{iUnit} = [];
         PayloadUnladen.CoGxPositionCell{iUnit} = [];
@@ -366,10 +370,10 @@ end
 %% Extract reference points
 % Reference points are extracted into a cell where each row is a unit. Column 1 = X, Column 2 = Y, Column 3 = Z. Each
 % column is a column array of the X, Y or Z reference points for that particular unit.
-Dimensions.RefPointsLadenCell = getReferencePoints(allParLadenFileData, Sprung);
+Dimensions.RefPointsLadenCell = getReferencePoints(allParLadenFileData, Sprung, Combination);
 
 if Is.lsunt
-    Dimensions.RefPointsUnladenCell = getReferencePoints(allParUnladenFileData, Sprung);
+    Dimensions.RefPointsUnladenCell = getReferencePoints(allParUnladenFileData, Sprung, Combination);
 end
 
 %% Determining the vehicle string

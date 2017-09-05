@@ -16,11 +16,15 @@
 %
 %% Change Log
 %
+% [0.4.0]
+%
+% * Dolly unit support (no reference points printed for dolly)
+%
 % [0.3.0]
 %
 % *Fixed*
 %
-% * 
+% * Hitch height compensation removed due to bug fix in TruckSim 2017.1
 %
 % [0.2.0]
 %
@@ -34,35 +38,41 @@
 %
 % * First code
 
-function PBSreportTable = generateTableReferencePoints(referencePointNames, refPointsLadenCell, Sprung, tableCaption,...
-    tableLabel)
+function PBSreportTable = generateTableReferencePoints(referencePointNames, refPointsLadenCell, Sprung, Combination,...
+    tableCaption, tableLabel)
 %% Table 11:  ReferencePoints (Laden)
 % Extracting table contents
 
 % Table.data = [Table.VehicleParameterHeadings columnDataForTable];
 Table.data = {};
 
+nDollys = length(Combination.dollys);
+nUnitsWithReferencePoints = Sprung.numberOffUnits - nDollys;
+
 for iUnit = 1 : Sprung.numberOffUnits
-    
-    iReferencePointsUnit = iUnit * ones(9,1);
-    
-    % Only the first 9 reference points are used in the current post processor
-    iXref = refPointsLadenCell{iUnit,1}(1:9);
-    iYref = refPointsLadenCell{iUnit,2}(1:9);
-    iZref = refPointsLadenCell{iUnit,3}(1:9);
-    
-    sLeftRight = {'Left'; 'Left'; 'Right'; 'Right'; 'Right'; 'Right'; 'Right'; 'Right'; 'Right'};
-    sManoeuvre = {'TASP'; 'TASP'; 'FS'; 'FS'; 'FS'; 'TASP \& TS'; 'TASP \& TS'; 'TASP \& TS'; 'TASP \& TS'};
-    sReferencePointNumber = {'1'; '2'; '3'; '4'; '5'; '6'; '7'; '8'; '9'};
-    sReferencePointsUnit = arrayfun(@(x) num2str(x, '%0.0f'), iReferencePointsUnit, 'UniformOutput', false);
-    sXref = arrayfun(@(x) num2str(x, '%0.0f'), iXref, 'UniformOutput', false);
-    sYref = arrayfun(@(x) num2str(x, '%0.0f'), iYref, 'UniformOutput', false);
-    sZref = arrayfun(@(x) num2str(x, '%0.0f'), iZref, 'UniformOutput', false);
-    sRefPointDescription = referencePointNames{iUnit};
-    
-    referencePointsForUnit = [sReferencePointsUnit, sReferencePointNumber, sManoeuvre, sLeftRight, sRefPointDescription, sXref, sYref, sZref];
-    
-    Table.data = [Table.data; referencePointsForUnit];
+    % Do not print reference points if a dolly unit
+    if ~any(iUnit == Combination.dollys)
+        iReferencePointsUnit = iUnit * ones(9,1);
+        
+        % Only the first 9 reference points are used in the current post processor
+        iXref = refPointsLadenCell{iUnit,1}(1:9);
+        iYref = refPointsLadenCell{iUnit,2}(1:9);
+        iZref = refPointsLadenCell{iUnit,3}(1:9);
+        
+        sLeftRight = {'Left'; 'Left'; 'Right'; 'Right'; 'Right'; 'Right'; 'Right'; 'Right'; 'Right'};
+        sManoeuvre = {'TASP'; 'TASP'; 'FS'; 'FS'; 'FS'; 'TASP \& TS'; 'TASP \& TS'; 'TASP \& TS'; 'TASP \& TS'};
+        sReferencePointNumber = {'1'; '2'; '3'; '4'; '5'; '6'; '7'; '8'; '9'};
+        sReferencePointsUnit = arrayfun(@(x) num2str(x, '%0.0f'), iReferencePointsUnit, 'UniformOutput', false);
+        sXref = arrayfun(@(x) num2str(x, '%0.0f'), iXref, 'UniformOutput', false);
+        sYref = arrayfun(@(x) num2str(x, '%0.0f'), iYref, 'UniformOutput', false);
+        sZref = arrayfun(@(x) num2str(x, '%0.0f'), iZref, 'UniformOutput', false);
+        sRefPointDescription = referencePointNames{iUnit};
+        
+        referencePointsForUnit = [sReferencePointsUnit, sReferencePointNumber, sManoeuvre, sLeftRight, sRefPointDescription, sXref, sYref, sZref];
+        
+        Table.data = [Table.data; referencePointsForUnit];
+    end
+
 end
 
 Table.Headings = {'\textbf{Unit}'  '\textbf{Pt.}' '\textbf{PM}' '\textbf{L/R}' '\textbf{Description}' '\textbf{X (mm)\tnote{1}}' '\textbf{Y (mm)\tnote{1}}' '\textbf{Z (mm)\tnote{1}}'};

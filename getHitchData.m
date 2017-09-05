@@ -1,21 +1,21 @@
 %% Function Description
-% 
+%
 % This function extracts all the required data for the hitch. It also includes checks to ensure that the correct
 % parameters have been entered into TruckSim
-% 
+%
 %% Inputs
-% 
+%
 % * endParFileData: End par file extracted to a cell array of strings
 % * allParFileData: _all par file extracted to a cell array of strings
-% 
+%
 %% Outputs
-% 
+%
 % * hitchXPositionArray: Array of hitch longitudinal positions
 % * hitchZPositionArray: Array of hitch heights
 % * hitchDatasetArray: Array of hitch model descriptions
 % * rollCoupledArray: Array of roll coupling (0 - false, 1 - true)
 % * loadCoupledArray: Array of load coupling (as of 0.1.0 it is hard coded as true for all hitches)
-% 
+%
 %% Change Log
 %
 % Future releases
@@ -25,19 +25,19 @@
 % all cases
 %
 % [0.2.0] - 2017-05-01
-% 
+%
 % Fixed
 %
 % * Changed to a structure variable output to neaten code
 %
 % [0.1.0] - 2017-01-25
-% 
+%
 % Added
-% 
+%
 % * First code
 
-function [Hitch] = getHitchData(endParFileData, allParFileData)
-                                            
+function [Hitch] = getHitchData(endParFileData, allParFileData, Combination)
+
 Hitch.XPositionArray = getVariableValuesFromPar(endParFileData, '\<LX_H');
 
 Hitch.RollMomentArray = getDatasetNameFromPar(allParFileData, 'LOG_ENTRY Used Dataset: Hitch: Roll Moment', '; ');
@@ -62,20 +62,21 @@ Hitch.DatasetArray = getDatasetNameFromPar(allParFileData, 'LOG_ENTRY Used Datas
 % Determining the number of hitches
 nHitches = length(Hitch.DatasetArray);
 
-% Determining whether the hitches are rollCoupled
+% Assume roll and load coupled
 Hitch.RollCoupledArray = ones(1, nHitches);
-
-% Hitches are hardcoded to be load coupled for now 
-% TODO: Code function to determine if load coupled or not (depending on presence of a dolly)
 Hitch.LoadCoupledArray = ones(1, nHitches);
 
+% Determining whether the hitches are rollCoupled [if 5th wheel - then roll coupled. If Pintle then not roll coupled]
 % Loop through each hitch. If the roll stiffness model is 'zero Roll Stiffness', then a pintle hitch is being used to
 % connect the units and no roll is transferred between the units
 for iHitch = 1 : nHitches
-%
-% * TODO: Determine whether the below code functions when a pintle hitch is being used.
-%
-    if strcmp(Hitch.DatasetArray{iHitch},'Zero Roll Stiffness')
+    if strcmp(Hitch.RollMomentArray{iHitch},'Zero')
         Hitch.RollCoupledArray(iHitch) = 0;
+        % If the next unit is a dolly - then there is also no load coupling.
+        if any(iHitch + 1 == Combination.dollys)
+            Hitch.LoadCoupledArray(iHitch) = 0;
+        end
     end
+end
+
 end

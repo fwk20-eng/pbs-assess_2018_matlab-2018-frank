@@ -1,25 +1,29 @@
 %% Function Description
-% 
+%
 % Use data extracted from TruckSim to determine the vehicle string for the combination
-% 
+%
 %% Inputs
-% 
+%
 % * Axle
 % * Tyre
 % * Hitch
 % * Sprung
 % * Combination
-% 
+%
 %% Outputs
-% 
+%
 % * Combination: appended with vehicleStringCell and combinationVehicleString
-% 
+%
 %% Change Log
-% 
+%
+% [0.2.0] - 2017-08-22
+%
+% * Added Dolly support
+%
 % [0.1.0] - 2017-01-01
-% 
+%
 % *Added*
-% 
+%
 % * First code
 
 function Combination = getVehicleString(Axle, Tyre, Hitch, Sprung, Combination)
@@ -35,14 +39,16 @@ for iUnit = 1:Sprung.numberOffUnits
     % Determine the first axle group within the unit
     currentAxleGroup = Axle.UnitAndGroup(indicesOfAxlesInUnit(1),3);
     
-    for iAxle = 1:length(indicesOfAxlesInUnit)
+    nAxlesInGroup = length(indicesOfAxlesInUnit);
+    
+    for iAxle = 1:nAxlesInGroup
         % Determine the first axle group within the unit
         axleGroup = Axle.UnitAndGroup(indicesOfAxlesInUnit(iAxle),3);
         % Process the axle group main symbol and current axle dual tyre status
         axleType = Axle.type{iUnit}{iAxle};
         axleSpringType = Axle.springType{iUnit}{iAxle};
         dualsOrSingles = tyreDualsOrSingles{iUnit}{iAxle};
-%% First axle
+        %% First axle (if axle group has more than 1 axle)
         if iAxle == 1
             % Determine main grouping from axle type
             switch axleType
@@ -58,15 +64,23 @@ for iUnit = 1:Sprung.numberOffUnits
                     vehicleString{iUnit} = [vehicleString{iUnit} 'y('];
             end
             % Add duals or singles for the axle
-            switch dualsOrSingles
-                case 'duals'
-                    vehicleString{iUnit} = [vehicleString{iUnit} 'd'];
-                case 'singles'
-                    vehicleString{iUnit} = [vehicleString{iUnit} 's'];
+            if nAxlesInGroup == 1 % If only one axle, the parenthesis needs to be closed
+                switch dualsOrSingles
+                    case 'duals'
+                        vehicleString{iUnit} = [vehicleString{iUnit} 'd)'];
+                    case 'singles'
+                        vehicleString{iUnit} = [vehicleString{iUnit} 's)'];
+                end
+            else
+                switch dualsOrSingles
+                    case 'duals'
+                        vehicleString{iUnit} = [vehicleString{iUnit} 'd'];
+                    case 'singles'
+                        vehicleString{iUnit} = [vehicleString{iUnit} 's'];
+                end
             end
-            
             currentAxleGroup = Axle.UnitAndGroup(indicesOfAxlesInUnit(iAxle),3);
-%% Next axle if in the same axle group (excluding the last axle in the unit)
+            %% Next axle if in the same axle group (excluding the last axle in the unit)
         elseif iAxle > 1 && iAxle ~= length(indicesOfAxlesInUnit) && axleGroup == currentAxleGroup
             % Special formatting if the axle is a tag axle - this still needs to be tested when the case arises
             if strcmp(axleType,'Tag')
@@ -81,7 +95,7 @@ for iUnit = 1:Sprung.numberOffUnits
             end
             
             currentAxleGroup = Axle.UnitAndGroup(indicesOfAxlesInUnit(iAxle),3);
-%% Next axle if in a different axle group  (excluding the last axle in the unit)
+            %% Next axle if in a different axle group  (excluding the last axle in the unit)
         elseif iAxle > 1 && iAxle ~= length(indicesOfAxlesInUnit) && axleGroup ~= currentAxleGroup
             % Determine main grouping from axle type
             switch axleType
@@ -106,7 +120,7 @@ for iUnit = 1:Sprung.numberOffUnits
             end
             
             currentAxleGroup = Axle.UnitAndGroup(indicesOfAxlesInUnit(iAxle),3);
-%% Last axle for the unit
+            %% Last axle for the unit
         elseif iAxle == length(indicesOfAxlesInUnit) && axleGroup == currentAxleGroup
             % Special formatting if the axle is a tag axle - this still needs to be tested when the case arises
             if strcmp(axleType,'Tag')
@@ -120,7 +134,7 @@ for iUnit = 1:Sprung.numberOffUnits
                 case 'singles'
                     vehicleString{iUnit} = [vehicleString{iUnit} 's)'];
             end
-            currentAxleGroup = Axle.UnitAndGroup(indicesOfAxlesInUnit(iAxle),3);   
+            currentAxleGroup = Axle.UnitAndGroup(indicesOfAxlesInUnit(iAxle),3);
             
         elseif iAxle == length(indicesOfAxlesInUnit)
             switch axleType
@@ -144,7 +158,7 @@ for iUnit = 1:Sprung.numberOffUnits
                     vehicleString{iUnit} = [vehicleString{iUnit} 's)'];
             end
             
-            currentAxleGroup = Axle.UnitAndGroup(indicesOfAxlesInUnit(iAxle),3);            
+            currentAxleGroup = Axle.UnitAndGroup(indicesOfAxlesInUnit(iAxle),3);
             
         end
     end
@@ -175,7 +189,7 @@ for iUnit = 1:Sprung.numberOffUnits
         end
         
         if iAxleGroup < length(axleGroupString)
-           underlinedVehicleString = [underlinedVehicleString '.'];
+            underlinedVehicleString = [underlinedVehicleString '.'];
         end
         
         % Move on to the next axle group

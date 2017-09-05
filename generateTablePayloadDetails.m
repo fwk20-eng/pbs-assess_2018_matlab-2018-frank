@@ -30,7 +30,11 @@ function PBSreportTable = generateTablePayloadDetails(Sprung, Payload, caption, 
 
 %% Removing trucksim modifiers from payload
 
-payloadDetailsForReport = editCombinationCellSplitText(Payload.DescriptionCell, {' (',' ['}, 1);
+try
+    payloadDetailsForReport = editCombinationCellSplitText(Payload.DescriptionCell, {' (',' ['}, 1);
+catch
+    disp('No valid payloads found');
+end
 
 %% Extracting table contents
 

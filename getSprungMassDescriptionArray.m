@@ -12,6 +12,10 @@
 % 
 %% Change Log
 % 
+% [0.2.0] - 2017-08-20
+%
+% * Added dolly support
+%
 % [0.1.0] - 2017-01-01
 % 
 % *Added*
@@ -19,8 +23,6 @@
 % * First code
 
 function sprungMassDescriptionArray = getSprungMassDescriptionArray(allParLadenFileData)
-
-display('This section of code will need to be updated once dolly''s are included in the assessment');
 
 GetUnitDescription.key = 'LOG_ENTRY Used Dataset: Vehicle: Lead Unit Sprung Mass;';
 GetUnitDescription.keySeperator = '} ';

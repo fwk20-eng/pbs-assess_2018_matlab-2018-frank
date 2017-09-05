@@ -17,6 +17,12 @@
 %
 %% Change Log
 %
+% [0.2.0] - 2017-08-21
+%
+% *Added*
+%
+% * Dolly support
+% 
 % [0.1.0] - 2017-05-08
 %
 % *Added*
@@ -24,7 +30,7 @@
 % * First code to allow extraction of tyre data for each axle.
 % * Adapted from getAllParDataForEachAxle.
 
-function [ExtractedTyreData] = getAllParDataForEachAxleFromTyreData(allParFileData, Sprung)
+function [ExtractedTyreData, dollyUnits] = getAllParDataForEachAxleFromTyreData(allParFileData, Sprung)
 %% Extracting data for unit 1
 disp('Note: code works for standard combinations with a single lead unit only');
 % Begin with the first unit
@@ -32,13 +38,13 @@ iUnit = 1;
 
 % Splicing the par file to the lead unit details only
 keyCell = {'ENTER_PARSFILE Vehicles\Lead', 'EXIT_PARSFILE Vehicles\Lead'};
-SplicedAllPar.Units = spliceAllPar(allParFileData, keyCell);
+SplicedAllPar.units = spliceAllPar(allParFileData, keyCell);
 
-tyreDualSpacing = getVariableValuesFromPar(SplicedAllPar.Units{iUnit}, '\<L_DUAL');
+tyreDualSpacing = getVariableValuesFromPar(SplicedAllPar.units{iUnit}, '\<L_DUAL');
 nAxles = length(tyreDualSpacing);
 
 % Extracting the the dataset for each tyre
-tyreDatasetArray = getDatasetNameFromPar(SplicedAllPar.Units{iUnit}, 'LOG_ENTRY Used Dataset: Tire;', '} ');
+tyreDatasetArray = getDatasetNameFromPar(SplicedAllPar.units{iUnit}, 'LOG_ENTRY Used Dataset: Tire;', '} ');
 
 iTyreIndex = 1;
 for iAxle = 1 : nAxles
@@ -67,20 +73,22 @@ for iAxle = 1 : nAxles
 end
 
 %% Extracting data for unit 2 and beyond
-% Continuing with the remaining units (assuming there are no dolly's, dolly's will need to be added in the future)
-disp('Note: code works for standard trailer units without dolly''s');
+% Continuing with the remaining units
 
 % Extract all trailer unit data
 keyCell = {'ENTER_PARSFILE Vehicles\Trailer', 'EXIT_PARSFILE Vehicles\Trailer'};
-SplicedAllPar.Units = [SplicedAllPar.Units, spliceAllPar(allParFileData, keyCell)];
+SplicedAllPar.units = [SplicedAllPar.units, spliceAllPar(allParFileData, keyCell)];
+
+% Extracting the dolly dataset if present
+[SplicedAllPar.units, dollyUnits] = extractNestedDollyDataFromTrailer(SplicedAllPar.units);
 
 for iUnit = 2:Sprung.numberOffUnits
     
-tyreDualSpacing = getVariableValuesFromPar(SplicedAllPar.Units{iUnit}, '\<L_DUAL');
+tyreDualSpacing = getVariableValuesFromPar(SplicedAllPar.units{iUnit}, '\<L_DUAL');
 nAxles = length(tyreDualSpacing);
 
 % Extracting the the dataset for each tyre
-tyreDatasetArray = getDatasetNameFromPar(SplicedAllPar.Units{iUnit}, 'LOG_ENTRY Used Dataset: Tire;', '} ');
+tyreDatasetArray = getDatasetNameFromPar(SplicedAllPar.units{iUnit}, 'LOG_ENTRY Used Dataset: Tire;', '} ');
 
 iTyreIndex = 1;
 for iAxle = 1 : nAxles
