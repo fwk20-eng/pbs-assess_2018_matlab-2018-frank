@@ -53,10 +53,10 @@ iUnit = 1;
 
 % Extracting the axle description (based on animation name)
 keyCell = {'ENTER_PARSFILE Vehicles\Lead', 'EXIT_PARSFILE Vehicles\Lead'};
-SplicedAllPar.Units = spliceAllPar(allParFileData, keyCell);
+SplicedAllPar.units = spliceAllPar(allParFileData, keyCell);
 
 keyCell = GetAxleData.dataSetKeyCell;
-SplicedAllPar.AxleDataset{:,iUnit} = spliceAllPar(SplicedAllPar.Units{:,iUnit}, keyCell)';
+SplicedAllPar.AxleDataset{:,iUnit} = spliceAllPar(SplicedAllPar.units{:,iUnit}, keyCell)';
 
 nSplicedAxles = length(SplicedAllPar.AxleDataset{:,iUnit});
 
@@ -75,17 +75,18 @@ for iAxle = 1: nSplicedAxles
 end
 
 %% Extracting data for unit 2 and beyond
-% Continuing with the remaining units (assuming there are no dolly's, dolly's will need to be added in the future)
-disp('Note: code works for standard trailer units without dolly''s');
 
 % Extract all trailer unit data
 keyCell = {'ENTER_PARSFILE Vehicles\Trailer', 'EXIT_PARSFILE Vehicles\Trailer'};
-SplicedAllPar.Units = [SplicedAllPar.Units, spliceAllPar(allParFileData, keyCell)];
+SplicedAllPar.units = [SplicedAllPar.units, spliceAllPar(allParFileData, keyCell)];
+
+% Extracting the dolly dataset if present
+SplicedAllPar.units = extractNestedDollyDataFromTrailer(SplicedAllPar.units);
 
 for iUnit = 2:Sprung.numberOffUnits
     
     keyCell = GetAxleData.dataSetKeyCell;
-    SplicedAllPar.AxleDataset{:,iUnit} = spliceAllPar(SplicedAllPar.Units{:,iUnit}, keyCell)';
+    SplicedAllPar.AxleDataset{:,iUnit} = spliceAllPar(SplicedAllPar.units{:,iUnit}, keyCell)';
     
     nSplicedAxles = length(SplicedAllPar.AxleDataset{:,iUnit});
     

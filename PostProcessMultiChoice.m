@@ -202,7 +202,7 @@ if Is.pbs
             MatKey.lsunt, Is, muPeakSteer, false);
     end
     if Is.axle
-      [Axle] = AXLE_solve(Axle, MatKey.axle, Project, Is);
+      [Axle] = AXLE_solve(Axle, MatKey.axle, Project, Is, Dummy);
       
       axleNumbers = AxleLoading(1, :);
       loadShare1AxleLoads = AxleLoading(3, :);
