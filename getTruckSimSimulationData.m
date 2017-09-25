@@ -11,6 +11,10 @@
 %
 %% Change Log
 %
+% [0.10.0] 2017-09-07
+%
+% * Fixed steer axle extraction
+%
 % [0.9.0] 2017-08-20
 %
 % * Added support for dolly combinations
@@ -271,7 +275,7 @@ Axle.Driven = drivenAxles(drivenAxles ~= 0);
 disp('Note: code works for driven axles in the 1st or 2nd axle group only');
 
 % Determine which axles are steered
-Axle.NumberOffSteer = length(Axle.Grouping(1));
+Axle.NumberOffSteer = length(Axle.Grouping{1});
 disp('Note: the code assumes all axles in the first axle group are steered');
 
 % Tyre sizes
@@ -326,7 +330,7 @@ if Is.lsunt
     PayloadUnladen.CoGxPositionCell = cellfun(@(x) x .* 0.001, PayloadUnladen.CoGxPositionCell, 'UniformOutput', 0);
     PayloadUnladen.CoGzPositionCell = cellfun(@(x) x .* 0.001, PayloadUnladen.CoGzPositionCell, 'UniformOutput', 0);
 else
-    % Need to manually crrate the unladen payload cell to allow for the axle load calculation to work
+    % Need to manually create the unladen payload cell to allow for the axle load calculation to work
     nUnits = length(Combination.includedPayloads);
     for iUnit = 1 : nUnits
         iUnladenPayload = 0;

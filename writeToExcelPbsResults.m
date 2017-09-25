@@ -30,7 +30,7 @@ function writeToExcelPbsResults(Lim, fullName, nLevels, Project, AxleLoading, Is
     resultsWithLevel)
 
 if Is.fullPBS && Is.save
-    results_round = rounder(r);
+    results_round = rounder(r, Is);
     printResultsPBSnotes(resultsWithLevel, Project.savePath, 'results', 'postAxleLoad',...
         AxleLoading, Project.resultsFileName, Project.runNotes);
     printResultsPBS(results_round, Lim, fullName, nLevels, Project.savePath, 'resultsRounded', 'postAxleLoadRounded',...

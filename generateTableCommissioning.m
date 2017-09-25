@@ -78,14 +78,22 @@ for iUnit = 1:nUnits
             axleTyreSize{iAxle, 3} = tyreSize;
             axleTyreSize{iAxle, 4} = ' ';
             
+            % Store the axle as previous axle
+            previousNonSkippableAxle = iAxle;
             % Check to see if the result is identical to the previous result (no point in duplicate information)
-        elseif ~(strcmp(parameterDescription,axleTyreSize{iAxle-1,1})) && ~(strcmp(parameterValue,...
-                axleTyreSize{iAxle-1,2}))
+        elseif ~(strcmp(parameterDescription,axleTyreSize{previousNonSkippableAxle,1})) && ~(strcmp(parameterValue,...
+                axleTyreSize{previousNonSkippableAxle,2}))
             axleTyreSize{iAxle, 1} = parameterDescription;
             axleTyreSize{iAxle, 2} = '-';
             axleTyreSize{iAxle, 3} = tyreSize;
             axleTyreSize{iAxle, 4} = ' ';
             
+            % Store the axle as previous axle. If you use the previous axle, and that previous axle is skipped due to
+            % being a repeat, then it is not written to the axleTyreSize matrix. Then the indices are exceeded when
+            % trying to refer to the previous axle index. This us usually not a problem when there is a single steer and
+            % 2 drive, since once you reach the second and last drive, the code moves to the next unit. When there are
+            % dual steers or tri/quad axles however this becomes an issue.
+            previousNonSkippableAxle = iAxle;
         end
     end
     

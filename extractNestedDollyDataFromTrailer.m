@@ -27,6 +27,7 @@ keyCell = {'ENTER_PARSFILE Vehicles\Dolly', 'EXIT_PARSFILE Vehicles\Dolly'};
 splicedAllParWithDolly = {};
 nRawUnits = length(rawSplicedParFile);
 iUnit = 1;
+dollyUnits = [];
 
 for iSplice = 1 : nRawUnits
     
@@ -37,7 +38,7 @@ for iSplice = 1 : nRawUnits
         
         splicedAllParWithDolly = [splicedAllParWithDolly, dollySplice, {trailerSpliceWithDollyRemoved}];
 
-        dollyUnits = [iUnit];
+        dollyUnits = [dollyUnits, iUnit];
 
         % Increase by 2 to accomodate for both dolly and trailer
         iUnit = iUnit + 2; 
@@ -48,6 +49,11 @@ for iSplice = 1 : nRawUnits
         iUnit = iUnit + 1;
     end
     
+end
+
+% Create the dolly units variable if no dolly's are found
+if ~exist('dollyUnits')
+    dollyUnits = [];
 end
 
 end
