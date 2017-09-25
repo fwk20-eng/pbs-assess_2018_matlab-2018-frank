@@ -48,11 +48,11 @@ Table.unladenReferencePoints = generateTableReferencePoints(Report.unladenRefere
 ComTable = generateTableCommissioning(Axle, Sprung, Tyre, Hitch, Combination);
 
 % Generate results tables
-Report.pbsResultsTable = generateTableResults(fullName, Lim, LimReport, rounder(resultsPbs), Report, nLevels, Is);
+Report.pbsResultsTable = generateTableResults(fullName, Lim, LimReport, rounder(resultsPbs, Is), Report, nLevels, Is);
 baselineResults = getBaselineResults(Report.baselinePbsCombination);
 Report.pbsBaselineResultsTable = generateBaselineResults(baselineResults, Lim, nLevels, Is);
 if Is.carCarrier
-    Report.pbsResultsTableTopdeck = generateBaselineResults(rounder(Topdeck.resultsPbs), Lim, nLevels, Is);
+    Report.pbsResultsTableTopdeck = generateBaselineResults(rounder(Topdeck.resultsPbs, Is), Lim, nLevels, Is);
 end
 
 % Set-up the paths for copying to the assessment folder

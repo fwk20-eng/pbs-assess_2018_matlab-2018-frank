@@ -1,4 +1,8 @@
-function [res] = rounder(raw)
+function [res] = rounder(raw, Is)
+
+if ~isfield(Is, 'australianPBS')
+    Is.australianPBS = 0;
+end
 
 res.STA     = floor(raw.STA);                   % round down to nearest 1%
 res.GRAa    = floor(raw.GRAa);                  % round down to nearest 1%
@@ -9,7 +13,13 @@ res.RA      =  ceil(raw.RA*100)/100;            % round up   to nearest 0.01
 res.HSTO    =  ceil(raw.HSTO*10)/10;            % round up   to nearest 0.01
 res.SRTt    = floor(raw.SRTt*100)/100;          % round down to nearest 0.01
 res.SRTtrrcu= floor(raw.SRTtrrcu*100)/100;      % round down to nearest 0.01
-res.TASP    =  ceil(raw.TASP*20)/20;            % round up   to nearest 0.05
+
+if ~Is.australianPBS
+    res.TASP    =  ceil(raw.TASP*20)/20;        % round up   to nearest 0.05
+elseif Is.australianPBS
+    res.TASP    =  ceil(raw.TASP*10)/10;        % round up   to nearest 0.1
+end
+
 res.LSSP    =  ceil(raw.LSSP*10)/10;            % round up   to nearest 0.1
 res.TS      =  ceil(raw.TS*100)/100;            % round up   to nearest 0.01
 res.FS      =  ceil(raw.FS*10)/10;              % round up   to nearest 0.1
