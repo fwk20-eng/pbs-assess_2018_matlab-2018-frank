@@ -1,19 +1,24 @@
 %% Function Description
-% 
+%
 % This function will extract the payloads for each combination and store them as per the Wits post processor.
-% 
+%
 %% Inputs
-% 
+%
 % * endParFileData: data extracted from the end par file.
 % * nUnits: number of units.
-% 
+%
 %% Outputs
-% 
+%
 % * payloadMassCell: Payload mass of each payload (rows) for each unit (columns).
 % * payloadCoGxPositionCell: Payload mass of each payload (rows) for each unit (columns).
 % * payloadCoGzPositionCell: Payload mass of each payload (rows) for each unit (columns).
-% 
+%
 %% Change Log
+%
+% [0.7.0]
+%
+% * Updated to extract payloads correctly when there is more than 1 payload per unit or when a unit has no payload. This
+% was malfunctioning due to issues with the way TruckSim has changed the way it stores the payloads in the par files.
 %
 % [0.6.0]
 %
@@ -39,72 +44,71 @@
 % * Fixed error causing index exceeded when a unit has no payloads
 %
 % [0.2.0] - 2017-04-24
-% Added 
+% Added
 %
 % * Functionality to extract the dataset name for each payload
-% 
+%
 % [0.1.0] - 2017-04-20
-% 
+%
 % Added
-% 
+%
 % * First code
 
 function [Payload] =...
-         determinePayloadCell(endParFileData, allParFileData, nUnits)
+    determinePayloadCell(endParFileData, allParFileData, nUnits)
 %% Extract descriptions of each payload for each unit
 %
-% * It is important to note that this only works due to the fact that the payloads and payload descriptions appear in 
-% the par files in order of appearance. If this is not the case then the behaviour of this code will not correctly 
+% * It is important to note that this only works due to the fact that the payloads and payload descriptions appear in
+% the par files in order of appearance. If this is not the case then the behaviour of this code will not correctly
 % assign payload names to the correct vehicle unit and mass value
 %
 % Extracting a list of names in order of appearance
 payloadDescriptionArray = getDatasetNameFromPar(allParFileData, 'LOG_ENTRY Used Dataset: Payload', '} ');
 
-%Initialise to the first payload description
-iPayloadNum = 1;
+% Initialising the payload cells
+for iUnit = 1 : nUnits
+    Payload.MassCell{iUnit} = [];
+    Payload.CoGxPositionCell{iUnit} = [];
+    Payload.CoGyPositionCell{iUnit} = [];
+    Payload.CoGzPositionCell{iUnit} = [];
+    Payload.MOIxCell{iUnit} = [];
+    Payload.MOIyCell{iUnit} = [];
+    Payload.MOIzCell{iUnit} = [];
+    Payload.DescriptionCell{iUnit} = [];
+end
 
-for iUnit = 1:nUnits
 %% Retrive payload mass data
-    % Retrieve the payload mass values
-    payloadMassArray = getVariableValuesFromPar(endParFileData, sprintf('%s%i', '\<M_PL(', iUnit));
+% Retrieve the payload mass values
+payloadMassArray = getVariableValuesFromPar(endParFileData, '^M_PL');
 
-    payloadCoGxPositionArray = getVariableValuesFromPar(endParFileData, sprintf('%s%i', '\<LX_CG_PL(', iUnit));
-    payloadCoGyPositionArray = getVariableValuesFromPar(endParFileData, sprintf('%s%i', '\<Y_CG_PL(', iUnit));
-    payloadCoGzPositionArray = getVariableValuesFromPar(endParFileData, sprintf('%s%i', '\<Z_CG_PL(', iUnit));
-    
-    payloadMOIxArray = getVariableValuesFromPar(endParFileData, sprintf('%s%i', '\<IXX_PL(', iUnit));
-    payloadMOIyArray = getVariableValuesFromPar(endParFileData, sprintf('%s%i', '\<IYY_PL(', iUnit));
-    payloadMOIzArray = getVariableValuesFromPar(endParFileData, sprintf('%s%i', '\<IZZ_PL(', iUnit));
-    
-    % * Attempt to initialise cells in the future, shouldn't make a huge difference since cell arrays are small.
-    % * I have used payloadMassArray as the logic operator as in some cases, the CoGx, CoGy, CoGz may be 0. Whereas a 0
-    % mass means there is definitely no payload
-    Payload.MassCell{:,iUnit} = payloadMassArray(payloadMassArray ~= 0);
-    Payload.CoGxPositionCell{:,iUnit} = payloadCoGxPositionArray(payloadMassArray ~= 0);
-    Payload.CoGyPositionCell{:,iUnit} = payloadCoGyPositionArray(payloadMassArray ~= 0);
-    Payload.CoGzPositionCell{:,iUnit} = payloadCoGzPositionArray(payloadMassArray ~= 0);
-    Payload.MOIxCell{:,iUnit} = payloadMOIxArray(payloadMassArray ~= 0);
-    Payload.MOIyCell{:,iUnit} = payloadMOIyArray(payloadMassArray ~= 0);
-    Payload.MOIzCell{:,iUnit} = payloadMOIzArray(payloadMassArray ~= 0);
+payloadCoGxPositionArray = getVariableValuesFromPar(endParFileData, '^LX_CG_PL');
+payloadCoGyPositionArray = getVariableValuesFromPar(endParFileData, '^Y_CG_PL');
+payloadCoGzPositionArray = getVariableValuesFromPar(endParFileData, '^Z_CG_PL');
 
-%% Retrieve payload description data 
-% * It is important to note that this only works due to the fact that the payloads and payload descriptions appear in 
-% the par files in order of appearance. If this is not the case then the behaviour of this code will not correctly 
-% assign payload names to the correct vehicle unit and mass value
+payloadMOIxArray = getVariableValuesFromPar(endParFileData, '^IXX_PL');
+payloadMOIyArray = getVariableValuesFromPar(endParFileData, '^IYY_PL');
+payloadMOIzArray = getVariableValuesFromPar(endParFileData, '^IZZ_PL');
 
-    %Initialise the payload description cell for the unit
-    Payload.DescriptionCell{iUnit} = {};
+% Retrieve the unit number for the location of each payload
+payloadSprungMassUnit = getVariableValuesFromPar(endParFileData, '^OPT_PL_BODY_ID');
+
+nPayloads = length(payloadSprungMassUnit);
+
+% Loop through the payloads and assign them to the correct sprung mass units
+for iPayload = 1 : nPayloads
+    iUnit = payloadSprungMassUnit(iPayload);
     
-    % Determine the number of payloads for that unit
-    nUnitPayloads = length(Payload.MassCell{iUnit});
+    Payload.MassCell{iUnit} = [Payload.MassCell{iUnit} payloadMassArray(iPayload)];
     
-    if nUnitPayloads
-        for iPayload = 1:nUnitPayloads
-            Payload.DescriptionCell{iUnit} = [Payload.DescriptionCell{iUnit} payloadDescriptionArray{iPayloadNum}];
-            % Move on to the next payload
-            iPayloadNum = iPayloadNum + 1;
-        end    
-    end
+    Payload.CoGxPositionCell{iUnit} = [Payload.CoGxPositionCell{iUnit} payloadCoGxPositionArray(iPayload)];
+    Payload.CoGyPositionCell{iUnit} = [Payload.CoGyPositionCell{iUnit} payloadCoGyPositionArray(iPayload)];
+    Payload.CoGzPositionCell{iUnit} = [Payload.CoGzPositionCell{iUnit} payloadCoGzPositionArray(iPayload)];
+    
+    Payload.MOIxCell{iUnit} = [Payload.MOIxCell{iUnit} payloadMOIxArray(iPayload)];
+    Payload.MOIyCell{iUnit} = [Payload.MOIyCell{iUnit} payloadMOIyArray(iPayload)];
+    Payload.MOIzCell{iUnit} = [Payload.MOIzCell{iUnit} payloadMOIzArray(iPayload)];
+    
+    Payload.DescriptionCell{iUnit} = [Payload.DescriptionCell{iUnit} payloadDescriptionArray{iPayload}];
 end
 
 end
