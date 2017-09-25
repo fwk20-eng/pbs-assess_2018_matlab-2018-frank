@@ -104,7 +104,7 @@ limitingPerformanceCode = unique(limitingPerformanceCode);
 nLimitingMeasures = length(limitingPerformanceCode);
 
 if worstPbsLevel == 5
-    Combination.pbsPerformanceResult = 'Fail due to not safisfying the required performance for the';
+    Combination.pbsPerformanceResult = 'Fail due to not satisfying the required performance for the';
 elseif worstPbsLevel ~=1
     Combination.pbsPerformanceResult = ['Level ' num2str(worstPbsLevel) ' conformance, limited by'];
 end
