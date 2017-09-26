@@ -61,7 +61,9 @@ if ~Is.fullPBS
     elseif Is.srt
         MatKey.Extraction = MatKey.srt{1};
     elseif Is.long % Use LST if long is being run alone
-        MatKey.Extraction = MatKey.long{1};
+        MatKey.Extraction = MatKey.long{1};    
+    elseif Is.axle % Use LST if long is being run alone
+        MatKey.Extraction = MatKey.axle{1};
     end
 else
     % If all manoeuvres are being run at the same time, use the LST maneouvre
