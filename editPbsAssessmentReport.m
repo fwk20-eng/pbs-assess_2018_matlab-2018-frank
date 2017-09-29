@@ -36,6 +36,9 @@ PbsReportFileData = editLinesInCellArray(PbsReportFileData, '\\ReportMonth', dat
 PbsReportFileData = editLinesInCellArray(PbsReportFileData, '\\ReportYear', date(1), '(?<=\{).*(?=\})');
 PbsReportFileData = editLinesInCellArray(PbsReportFileData, '\\ReportRev', Report.reportRevision, '(?<=\{).*(?=\})');
 
+% Modify the report type to suit the combination being assessed
+PbsReportFileData = editLinesInCellArray(PbsReportFileData, ['\\togglefalse\{', Report.vehicleType], 'true', '(?<=toggle).*(?=\{)');
+
 % Write main tex file
 fid = fopen(Report.pbsAssessmentMainTexFilePath,'w');
 
