@@ -82,14 +82,14 @@ if Is.carCarrier
 end
 
 % Generate the latex tables and save in the PBS assessment tex folder
-generateLatexTablesForPBSreport(Table, 'CombinationTables.tex', pbsAssessCopyToFullPath);
+generateLatexTablesForPBSreport(Table, '5-1-CombinationTables.tex', pbsAssessCopyToFullPath);
 
 % Generate commissioning tables in a seperate tex tile
-generateLatexTablesForPBSreport(ComTable, 'CommissioningTables.tex', pbsAssessCopyToFullPath);
+generateLatexTablesForPBSreport(ComTable, '6-1-CommissioningTables', pbsAssessCopyToFullPath);
 
 % Modify the PBS assessment parameters and save to a new file
 Report.pbsAssessmentMainTexFilePath = strcat(pbsAssessCopyToFullPath, '\PBS_Assessment.tex');
-Report.pbsAssessmentResultsTexFilePath = strcat(pbsAssessCopyToFullPath, '\tex\CombinationResults.tex');
+Report.pbsAssessmentResultsTexFilePath = strcat(pbsAssessCopyToFullPath, '\tex\2-1-CombinationResults.tex');
 
 % Renamed tex filename for assessment
 date = strsplit(datestr(now,'yyyy-mm-dd'),'-');
@@ -99,33 +99,37 @@ renamedTexFileName = strcat(date{1}, date{2}, date{3}, '_WITS_PBS-Assessment_', 
 Report.pbsAssessmentRenamedTexFilePath = strcat(pbsAssessCopyToFullPath, '\', renamedTexFileName, '.tex');
 
 %% Combining parameters for the report where necessary
-
-% Trailer overhangs
-for iTrailer = 2:Sprung.numberOffUnits
-    frontOverhangDescription = ['\\newcommand\{\\tl' num2words((iTrailer - 1), 'case', 'sentence') 'FrontOverhang\}'];
-    rearOverhangDescription = ['\\newcommand\{\\tl' num2words((iTrailer - 1), 'case', 'sentence') 'RearOverhang\}'];
+% Generate the overhang modification array
+for iUnit = 1:Sprung.numberOffUnits
     
-    if Combination.frontalOverhangs(iTrailer) == 0
-    frontOverhang = [num2str(Combination.frontalOverhangs(iTrailer)) '~mm (no overhang)'];        
+    if iUnit == 1
+        frontOverhangDescription = '\\newcommand\{\\pmFrontOverhang\}';
+        rearOverhangDescription = '\\newcommand\{\\pmRearOverhang\}';
     else
-    frontOverhang = [num2str(Combination.frontalOverhangs(iTrailer)) '~mm (' ...
-        num2str(Combination.frontalOverhangsRelativeToDatum(iTrailer)) '~mm forward of the hitch point)'];
+        frontOverhangDescription = ['\\newcommand\{\\tl' num2words((iUnit - 1), 'case', 'sentence') 'FrontOverhang\}'];
+        rearOverhangDescription = ['\\newcommand\{\\tl' num2words((iUnit - 1), 'case', 'sentence') 'RearOverhang\}'];
     end
     
-    
-    if Combination.rearOverhangs(iTrailer) == 0
-    rearOverhang = [num2str(Combination.rearOverhangs(iTrailer)) '~mm (no overhang)'];        
+    if Combination.frontalOverhangs(iUnit) == 0
+        frontOverhang = [num2str(Combination.frontalOverhangs(iUnit)) '~mm (no overhang)'];        
     else
-    rearOverhang = [num2str(Combination.rearOverhangs(iTrailer)) '~mm (' ...
-        num2str(Combination.rearOverhangsRelativeToDatum(iTrailer)) '~mm rear of the hitch point)'];
+        frontOverhang = [num2str(Combination.frontalOverhangs(iUnit)) '~mm (' ...
+        num2str(Combination.frontalOverhangsRelativeToDatum(iUnit)) '~mm forward of the hitch point)'];
     end
     
-    if iTrailer == 2 % Create
-    overhangDetails = {...
+    if Combination.rearOverhangs(iUnit) == 0
+        rearOverhang = [num2str(Combination.rearOverhangs(iUnit)) '~mm (no overhang)'];        
+    else
+        rearOverhang = [num2str(Combination.rearOverhangs(iUnit)) '~mm (' ...
+        num2str(Combination.rearOverhangsRelativeToDatum(iUnit)) '~mm rear of the hitch point)'];
+    end
+    
+    if iUnit == 1 % Create
+        overhangDetails = {...
         frontOverhangDescription, frontOverhang;
         rearOverhangDescription, rearOverhang};
     else % Append
-    overhangDetails = [overhangDetails;
+        overhangDetails = [overhangDetails;
         {frontOverhangDescription, frontOverhang};
         {rearOverhangDescription, rearOverhang}];
     end
@@ -148,7 +152,6 @@ additionalModifiers = {...
     };
 
 additionalModifiers = [additionalModifiers; overhangDetails];
-
 
 Report.modifiers = [Report.modifiers; additionalModifiers];
     

@@ -14,6 +14,13 @@
 %
 %% Change Log
 %
+% [0.2.0] - 2017-09-26
+%
+% *Added*
+%
+% * Write a log file in the specific run folder
+%
+%
 % [0.1.0] - 2017-01-01
 %
 % *Added*
@@ -84,10 +91,11 @@ if Is.pbs
     appendLogFileData = [appendLogFileData; markdownResultsTable; ' '];
 end
 
+newLogFileData = appendLogFileData;
 % Write the latest assessment data first
 appendLogFileData = [appendLogFileData; originalLogFileData];
 
-% Write results tex file
+% Write results to a global run log file
 fid = fopen(runLogPath,'w');
 
 nRows = length(appendLogFileData);
@@ -97,5 +105,18 @@ for iRow = 1 : nRows
 end
 
 fclose(fid);
+
+localRunLogPath = strcat(Project.runFolderPath, '\Results-Summary_', Project.revision, '.md');
+% Write the results to a local run file for the current run
+fid = fopen(localRunLogPath,'w');
+
+nRows = length(newLogFileData);
+
+for iRow = 1 : nRows
+    fprintf(fid,'%s\n', newLogFileData{iRow});
+end
+
+fclose(fid);
+
 
 end
