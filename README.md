@@ -42,7 +42,7 @@ The following readme applies to all files in the TruckSim data extraction folder
 * Axle load rating to reports
 * Function editCombinationCellRegexpBetweenText
 * Function editCombinationCellSplitText
-* Function extractInformationBetweenParenthesisInCellArray
+* Function extractTextBetweenParenthesis_CombinationCell
 
 
 **Fixed**

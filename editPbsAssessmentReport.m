@@ -18,7 +18,7 @@
 %
 % * First code
 
-function editPbsAssessmentReport(Report, Is)
+function editPBSAssessmentReport(Report, Is)
 
 PbsReportFileData = readLinesFromFile(Report.pbsAssessmentMainTexFilePath);
 
