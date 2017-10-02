@@ -31,7 +31,7 @@ nManoeuvres = length(keyFields);
 for iManoeuvre = 1 : nManoeuvres
     if Is.(keyFields{iManoeuvre})
         % Note the filename and error are not used anywhere, hence the tilde ignores the values
-        [~, ~] = getRun(MatKey.(keyFields{iManoeuvre}){1}, MatKey.(keyFields{iManoeuvre})(2), Project.savePath,...
+        [~, ~] = copySimulationFiles(MatKey.(keyFields{iManoeuvre}){1}, MatKey.(keyFields{iManoeuvre})(2), Project.savePath,...
             Project.truckSimRunsPath, Project.runKey, 1);
     end
 end
