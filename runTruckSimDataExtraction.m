@@ -11,6 +11,13 @@
 %
 %% Change Log
 %
+% [0.11.0] 2017-10-04
+%
+% *Added*
+%
+% * Check to ensure that the LST parameters are correct
+%
+%
 % [0.10.0] 2017-09-07
 %
 % * Fixed steer axle extraction
@@ -73,31 +80,6 @@
 %   variable name.
 % * Generate vehicle configuration
 % * Generated post process variables
-% * [x] grouping
-% * [x] mAxle [M_US]
-% * [x] xAxle [LX_AXLE]
-% * [x] zAxle [H_CG_AXLE]
-% * [x] Ndrive
-% * [x] nSteer
-% * [x] nTyres [OPT_TIRE_MODEL]
-% * [x] rr [RRE]
-% * [x] rollCoupled
-% * [x] loadCoupled - hard coded to be true for all hitch points for now.
-% * [?] dollys - I have not done a dolly project yet. Will add this functionality once I have completed one.
-% * [x] l - hitch longitudinal position [LX_H]
-% * [x] h - hitch height [H_H] % [H_H_FRONT]
-% * [?] Area [Z_LENGTH (MAX) * Y_LENGTH (MAX)] - Will manually enter this for now
-% * [x] Ltot [This will need to be manually entered]
-% * [x] VehWidthLoad - Find max width from the reference points at laden condition
-% * [x] VehWidthUnload - Find max width from the reference points at the unladen condition
-% * [x] SteerWidth
-% * [x] mChas [M_SU]
-% * [x] xChas [LX_CG_SU]
-% * [x] zChas [H_CG_SU]
-% * [x] dLoad - all units
-% * [x] mLoad - all units [M_PL]
-% * [x] xLoad - all units [LX_CG_PL]
-% * [x] zLoad - all units [H_CG_PL]
 
 function [Tyre, Axle, Hitch, Sprung, Dimensions, PayloadLaden, PayloadUnladen, Dummy, Combination] = ...
     runTruckSimDataExtraction(ParDetails, Is, Combination)
@@ -220,7 +202,7 @@ Axle.steerRollRatio = extractAxleAllParData(allParLadenFileData, GetAxleSteerRol
 % Generate dummy axle arrays based on the axle compliance dataset names to help filter the subsequent axle arrays
 [Dummy] = findDummyAxles(Axle.complianceDatasetName);
 
-% Processing dummy axles if they exist in the combination
+%% Processing dummy axles if they exist in the combination
 if Dummy.isDummyAxle
     Axle.complianceDatasetName = removeDummyAxlesFromCombinationCell(Axle.complianceDatasetName, Dummy.isRealAxleCell);
     Axle.type = removeDummyAxlesFromCombinationCell(Axle.type, Dummy.isRealAxleCell);
@@ -334,7 +316,7 @@ else
     nUnits = length(Combination.includedPayloads);
     for iUnit = 1 : nUnits
         iUnladenPayload = 0;
-
+        
         % Initialising unladen cell
         PayloadUnladen.MassCell{iUnit} = [];
         PayloadUnladen.CoGxPositionCell{iUnit} = [];
@@ -380,10 +362,79 @@ if Is.lsunt
     Dimensions.RefPointsUnladenCell = extractReferencePoints(allParUnladenFileData, Sprung, Combination);
 end
 
-%% Determining the vehicle string
-Combination = computeVehicleString(Axle, Tyre, Hitch, Sprung, Combination);
+%% Extract LST parameters to ensure that the correct inputs have been used
 
-%% Determining the vehicle classification
-Combination = computeVehicleClassification(Axle, Tyre, Hitch, Sprung, Combination);
+if Is.lst || Is.lsunt
+    yawUnit = getDatasetNameFromPar(allParLadenFileData, 'DEFINE_OUTPUT Yaw_Lin', {'= ', ';'});
+    Combination.yawUnit = str2num(yawUnit{1}{1}(end));
+    
+    %% Warning message for incorrect Yaw Unit
+    if Combination.yawUnit ~= Sprung.numberOffUnits
+        warnAxleLoad = questdlg(['The incorrect unit has been chosen in LST manoeuvre, unit should be: ' num2str(Combination.yawUnit)],...
+            'Yes', 'End Assessment', 'End Assessment');
+        
+        switch warnAxleLoad
+            case 'Yes'
+                uiwait(msgbox('Please note that the LST results may not be correct'));
+            case 'End Assessment'
+                uiwait(msgbox('The assessment will now be ended with a manually initialised error'));
+                error('Manually initiated error in order to jump out of the script');
+        end
+    end
+    
+    %% Check centre of last axle group
+    centreOfLastAxleGroup = getDatasetNameFromPar(allParLadenFileData, 'DEFINE_OUTPUT X_ALin', {'= ', ';'});
+    centreOfLastAxleGroup = strsplit(centreOfLastAxleGroup{1}{1}, {'(', '/2', ')'});
+    Combination.centreOfLastAxleGroup = centreOfLastAxleGroup{2};
+    
+    % Determine the actual centre of axle group
+    lastAxleGroupIndices = Axle.Grouping{end};
+    nAxlesInLastGroup = length(lastAxleGroupIndices);
+    
+    switch nAxlesInLastGroup
+        case 1
+            centreAxleIndices = 1;
+        case 2
+            centreAxleIndices = [1,2];
+        case 3
+            centreAxleIndices = 2;
+        case 4
+            centreAxleIndices = [2,3];
+    end
+    
+    nCentreAxles = length(centreAxleIndices);
+    centreAxleString ='';
+    
+    for iAxle = 1 : nCentreAxles
+        
+        if iAxle == 1
+            centreAxleString =  ['X_A', num2str(lastAxleGroupIndices(centreAxleIndices(iAxle)))];
+        else
+            centreAxleString = [centreAxleString, '+', 'X_A', num2str(lastAxleGroupIndices(centreAxleIndices(iAxle)))];
+        end
+    end
+    %% Warning message for incorrect axles
+    if ~strcmp(centreAxleString, Combination.centreOfLastAxleGroup)
+        warnAxleLoad = questdlg(['The incorrect axles have been chosen in LST manoeuvre, axles should be: ' centreAxleString],...
+            'Yes', 'End Assessment', 'End Assessment');
+        
+        switch warnAxleLoad
+            case 'Yes'
+                uiwait(msgbox('Please note that the LST results may not be correct'));
+            case 'End Assessment'
+                uiwait(msgbox('The assessment will now be ended with a manually initialised error'));
+                error('Manually initiated error in order to jump out of the script');
+        end
+    end
+    
+    Combination.widthAtLastAxleGroup = getDatasetNameFromPar(allParLadenFileData, 'DEFINE_OUTPUT TLin', {'= ', ';'});
+end
 
+if Is.fullPBS
+    %% Determining the vehicle string
+    Combination = computeVehicleString(Axle, Tyre, Hitch, Sprung, Combination);
+    
+    %% Determining the vehicle classification
+    Combination = computeVehicleClassification(Axle, Tyre, Hitch, Sprung, Combination);
+end
 end
