@@ -70,7 +70,7 @@ Hitch.LoadCoupledArray = ones(1, nHitches);
 % Loop through each hitch. If the roll stiffness model is 'zero Roll Stiffness', then a pintle hitch is being used to
 % connect the units and no roll is transferred between the units
 for iHitch = 1 : nHitches
-    if strcmp(Hitch.RollMomentArray{iHitch},'Zero')
+    if strcmp(Hitch.RollMomentArray{iHitch},'0')
         Hitch.RollCoupledArray(iHitch) = 0;
         % If the next unit is a dolly - then there is also no load coupling.
         if any(iHitch + 1 == Combination.dollys)
