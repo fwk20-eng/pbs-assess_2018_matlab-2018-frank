@@ -39,6 +39,11 @@ PbsReportFileData = editLinesInCellArray(PbsReportFileData, '\\ReportRev', Repor
 % Modify the report type to suit the combination being assessed
 PbsReportFileData = editLinesInCellArray(PbsReportFileData, ['\\togglefalse\{', Report.vehicleType], 'true', '(?<=toggle).*(?=\{)');
 
+% Modify the report based on booleans
+if Is.semi
+    PbsReportFileData = editLinesInCellArray(PbsReportFileData, ['\\togglefalse\{', 'mod'], 'true', '(?<=toggle).*(?=\{)');
+end
+
 % Write main tex file
 fid = fopen(Report.pbsAssessmentMainTexFilePath,'w');
 
@@ -77,8 +82,8 @@ end
 
 ResultsTable.booktabs = 1;
 ResultsTable.tableBorders = 0;
-ResultsTable.footNotes = {'\item[1] MoD/DoM performance relaxation approved by the SMART Truck Review Panel for vehicles assessed and operating in South Africa';
-    '\item[2] TASP performance relaxation approved by the SMART Truck Review Panel for vehicles assessed and operating in South Africa'};
+ResultsTable.footNotes = {'\item[1] TASP performance relaxation approved by the SMART Truck Review Panel for vehicles assessed and operating in South Africa';
+                          '\item[2] MoD/DoM performance relaxation approved by the SMART Truck Review Panel for vehicles assessed and operating in South Africa'};
 ResultsTable.tableCaption = 'PBS Assessment Results';
 ResultsTable.tableLabel = 'Results';
 resultsTableLatexCode = latexTable(ResultsTable);

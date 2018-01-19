@@ -14,3 +14,5 @@ set(gcf, 'PaperSize', [6.25 4.25]);
 set(gcf, 'PaperPositionMode', 'manual');
 set(gcf, 'PaperPosition', [0 0 6.25 4.25]);
 print('-dpdf', '-r600', strcat(figPath, '\', figName))
+
+end

@@ -57,37 +57,40 @@ for i = 1:length(Project.runNotes)
 end
 
 appendLogFileData = [appendLogFileData; ' '; '## Axle loading'; ' '];
-% Generate axle loading cell for markdown table
+
+%% Generate axle loading cell for markdown table
 axleLoading = num2cell(axleLoading);
 axleLoadingHeadings = {'**Axle**'; '**LoadSharing 1**'; '**Laden (kg)**'; '**Unladen (kg)**'; '**LoadSharing 2**';...
     '**Laden (kg)**'; '**Unladen (kg)**'};
-axleLoading = [axleLoadingHeadings, axleLoading];
-markdownAxleLoading = markdownTable(axleLoading);
+AxleLoading.data = [axleLoadingHeadings, axleLoading];
+markdownAxleLoading = markdownTable(AxleLoading);
 appendLogFileData = [appendLogFileData; markdownAxleLoading; ' '];
 
-% If axle loads are extracted from Trucksim, then add the comparison to log file
+%% If axle loads are extracted from Trucksim, then add the comparison to log file
 if Is.axle
     appendLogFileData = [appendLogFileData; ' '; '### Axle loading comparison with TruckSim'; ' '];
     axleComparison = num2cell(Axle.truckSimLoads);
     axleComparisonHeadings = {'**Axle**'; '**TruckSim Loads (kg)**'; '**Matlab Loads (kg)**'; '**Difference (kg)**';...
         '**Difference (%)**'};
-    axleComparison = [axleComparisonHeadings, axleComparison];
-    markdownAxleLoadComparison = markdownTable(axleComparison);
+    AxleComparison.data = [axleComparisonHeadings, axleComparison];
+    markdownAxleLoadComparison = markdownTable(AxleComparison);
     appendLogFileData = [appendLogFileData; markdownAxleLoadComparison; ' '];
 end
 
 appendLogFileData = [appendLogFileData; ' '; '## CGM and Traction Check'; ' '];
-% Adding a table for GCM and drive axle load
+
+%% Adding a table for GCM and drive axle load
 gcmHeadings = {'**GCM**', '**Drive axle load (kg)**', '**Drive axle load ratio (>20%)**'};
 gcmData = {num2str(Axle.gcm), num2str(Axle.driveAxleLoad, '%0.0f'), num2str(Axle.driveAxleLoadRatio*100, '%0.2f')};
-gcmTable = [gcmHeadings; gcmData];
-markdownGCMTable = markdownTable(gcmTable);
+GcmTable.data = [gcmHeadings; gcmData];
+markdownGCMTable = markdownTable(GcmTable);
 appendLogFileData = [appendLogFileData; markdownGCMTable; ' '];
 
 appendLogFileData = [appendLogFileData; '## Results'; ' '];
 
 if Is.pbs
-    markdownResultsTable = markdownTable(resultsWithLevel);
+    ResultsWithLevel.data = resultsWithLevel;
+    markdownResultsTable = markdownTable(ResultsWithLevel);
     appendLogFileData = [appendLogFileData; markdownResultsTable; ' '];
 end
 

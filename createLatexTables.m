@@ -32,7 +32,7 @@ fid=fopen(filepath,'w');
 for iTable = 1 : nTables
     % save LaTex code as file
     
-    [nrows,ncols] = size(Table.(fieldNames{iTable}));
+    [nrows,~] = size(Table.(fieldNames{iTable}));
     
     for row = 1:nrows
         fprintf(fid,'%s\n',Table.(fieldNames{iTable}){row,:});
@@ -42,7 +42,7 @@ for iTable = 1 : nTables
 end
 
 fclose(fid);
-fprintf('\n... your LaTex code has been saved as ''filename'' in your working directory\n');
+fprintf(['\n... your LaTex code has been saved as ', filename, ' in your working directory\n']);
 
 end
 

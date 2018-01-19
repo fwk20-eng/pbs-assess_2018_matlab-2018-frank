@@ -1,3 +1,8 @@
+% 2017-11-30
+
+% *Fixed*
+% Updated axle load calculations to work in the case of an unequal axle loading
+
 function [A1, A2] = computeAxleLoadDistribution(grouping, loadshare1, loadCoupled, l, mAxle, xAxle, mChas, xChas, mLoad, xLoad)
 for i=length(grouping):-1:3
     if i==length(grouping) %if last trailer it cannot receive a hitch load
