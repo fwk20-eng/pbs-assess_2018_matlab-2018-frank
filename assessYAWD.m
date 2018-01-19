@@ -34,10 +34,13 @@ maxAy = max(Ay);
 
 %Check to ensure that the lateral acceleration for the steer axle is within
 %the correct levels.
-if maxAy < 0.19
-    error('%s%0.2f%s','Lateral acceleration is below 0.19 g: ', maxAy, ' g -->> Increase STEER_SW_GAIN manoeuvre not harsh enough'); %For this to work, the original definition of error had to be changed to errorx
-elseif maxAy > 0.21
-    error('%s%0.2f%s','Lateral acceleration is above 0.21 g: ', maxAy, ' g -->> Decrease STEER_SW_GAIN maoneouvre may be too harsh');    
+
+if ~Is.skipManoeuvreChecks
+    if maxAy < 0.19
+        error('%s%0.2f%s','Lateral acceleration is below 0.19 g: ', maxAy, ' g -->> Increase STEER_SW_GAIN manoeuvre not harsh enough'); %For this to work, the original definition of error had to be changed to errorx
+    elseif maxAy > 0.21
+        error('%s%0.2f%s','Lateral acceleration is above 0.21 g: ', maxAy, ' g -->> Decrease STEER_SW_GAIN maoneouvre may be too harsh');    
+    end
 end
 
 A1threshold = 0.25;  % find A1 by looking for first peak with value higher than 1 

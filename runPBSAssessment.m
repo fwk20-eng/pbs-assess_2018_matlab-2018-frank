@@ -1,4 +1,5 @@
-function runPBSAssessment(Is, Project, Combination, Report, ResultCode)
+function resultsPbs = runPBSAssessment(Is, Project, Combination, Report, ResultCode)
+
 %% Adding the paths containing the required .m files
 addpath('C:\Dropbox\_Personal\Programming\Global_Matlab_Toolbox\Downloaded\latexTable');
 addpath('C:\Dropbox\PBS\MatLab\_Global_Scripts\PBS_Data');
@@ -40,14 +41,14 @@ if Is.carCarrier
     [Topdeck.Project, ~, ~, ~, ~, ~, ~, ~, ~, ~, ~, Topdeck.resultsPbs, ~, ~, Topdeck.PayloadLaden, ~, ~, ~, ~] = ...
         runPBSManoeuvres(Is, Project, Combination, MatKey, Report);
     
-    %%	Writting reslts and combination parameters to report if a full assessment is being conducted
-    if Is.fullPBS
+    %%	Writting results and combination parameters to report if a full assessment is being conducted
+    if Is.fullPBS || Is.writeParameterLog
         writeLatexPBSAssessment(Project, Combination, ParDetails, Sprung, Axle, Hitch, Engine, Report, Dimensions,...
             fullName, Lim, LimReport, resultsPbs, nLevels, Is, PayloadLaden, Axle1, AxleU1, Tyre, Topdeck);
     end
 else
     %%	Writting reslts and combination parameters to report if a full assessment is being conducted
-    if Is.fullPBS
+    if Is.fullPBS || Is.writeParameterLog
         writeLatexPBSAssessment(Project, Combination, ParDetails, Sprung, Axle, Hitch, Engine, Report, Dimensions,...
             fullName, Lim, LimReport, resultsPbs, nLevels, Is, PayloadLaden, Axle1, AxleU1, Tyre);
     end
@@ -56,4 +57,5 @@ end
 disp('-------------------------------------------------------------------------------------');
 disp('	Analysis complete');
 disp('-------------------------------------------------------------------------------------');
+
 end

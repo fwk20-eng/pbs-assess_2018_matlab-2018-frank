@@ -14,11 +14,8 @@
 %% Change Log
 %% Future Additions
 %
-% * Extract axle loadings from MatLab Files to add/compare to MatLab (use a static procedure in TruckSim to get
-%   accurate loadings)
 % * Have function that checks input parameters are correct
 % * Do artic angle and artic angle rate for Yaw Damping
-% * Do summary of all elements in r
 %
 %
 %% Checks and corrections
@@ -136,7 +133,8 @@ if Is.pbs
     % Loaded axles loads for normal operation
     Axle1 = computeAxleLoadWithGradient(0, Axle.UnsprungMassArray, Axle.XPositionArray, Axle.ZPositionArray, Hitch.XPositionArray,...
         Hitch.ZPositionArray, mSprung, XcgSprung, HcgSprung, Axle.Grouping, Combination.loadshare1,...
-        Hitch.LoadCoupledArray); 
+        Hitch.LoadCoupledArray);
+    
     % Loaded axles loads for Startability
     Axle2 = computeAxleLoadWithGradient(0, Axle.UnsprungMassArray, Axle.XPositionArray, Axle.ZPositionArray, Hitch.XPositionArray,...
         Hitch.ZPositionArray, mSprung, XcgSprung, HcgSprung, Axle.Grouping, Combination.loadshare2,...
@@ -212,6 +210,7 @@ if Is.pbs
       Axle.truckSimLoads = [axleNumbers; Axle.truckSimLoads; loadShare1AxleLoads; differenceInAxleLoad; ...
           differenceInAxleLoadPerc];
     end
+    
     disp('-------------------------------------------------------------------------------------')
     disp('	Axle Loads')
     disp('-------------------------------------------------------------------------------------')
@@ -226,7 +225,7 @@ if Is.pbs
     
     %% Check for NRTA regulation 239 (3)
     
-    if Axle.driveAxleLoadRatio < 0.2
+    if (Axle.driveAxleLoadRatio) < 0.2 && ~Is.skipManoeuvreChecks
         
         warnAxleLoad = questdlg('Drive axle load does not satisfy the required 20 % of the total vehicle GCM (NRTA regulation 239 (3))',...
             'Would you like to proceed with the assessment?',...
@@ -247,10 +246,7 @@ if Is.pbs
     disp('-------------------------------------------------------------------------------------')
     resultsPbs = r;
     resultsWithLevel = createTableResults(r, Lim, fullName, nLevels, Is);
-   
-% Implimentation of determining PBS level
-    Combination = createPBSPerformanceString(Combination, resultsWithLevel);
-    
+  
     display(resultsWithLevel(:, 1:4));
     warning on
     
@@ -260,6 +256,8 @@ if Is.pbs
     %% Write data to excel
     
     if Is.fullPBS
+        % Implimentation of determining PBS level
+        Combination = createPBSPerformanceString(Combination, resultsWithLevel);
         printAxleLoads(Project, Sprung, PayloadLaden, Axle, Hitch, Combination, Is);
         runWriteExcelPBSResultsAndAxleLoads(Lim, fullName, nLevels, Project, AxleLoading, Is, roundAxleLoading, r,...
             Combination, resultsWithLevel);

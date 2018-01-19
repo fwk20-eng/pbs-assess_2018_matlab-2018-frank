@@ -36,11 +36,13 @@ end
 
 maxLatError = max(LatError); % find the peak lateral error
 
-%Check to ensure that the lateral error is within the correct limits
-if maxLatError > 0.030
-    error('%s%0.2f%s','Lateral error is above 30 mm: ', maxLatError*1000, ' mm -->> Decrease TPREV_CONSTANT'); %For this to work, the original definition of error had to be changed to errorx
-% elseif maxLatError < 0.020
-%     error('%s%0.2f%s','Lateral error is below 20 mm: ', maxLatError*1000, ' mm -->> Increase TPREV_CONSTANT, manoeuvre may be too harsh');
+if ~Is.skipManoeuvreChecks
+    %Check to ensure that the lateral error is within the correct limits
+    if maxLatError > 0.030
+        error('%s%0.2f%s','Lateral error is above 30 mm: ', maxLatError*1000, ' mm -->> Decrease TPREV_CONSTANT'); %For this to work, the original definition of error had to be changed to errorx
+    elseif maxLatError < 0.025
+        error('%s%0.2f%s','Lateral error is below 25 mm: ', maxLatError*1000, ' mm -->> Increase TPREV_CONSTANT, manoeuvre may be too harsh');
+    end
 end
 
 iLast = nVehUnits;
