@@ -18,7 +18,7 @@
 %
 % * First code
 
-function PBSreportTable = createTableLatexUnloadedSprungMassDetails(Sprung)
+function [PBSreportTable, logTable] = createTableLatexUnloadedSprungMassDetails(Sprung)
 % Note: This section will need to be developed as various vehicle configurations are assessed. It has currently been
 % tested with:
 %
@@ -58,6 +58,9 @@ end
 %% Generating the Latex Tables (this should be moved to a standalone function file when suitably tested.
 Table.Headings = {'\textbf{Unit}' '\textbf{Mass (kg)}' '\textbf{Moments of inertia (kg.m\sstw{}) Ixx; Iyy; Izz}' '\textbf{CoG position (mm) (x;y;z)}\tnote{1}'};
 
+markdownHeadings = {'Unit' 'Mass (kg)' 'Moments of inertia (kg.m2) Ixx; Iyy; Izz' 'CoG position (mm) (x;y;z)'};
+MdTable.data = [markdownHeadings; Table.data];
+
 %% Compiling the structure fields required by latexTable
 Table.data = [Table.Headings; Table.data];
 Table.footNotes = {'\item[1] SAE up co-ordinate system and origin taken from centre of steer axle or hitch point at ground level'};
@@ -65,6 +68,10 @@ Table.tableCaption = 'Unloaded Sprung Mass Values, Moments of Inertia and CoG Po
 Table.tableLabel = 'UnloadedSprungMassValuesMomentsOfInertiaAndCoGPositions';
 Table.booktabs = 0;
 Table.tableBorders = 1;
+
+MdTable.label = Table.tableCaption;
+
+logTable = markdownTable(MdTable);
 
 PBSreportTable = latexTable(Table);
 end

@@ -21,7 +21,7 @@
 % 
 % * First code
 
-function PBSreportTable = createTableLatexAxleGroupLoads(Axle, Axle1, AxleU1)
+function [PBSreportTable, logTable] = createTableLatexAxleGroupLoads(Axle, Axle1, AxleU1)
 %% Generating the Latex Tables (this should be moved to a standalone function file when suitably tested.
 %% Table 2: Axle Group Loads of Proposed Vehicle
 
@@ -112,16 +112,23 @@ end
 
 Table.headings = {'\textbf{Unit}' '\textbf{Axle}' '\textbf{Fully laden axle group load (kg)}\tnote{1}'...
                   '\textbf{Unladen axle group load (kg)}\tnote{2}' '\textbf{Axle Load Rating (kg)}'};
+              
+markdownHeadings = {'Unit' 'Axle' 'Fully laden axle group load (kg)' 'Unladen axle group load (kg)' 'Axle Load Rating (kg)'};
+MdTable.data = [markdownHeadings; Table.data];
 
 Table.footNotes = {'\item[1] Discrepencies between axle loads and GCM may occur due to rounding';...
                    '\item[2] Proposed vehicle with no payload, only fuel and driver'};
-               
+
 % Compiling the structure fields required by latexTable
 Table.data = [Table.headings; Table.data];
 Table.tableCaption = 'Axle Group Loads of Proposed Vehicle';
 Table.tableLabel = 'AxleGroupLoadsOfProposedVehicle';
 Table.booktabs = 0;
 Table.tableBorders = 1;
+
+MdTable.label = Table.tableCaption;
+
+logTable = markdownTable(MdTable);
 
 PBSreportTable = latexTable(Table);
 end

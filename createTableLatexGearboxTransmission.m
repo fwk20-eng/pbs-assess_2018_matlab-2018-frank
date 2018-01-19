@@ -18,7 +18,7 @@
 %
 % * First code
 
-function PBSreportTable = createTableLatexGearboxTransmission(Engine)
+function [PBSreportTable, logTable] = createTableLatexGearboxTransmission(Engine)
 %% Extracting table contents
 
 sGearboxLabels = Engine.gearsStartLabels';
@@ -28,12 +28,19 @@ Table.data = [sGearboxLabels sGearRatio sEfficiencies];
 
 Table.Headings = {'\textbf{Gear}'  '\textbf{Ratio}' '\textbf{Efficiencies}'};
 
+markdownHeadings = {'Gear' 'Ratio' 'Efficiencies'};
+MdTable.data = [markdownHeadings; Table.data];
+
 % Compiling the structure fields required by latexTable
 Table.data = [Table.Headings; Table.data];
 Table.tableCaption = 'Gearbox Transmission Data';
 Table.tableLabel = 'GearboxTransmissionData';
 Table.booktabs = 0;
 Table.tableBorders = 1;
+
+MdTable.label = Table.tableCaption;
+
+logTable = markdownTable(MdTable);
 
 PBSreportTable = latexTable(Table);
 end

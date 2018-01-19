@@ -68,11 +68,11 @@ for iUnit = 1:nUnits
     for iAxle = 1:length(Axle.DescriptionCell{iUnit})
         parameterDescription = ['Tyre size - ' Axle.DescriptionCell{iUnit}{iAxle}];
         parameterValue = Tyre.sizes{iUnit}{iAxle};
+        tyreSize = strsplit(parameterValue, ' ');
+        % Extracting tyre size
+        tyreSize = tyreSize{1};
+        
         if iAxle == 1
-            tyreSize = strsplit(parameterValue, ' ');
-            % Extracting tyre size
-            tyreSize = tyreSize{1};
-            
             axleTyreSize{iAxle, 1} = parameterDescription;
             axleTyreSize{iAxle, 2} = '-';
             axleTyreSize{iAxle, 3} = tyreSize;

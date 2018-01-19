@@ -26,7 +26,7 @@
 %
 % * First code
 
-function PBSreportTable = createTableLatexSuspensionDetails(Axle)
+function [PBSreportTable, logTable] = createTableLatexSuspensionDetails(Axle)
 %% Extracting table contents
 
 %% Table Six: Data
@@ -79,6 +79,9 @@ end
 
 Table.Headings = {'\textbf{Unit}' '\textbf{Axle}' '\textbf{Suspension}' '\textbf{Spring Model}' '\textbf{Damper Model}' '\textbf{Stabiliser Model}\tnote{1}'};
 
+markdownHeadings = {'Unit' 'Axle' 'Suspension' 'Spring Model' 'Damper Model' 'Stabiliser Model'};
+MdTable.data = [markdownHeadings; Table.data];
+
 % Compiling the structure fields required by latexTable
 Table.data = [Table.Headings; Table.data];
 Table.footNotes = {'\item[1] If ``-", no stabiliser is present, the auxiliary roll moment is due to the inherent stiffness of the axle'};
@@ -87,6 +90,10 @@ Table.tableCaption = 'Suspension Details';
 Table.tableLabel = 'SuspensionDetails';
 Table.booktabs = 0;
 Table.tableBorders = 1;
+
+MdTable.label = Table.tableCaption;
+
+logTable = markdownTable(MdTable);
 
 PBSreportTable = latexTable(Table);
 end

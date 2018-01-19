@@ -20,7 +20,7 @@
 %
 % * First code, taken from createTableLatexSuspensionDetails
 
-function PBSreportTable = createTableLatexSuspensionProperties(Axle)
+function [PBSreportTable, logTable] = createTableLatexSuspensionProperties(Axle)
 %% Table: Data
 Table.Units = Axle.UnitCellArray;
 Table.AxleDescription = Axle.DescriptionCell;
@@ -72,6 +72,9 @@ end
 
 Table.Headings = {'\textbf{Unit}' '\textbf{Axle}' '\textbf{Suspension}' '\textbf{RC height (mm)}\tnote{1}' '\textbf{Track width (mm)}' '\textbf{Auxiliary roll stiffness (Nm/\degree{})}' '\textbf{Steer/roll ratio (\degree{}/\degree{})}'};
 
+markdownHeadings = {'Unit' 'Axle' 'Suspension' 'RC height (mm)' 'Track width (mm)' 'Auxiliary roll stiffness (Nm/deg)' 'Steer/roll ratio (deg/deg)'};
+MdTable.data = [markdownHeadings; Table.data];
+
 % Compiling the structure fields required by latexTable
 Table.data = [Table.Headings; Table.data];
 Table.footNotes = {'\item[1] Roll centre height relative to the axle centre height (+ above, - below)'};
@@ -80,6 +83,10 @@ Table.tableCaption = 'Suspension Properties';
 Table.tableLabel = 'SuspensionProperties';
 Table.booktabs = 0;
 Table.tableBorders = 1;
+
+MdTable.label = Table.tableCaption;
+
+logTable = markdownTable(MdTable);
 
 PBSreportTable = latexTable(Table);
 end

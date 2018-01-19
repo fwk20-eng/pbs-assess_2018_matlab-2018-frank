@@ -27,7 +27,7 @@
 %
 % * First code
 
-function [PBSreportTable, axleDescriptionCellArray] = createTableLatexVehicleSummary(Tyre, Axle)
+function [PBSreportTable, axleDescriptionCellArray, logTable] = createTableLatexVehicleSummary(Tyre, Axle)
 %% Generating the Latex Tables (this should be moved to a standalone function file when suitably tested.
 %% Table 1: Summary of Vehicle
 % Extracting table contents
@@ -87,12 +87,19 @@ end
 
 Table.Headings = {'\textbf{Unit}' '\textbf{Axle}' '\textbf{Axle configuration}' '\textbf{Suspension type}' '\textbf{Tyre size}' '\textbf{Rim material}'};
 
+markdownHeadings = {'Unit' 'Axle' 'Axle configuration' 'Suspension type' 'Tyre size' 'Rim material'};
+MdTable.data = [markdownHeadings; Table.data];
+
 % Compiling the structure fields required by latexTable
 Table.data = [Table.Headings; Table.data];
 Table.tableCaption = 'Summary of Vehicle Combination';
 Table.tableLabel = 'SummaryOfVehicleCombination';
 Table.booktabs = 0;
 Table.tableBorders = 1;
+
+MdTable.label = Table.tableCaption;
+
+logTable = markdownTable(MdTable);
 
 PBSreportTable = latexTable(Table);
 end

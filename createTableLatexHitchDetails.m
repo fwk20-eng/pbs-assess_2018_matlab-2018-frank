@@ -18,7 +18,7 @@
 %
 % * First code
 
-function PBSreportTable = createTableLatexHitchDetails(Hitch)
+function [PBSreportTable, logTable] = createTableLatexHitchDetails(Hitch)
 % Note: This section will need to be developed as various vehicle configurations are assessed. It has currently been
 % tested with:
 %
@@ -48,6 +48,9 @@ end
 
 Table.Headings = {'\textbf{Unit}' '\textbf{Hitch type}' '\textbf{Longitudinal position (mm)}\tnote{1}' '\textbf{Height (mm)}\tnote{2}' '\textbf{Roll stiffness (Nm/\degree{})}'};
 
+markdownHeadings = {'Unit' 'Hitch type' 'Longitudinal position (mm)' 'Height (mm)' 'Roll stiffness (Nm/degree)'};
+MdTable.data = [markdownHeadings; Table.data];
+
 % Compiling the structure fields required by latexTable
 Table.data = [Table.Headings; Table.data];
 Table.footNotes = {'\item[1] SAE up co-ordinate system and origin taken from centre of steer axle or hitch point at ground level';
@@ -56,6 +59,10 @@ Table.tableCaption = 'Hitch Details';
 Table.tableLabel = 'HitchDetails';
 Table.booktabs = 0;
 Table.tableBorders = 1;
+
+MdTable.label = Table.tableCaption;
+
+logTable = markdownTable(MdTable);
 
 PBSreportTable = latexTable(Table);
 end

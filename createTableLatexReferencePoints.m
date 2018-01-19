@@ -38,8 +38,8 @@
 %
 % * First code
 
-function PBSreportTable = createTableLatexReferencePoints(referencePointNames, refPointsLadenCell, Sprung, Combination,...
-    tableCaption, tableLabel)
+function [PBSreportTable, logTable] = createTableLatexReferencePoints(referencePointNames, refPointsLadenCell,...
+    Sprung, Combination, tableCaption, tableLabel)
 %% Table 11:  ReferencePoints (Laden)
 % Extracting table contents
 
@@ -76,6 +76,10 @@ for iUnit = 1 : Sprung.numberOffUnits
 end
 
 Table.Headings = {'\textbf{Unit}'  '\textbf{Pt.}' '\textbf{PM}' '\textbf{L/R}' '\textbf{Description}' '\textbf{X (mm)\tnote{1}}' '\textbf{Y (mm)\tnote{1}}' '\textbf{Z (mm)\tnote{1}}'};
+
+markdownHeadings = {'Unit' 'Pt.' 'PM' 'L/R' 'Description' 'X (mm)' 'Y (mm)' 'Z (mm)'};
+MdTable.data = [markdownHeadings; Table.data];
+
 % Compiling the structure fields required by latexTable
 Table.footNotes = {'\item[1] SAE up co-ordinate system and origin taken from centre of steer axle or hitch point at ground level'};
 Table.data = [Table.Headings; Table.data];
@@ -83,6 +87,10 @@ Table.tableCaption = tableCaption;
 Table.tableLabel = tableLabel;
 Table.booktabs = 0;
 Table.tableBorders = 1;
+
+MdTable.label = Table.tableCaption;
+
+logTable = markdownTable(MdTable);
 
 PBSreportTable = latexTable(Table);
 end

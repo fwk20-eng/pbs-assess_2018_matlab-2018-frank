@@ -18,7 +18,7 @@
 %
 % * First code
 
-function PBSreportTable = createTableLatexUnsprungMassDetails(Axle)
+function [PBSreportTable, logTable] = createTableLatexUnsprungMassDetails(Axle)
 % Note: This section will need to be developed as various vehicle configurations are assessed. It has currently been
 % tested with:
 %
@@ -44,45 +44,54 @@ Table.data = {};
 for iUnit = 1 : nUnits
     
     nAxlesOnUnit = length(Axle.UnitCellArray{iUnit});
-    
-    if iUnit == 1
-        for iAxle = 1 : nAxlesOnUnit
-            sUnit = int2str(iUnit);
-            sAxleDescription = Axle.DescriptionCell{iUnit}{iAxle};
-            sUnsprungMass = int2str(Axle.UnsprungMassArray(iAxleIndex));
-            % Need to multiply by 1000 to get to mm.
-            sAxleCoGz = int2str(Axle.ZPositionArray(iAxleIndex)*1000);
-            dataRow = {sUnit, sAxleDescription, sUnsprungMass, sAxleCoGz};
-            
-            Table.data = [Table.data; dataRow];
-            % Move to next axle
-            iAxleIndex = iAxleIndex + 1;
-        end
-    else
+    %     if iUnit == 1
+    for iAxle = 1 : nAxlesOnUnit
         sUnit = int2str(iUnit);
-        %Extract only the first description
-        sAxleDescription = Axle.DescriptionCell{iUnit}{1};
+        sAxleDescription = Axle.DescriptionCell{iUnit}{iAxle};
         sUnsprungMass = int2str(Axle.UnsprungMassArray(iAxleIndex));
         % Need to multiply by 1000 to get to mm.
         sAxleCoGz = int2str(Axle.ZPositionArray(iAxleIndex)*1000);
-        dataRow = {sUnit, sAxleDescription, sUnsprungMass, sAxleCoGz};
+        sAxleCoGx = int2str(Axle.XPositionArray(iAxleIndex)*1000);
+        dataRow = {sUnit, sAxleDescription, sUnsprungMass, sAxleCoGz, sAxleCoGx};
+        
         Table.data = [Table.data; dataRow];
+        % Move to next axle
         iAxleIndex = iAxleIndex + 1;
-        % Move straight to next axle group
-        iAxleIndex = iAxleIndex + nAxlesOnUnit;
+        %         end
+        %     else
+        %         sUnit = int2str(iUnit);
+        %         %Extract only the first description
+        %         sAxleDescription = Axle.DescriptionCell{iUnit}{1};
+        %         sUnsprungMass = int2str(Axle.UnsprungMassArray(iAxleIndex));
+        %         % Need to multiply by 1000 to get to mm.
+        %         sAxleCoGz = int2str(Axle.ZPositionArray(iAxleIndex)*1000);
+        %         sAxleCoGx = int2str(Axle.XPositionArray(iAxleIndex)*1000);
+        %         dataRow = {sUnit, sAxleDescription, sUnsprungMass, sAxleCoGz, sAxleCoGx};
+        %         Table.data = [Table.data; dataRow];
+        %         iAxleIndex = iAxleIndex + 1;
+        %         % Move straight to next axle group
+        %         iAxleIndex = iAxleIndex + nAxlesOnUnit;
+        %     end
+        
     end
-    
 end
-
 %% Generating the Latex Tables (this should be moved to a standalone function file when suitably tested.
-Table.Headings = {'\textbf{Unit}' '\textbf{Axle}' '\textbf{Mass (kg)}' '\textbf{CoG height (mm)}'};
+Table.Headings = {'\textbf{Unit}' '\textbf{Axle}' '\textbf{Mass (kg)}' '\textbf{CoG height (mm)}' '\textbf{Longitudinal Position\tnote{1} (mm)}'};
+
+markdownHeadings = {'Unit' 'Axle' 'Mass (kg)' 'CoG height (mm)' 'Longitudinal Position (mm)'};
+MdTable.data = [markdownHeadings; Table.data];
 
 % Compiling the structure fields required by latexTable
 Table.data = [Table.Headings; Table.data];
+Table.footNotes = {'\item[1] SAE up co-ordinate system and origin taken from centre of steer axle or hitch point at ground level'};
 Table.tableCaption = 'Unsprung Mass Values and CoG Heights';
 Table.tableLabel = 'UnsprungMassValuesAndCoGHeights';
 Table.booktabs = 0;
 Table.tableBorders = 1;
+
+MdTable.label = Table.tableCaption;
+
+logTable = markdownTable(MdTable);
 
 PBSreportTable = latexTable(Table);
 end

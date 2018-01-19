@@ -18,7 +18,7 @@
 %
 % * First code
 
-function PBSreportTable = createTableLatexPrimeMoverSummary(Engine, Sprung)
+function [PBSreportTable, logTable] = createTableLatexPrimeMoverSummary(Engine, Sprung)
 %% Table 8:  Truck-Tractor Details
 % Extracting table contents
 
@@ -52,12 +52,19 @@ Table.data = [Table.vehicleParameterHeadings columnDataForTable];
 
 Table.headings = {'\textbf{Vehicle parameter}'  '\textbf{Description}'};
 
+markdownHeadings = {'Vehicle parameter' 'Description'};
+MdTable.data = [markdownHeadings; Table.data];
+
 % Compiling the structure fields required by latexTable
 Table.data = [Table.headings; Table.data];
 Table.tableCaption = 'Prime Mover Specific Details';
 Table.tableLabel = 'PrimeMoverSpecificDetails';
 Table.booktabs = 0;
 Table.tableBorders = 1;
+
+MdTable.label = Table.tableCaption;
+
+logTable = markdownTable(MdTable);
 
 PBSreportTable = latexTable(Table);
 end
