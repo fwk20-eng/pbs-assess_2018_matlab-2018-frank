@@ -41,7 +41,9 @@ Project.savePath = sprintf('%s%s%s%s',Project.runFolderPath, '\', datestr(now,'y
 Project.runKey = sprintf('%s%s%s',Project.key,'_',Project.revision);
 Project.resultsFileName = strcat(Project.runKey, '_summary.xlsx');
 
-checkOverwrite(Project.savePath, Project.resultsFileName); %Note: xlswrite1 cannot handle creating a directory, so it is manually created in checkOverwrite if it does not exist
+if ~Is.skipManoeuvreChecks
+    checkOverwrite(Project.savePath, Project.resultsFileName); %Note: xlswrite1 cannot handle creating a directory, so it is manually created in checkOverwrite if it does not exist
+end
 
 %% Determining which matkey to use to extract the information
 
