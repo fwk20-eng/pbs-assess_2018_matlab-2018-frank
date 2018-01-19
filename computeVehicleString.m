@@ -84,7 +84,7 @@ for iUnit = 1:Sprung.numberOffUnits
         elseif iAxle > 1 && iAxle ~= length(indicesOfAxlesInUnit) && axleGroup == currentAxleGroup
             % Special formatting if the axle is a tag axle - this still needs to be tested when the case arises
             if strcmp(axleType,'Tag')
-                vehicleString{iUnit} = [vehicleString{iUnit} 'T('];
+                vehicleString{iUnit} = [vehicleString{iUnit} ')T('];
             end
             % Add duals or singles for the axle
             switch dualsOrSingles
@@ -124,7 +124,7 @@ for iUnit = 1:Sprung.numberOffUnits
         elseif iAxle == length(indicesOfAxlesInUnit) && axleGroup == currentAxleGroup
             % Special formatting if the axle is a tag axle - this still needs to be tested when the case arises
             if strcmp(axleType,'Tag')
-                vehicleString{iUnit} = [vehicleString{iUnit} 'T('];
+                vehicleString{iUnit} = [vehicleString{iUnit} ')T('];
             end
             
             % Add duals or singles for the axle
