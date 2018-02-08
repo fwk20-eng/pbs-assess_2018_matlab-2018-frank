@@ -3,16 +3,16 @@ The following readme applies to all files in the TruckSim data extraction folder
 
 # Tickets
 
-* [ ] **2017-05-12 - 1:** Ensure conformity in variable naming. This is directed mainly towards the structures that were created with variable names that have an initial capital letter. This is confusion, only structures should have capital letters I have tested the find and replace in all files in Visual Studio code and it does the trick Just be vigilant on which files are beibg modified.
-
 # Future Log (To Do)
 
-* [x] Results table for report. This needs to integrate the baseline as well as the actual combination. Perhaps the baseline results can be stored in a getBaseline function where you can store all of the baseline combinations that are currently used.
-* [x] Write results table to tex file for report.
-* [x] Compartmentalise the post processor to open up the possiblity for doing car-carrier assessments.
-* [x] Add feature to asses a car carrier with top deck as well as unladen details in the combination tables and results table.
-
 # Change Log
+
+[] - 2018-02-08
+**Fixed**
+* A period of changelogs have been omitted. However at this point the post processor is fully functional for 2017.1 
+
+**Note**
+* This is where the repository will be forked to a 2018 release edition. 2017.1 may still be refined however 2018 will become the main focus from hereon in.
 
 [2.0.0] - 2017-06-09
 
