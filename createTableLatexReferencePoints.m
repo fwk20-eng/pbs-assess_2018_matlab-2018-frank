@@ -16,6 +16,12 @@
 %
 %% Change Log
 %
+% [0.5.0] - 2018-02-08
+%
+% *Changed*
+%
+% Added a single referencepointnames variable into this section,all reference points will be labelled according to front/rear as a generic to avoid complexity in reporting
+%
 % [0.4.0]
 %
 % * Dolly unit support (no reference points printed for dolly)
@@ -38,13 +44,21 @@
 %
 % * First code
 
-function [PBSreportTable, logTable] = createTableLatexReferencePoints(referencePointNames, refPointsLadenCell,...
+function [PBSreportTable, logTable] = createTableLatexReferencePoints(refPointsLadenCell,...
     Sprung, Combination, tableCaption, tableLabel)
-%% Table 11:  ReferencePoints (Laden)
-% Extracting table contents
 
-% Table.data = [Table.VehicleParameterHeadings columnDataForTable];
 Table.data = {};
+
+referencePointNames = {...
+    'Front';...% 1
+    'Front';...% 2
+    'Front';...% 3
+    'Front';...% 4
+    'Front';...% 5
+    'Rear';...% 6
+    'Rear';...% 7
+    'Rear';...% 8
+    'Rear'};% 9
 
 nDollys = length(Combination.dollys);
 nUnitsWithReferencePoints = Sprung.numberOffUnits - nDollys;
@@ -66,7 +80,7 @@ for iUnit = 1 : Sprung.numberOffUnits
         sXref = arrayfun(@(x) num2str(x, '%0.0f'), iXref, 'UniformOutput', false);
         sYref = arrayfun(@(x) num2str(x, '%0.0f'), iYref, 'UniformOutput', false);
         sZref = arrayfun(@(x) num2str(x, '%0.0f'), iZref, 'UniformOutput', false);
-        sRefPointDescription = referencePointNames{iUnit};
+        sRefPointDescription = referencePointNames;
         
         referencePointsForUnit = [sReferencePointsUnit, sReferencePointNumber, sManoeuvre, sLeftRight, sRefPointDescription, sXref, sYref, sZref];
         

@@ -44,11 +44,7 @@ Hitch.RollMomentArray = getDatasetNameFromPar(allParFileData, 'LOG_ENTRY Used Da
 
 nHitches = length(Hitch.XPositionArray);
 
-if nHitches == 1
-    Hitch.ZPositionArray = getVariableValuesFromPar(endParFileData, '\<H_H\s');
-else
-    Hitch.ZPositionArray = getVariableValuesFromPar(endParFileData, '\<H_H\(');
-end
+Hitch.ZPositionArray = getVariableValuesFromPar(endParFileData, '\<H_H\(');
 
 hitchZPositionArrayCheck = getVariableValuesFromPar(endParFileData, '\<H_H_FRONT');
 

@@ -100,6 +100,9 @@ if Is.lsunt
     allParUnladenFileData = readLinesFromFile(allParUnladenFileFullPath);
 end
 
+%% Calculations with existing data
+Combination.frontalAreaForDrag = max(Combination.maxWidth)*0.001*max(Combination.maxHeight)*0.001; % [m]
+
 %% Extract sprung mass properties
 Sprung.DescriptionArray = extractSprungMassDescriptionArray(allParLadenFileData);
 Sprung.MassArray = getVariableValuesFromPar(endParLadenFileData, '^M_SU');
