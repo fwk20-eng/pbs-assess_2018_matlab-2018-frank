@@ -1,7 +1,6 @@
 function resultsPbs = runPBSAssessment(Is, Project, Combination, Report, ResultCode)
 
 %% Adding the paths containing the required .m files
-addpath('C:\Dropbox\_Personal\Programming\Global_Matlab_Toolbox\Downloaded\latexTable');
 addpath('C:\Dropbox\PBS\MatLab\_Global_Scripts\PBS_Data');
 %% Checking booleans
 Is = checkBooleans(Is);
