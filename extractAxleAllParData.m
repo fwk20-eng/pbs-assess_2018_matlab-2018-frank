@@ -47,7 +47,7 @@
 
 function extractedAxleData = extractAxleAllParData(allParFileData, GetAxleData, Sprung)
 %% Extracting data for unit 1
-disp('Note: code works for standard combinations with a single lead unit only');
+% disp('Note: code works for standard combinations with a single lead unit only');
 % Begin with the first unit
 iUnit = 1;
 

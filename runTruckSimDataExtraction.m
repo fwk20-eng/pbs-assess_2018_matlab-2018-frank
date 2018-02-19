@@ -103,6 +103,12 @@ end
 %% Calculations with existing data
 Combination.frontalAreaForDrag = max(Combination.maxWidth)*0.001*max(Combination.maxHeight)*0.001; % [m]
 
+%% Warning messages
+disp('** Note: code works for standard combinations with a single lead unit only');
+disp('** Note: code works for driven axles in the 1st or 2nd axle group only');
+disp('** Note: the code assumes all axles in the first axle group are steered');
+disp('** Note: code assumes 0 dual spacing indicates single tyres');
+
 %% Extract sprung mass properties
 Sprung.DescriptionArray = extractSprungMassDescriptionArray(allParLadenFileData);
 Sprung.MassArray = getVariableValuesFromPar(endParLadenFileData, '^M_SU');
@@ -257,11 +263,11 @@ axlePowertrainTorqueLogicArray(axlePowertrainTorqueLogicArray > 0) = 1;
 % Only the first 2 axle groups are considered to possibly have driven axles
 drivenAxles = cell2mat(Axle.Grouping(1:2)') .* axlePowertrainTorqueLogicArray;
 Axle.Driven = drivenAxles(drivenAxles ~= 0);
-disp('Note: code works for driven axles in the 1st or 2nd axle group only');
+% disp('** Note: code works for driven axles in the 1st or 2nd axle group only');
 
 % Determine which axles are steered
 Axle.NumberOffSteer = length(Axle.Grouping{1});
-disp('Note: the code assumes all axles in the first axle group are steered');
+% disp('** Note: the code assumes all axles in the first axle group are steered');
 
 % Tyre sizes
 Tyre.sizes = ExtractedTyreData.Sizes;

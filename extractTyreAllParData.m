@@ -32,7 +32,7 @@
 
 function [ExtractedTyreData, dollyUnits] = extractTyreAllParData(allParFileData, Sprung)
 %% Extracting data for unit 1
-disp('Note: code works for standard combinations with a single lead unit only');
+% disp('Note: code works for standard combinations with a single lead unit only');
 % Begin with the first unit
 iUnit = 1;
 
@@ -48,7 +48,7 @@ tyreDatasetArray = getDatasetNameFromPar(SplicedAllPar.units{iUnit}, 'LOG_ENTRY 
 
 iTyreIndex = 1;
 for iAxle = 1 : nAxles
-    disp('Note: code assumes 0 dual spacing indicates single tyres');
+    % disp('Note: code assumes 0 dual spacing indicates single tyres');
        
     % Note the tyreDataset must be named according to 315/80R22.5 (lag). A single space seperates the tyre size from the
     % lag/no lag modifier.
@@ -92,7 +92,7 @@ tyreDatasetArray = getDatasetNameFromPar(SplicedAllPar.units{iUnit}, 'LOG_ENTRY 
 
 iTyreIndex = 1;
 for iAxle = 1 : nAxles
-    disp('Note: code assumes 0 dual spacing indicates single tyres');
+    % disp('Note: code assumes 0 dual spacing indicates single tyres');
     
     if tyreDualSpacing(iAxle) == 0
         nTyres = 2;
