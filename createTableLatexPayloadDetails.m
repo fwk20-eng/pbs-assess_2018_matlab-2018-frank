@@ -75,7 +75,7 @@ for iUnit = 1 : Sprung.numberOffUnits
             
             sCoG = sprintf('%s%s%s%s%s%s%s', '(',sCoGx, '; ', sCoGy, '; ', sCoGz, ')');
             
-            rowOfDataForTable = {sUnit, sPayloadDescription, sMass, sCoG, sMOI};
+            rowOfDataForTable = {sUnit, sPayloadDescription, sMass, sMOI, sCoG};
             Table.data = [Table.data; rowOfDataForTable];
         end
     end
