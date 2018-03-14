@@ -20,120 +20,98 @@ end
 
 nVehUnits = length(mSprung);
 
+%% Extract the data from the mat file
 if Dummy.isDummyAxle
     % If there is a dummy axle, you need to pass through the indices of the valid axles
-    [Data, error] = readSimulationVariables_WithDummyAxles(MatKey, {'Roll' 'Ay_S' 'Fz_L' 'Roll_Tab'}, ...
+    [Data, error] = readSimulationVariables_WithDummyAxles(MatKey(1,:), {'Roll' 'Ay_S' 'Fz_L' 'Roll_Tab'}, ...
         {nVehUnits nVehUnits Dummy.isRealAxleIndex 1}, {'_' '' '' ''}, [], Project.savePath, Project.truckSimRunsPath,...
         Project.runKey, [0 2 1 0]);
 else
-    [Data, error] = readSimulationVariables(MatKey, {'Roll' 'Ay_S' 'Fz_L' 'Roll_Tab'}, [nVehUnits nVehUnits Axle.NumberOff 1], ...
+    [Data, error] = readSimulationVariables(MatKey(1,:), {'Roll' 'Ay_S' 'Fz_L' 'Roll_Tab'}, [nVehUnits nVehUnits Axle.NumberOff 1], ...
         {'_' '' '' ''}, [], Project.savePath, Project.truckSimRunsPath, Project.runKey,[0 2 1 0]);
 end
 
-if error == 1
-    ind=min(find(Data{1}>=0));
-    Time    = Data{1}(ind:end);      % convert to vector
-    Roll    = Data(2,:);
-    Ay_tsim = Data(3,:);
-    Fz_L    = Data(4,:);
-    Roll_Tab= Data{5}(ind:end);
-    AY=sind(Roll_Tab);
-else
-    return                  % data not loaded correctly
-end
+[Time, AYrcu, SRTt, indiC, ind, SRTreason, SRTtrrcu] = assessSRTtWithSRTrrcu(Data, error, SRTrollThresh, nVehUnits, Axle, Hitch, Combination,...
+                                                mSprung, HcgSprung);
 
-for i = 1:nVehUnits
-    Roll{i} = Roll{i}(ind:end); % Discard data when time < 0
-    Ay_tsim{i} = Ay_tsim{i}(ind:end); % Discard data when time < 0
-end
-for i = 1:Axle.NumberOff
-    Fz_L{i} = Fz_L{i}(ind:end); % Discard data when time < 0
-end
-
-for i = 1:nVehUnits %check if rollover angle reached
-    if sum((Roll{i}-Roll_Tab) >= SRTrollThresh)
-        indroll(i)=find((Roll{i}-Roll_Tab) >= SRTrollThresh,1);
-        Rollunit(i,:)=Roll{i};
+if Is.srtRrcu
+    clear SRTtrrcu; % ignore the original SRTrrcu calculated without a stabilising mass
+    
+    %% Running again with the rearmost roll coupled unit matlab file
+    if Dummy.isDummyAxle
+        % If there is a dummy axle, you need to pass through the indices of the valid axles
+        [Data, error] = readSimulationVariables_WithDummyAxles(MatKey(2,:), {'Roll' 'Ay_S' 'Fz_L' 'Roll_Tab'}, ...
+            {nVehUnits nVehUnits Dummy.isRealAxleIndex 1}, {'_' '' '' ''}, [], Project.savePath, Project.truckSimRunsPath,...
+            Project.runKey, [0 2 1 0]);
     else
-        indroll(i)=length(Roll{i});
+        [Data, error] = readSimulationVariables(MatKey(2,:), {'Roll' 'Ay_S' 'Fz_L' 'Roll_Tab'}, [nVehUnits nVehUnits Axle.NumberOff 1], ...
+            {'_' '' '' ''}, [], Project.savePath, Project.truckSimRunsPath, Project.runKey,[0 2 1 0]);
     end
+    
+    [Time_rrcu, AYrcu_rrcu, ~, ~, ind_rrcu, ~, SRTtrrcu] = assessSRTtWithSRTrrcu(Data, error, SRTrollThresh, ...
+                                                                                nVehUnits, Axle, Hitch, Combination,...
+                                                                                mSprung, HcgSprung);
+  
 end
-
-j=0; %check if all wheels in the air
-for i = (Axle.NumberOffSteer+1):1:Axle.NumberOff
-    j=j+1;
-    if isempty(find((Fz_L{i} <= 0),1))
-        indFz(j)=length(Fz_L{i});
-    else
-        indFz(j)=find((Fz_L{i} <= 0),1);
-    end
-end
-indFzall=max(indFz);
-
-i1st = 1;
-iLast = i1st;
-iC = 1;
-SRTrcu = [];
-while i1st <= nVehUnits
-    while (iLast < nVehUnits) && Hitch.RollCoupledArray(iLast)   % find first and last units of this coupled set
-        iLast = iLast + 1;
-    end
-    ind(iC)=[min([indFzall indroll(i1st:iLast)])];
-    SRTreason(iC)=1; %SRTreason -> 1 for angle, 2 for lift of tyres and 3 for decrease of lat accel
-    if ind(iC)==indFzall
-        SRTreason(iC)=2;
-    end
-    AYrcu{iC} = zeros(ind(iC),1); % create AY data for this RCU
-    denom = 0;
-    for i = i1st:iLast
-        if sum(i == Combination.dollys(:)) == 0 % only include unit if not in dollys vector (see C11.3(c)(i, ii & iii) of NTC standards) % evaluated here and not above in case dolly is in the middle of rrcu (i.e. C-dolly)
-            AYrcu{iC} = AYrcu{iC} + mSprung(i).*HcgSprung(i).*(AY(1:ind(iC))+Ay_tsim{i}(1:ind(iC)));
-            denom = denom + mSprung(i)*HcgSprung(i);
-        end
-    end
-    AYrcu{iC} = AYrcu{iC}/denom./cosd(Roll_Tab(1:ind(iC)));
-    SRTrcu(iC) = max(AYrcu{iC});
-    if SRTrcu(iC)~= AYrcu{iC}(end)
-        SRTreason(iC)=3;
-    end
-    iC = iC + 1;
-    i1st  = iLast  + 1;
-    iLast = i1st;
-end
-
-[SRTt indiC]= min(SRTrcu); %indiC is the unit that rolls over
-SRTtrrcu = SRTrcu(end);
 
 % plotting
 if Is.plotOn
     figure('name', 'SRT')
     
     hold on
-    axis([floor(Time(min(ind))/2) ceil(Time(max(ind))) 0 ceil((SRTt+0.01)*10)/10])  %set axis
     
-    legTitles = {};
-    for i = 1:length(AYrcu)
-        plot(Time(1:ind(i)), AYrcu{i}(1:ind(i)), 'Color', getColour(i));
-        legTitles = [legTitles; ['roll-coupled unit ' int2str(i)]];
+    if Is.srtRrcu
+        axis([floor(Time(min(ind))/2) ceil(Time_rrcu(max(ind_rrcu))) 0 ceil((SRTt+0.01)*10)/10])  %set axis
+    else
+        axis([floor(Time(min(ind))/2) ceil(Time(max(ind))) 0 ceil((SRTt+0.01)*10)/10])  %set axis
     end
     
-    PBSlimX = [0 Time(end)];
+    legTitles = {};
+    
+    % Plot the lateral acceleration for all of the roll-coupled units, if rrcu is run, then rrcu must be plotted with
+    % the data that was extracted in the rrcu script
+    if Is.srtRrcu
+        % Plot all units before the rrcu with the original manoeuvre data
+        for i = 1:(length(AYrcu) - 1)
+            plot(Time(1:ind(i)), AYrcu{i}(1:ind(i)), 'Color', getColour(i));
+            legTitles = [legTitles; ['roll-coupled unit ' int2str(i)]];
+        end
+        % Plot the rrcu with the rrcu data 
+        iRrcu = length(AYrcu); % rearmost roll-coupled unit
+        plot(Time_rrcu(1:ind_rrcu(iRrcu)), AYrcu_rrcu{i}(1:ind_rrcu(iRrcu)), 'Color', getColour(iRrcu));
+        legTitles = [legTitles; ['roll-coupled unit ' int2str(iRrcu)]];
+        
+    else 
+        for i = 1:length(AYrcu)
+            plot(Time(1:ind(i)), AYrcu{i}(1:ind(i)), 'Color', getColour(i));
+            legTitles = [legTitles; ['roll-coupled unit ' int2str(i)]];
+        end
+    end
+    
+    if Is.srtRrcu
+        PBSlimX = [0 Time_rrcu(end)];
+    else
+        PBSlimX = [0 Time(end)]; 
+    end
+    
     PBSlimY = [limSRT limSRT];
     plot(PBSlimX, PBSlimY, '--r')
     
     legTitles = [legTitles; 'min requirement'];
     
-    PBSlimX = [0 Time(end)];
     PBSlimY = [SRTt SRTt];
     plot(PBSlimX, PBSlimY, '--k')
     
     legTitles = [legTitles; 'SRT achieved'];
     
+    if Is.srtRrcu
+        PBSlimY = [SRTtrrcu SRTtrrcu];
+        plot(PBSlimX, PBSlimY, '--y')
+        legTitles = [legTitles; 'SRTrrcu achieved'];
+    end
+    
     xlabel('Time [s]')
     ylabel('Lateral Acceleration [g]')
-    
-    text([floor(Time(min(ind))/2)+1], floor(SRTt*100)/100+0.01,['SRT = ' num2str(floor(SRTt*100)/100) ' g'])
-    text([floor(Time(min(ind))/2)+1], floor(SRTt*100)/100-0.01,['SRTrrcu = ' num2str(floor(SRTtrrcu*100)/100) ' g'])
     
     if (SRTreason(indiC)==1),
         text([floor(Time(min(ind))/2)+1], 0.02,['SRT when threshold roll angle reached'])
@@ -141,6 +119,12 @@ if Is.plotOn
         text([floor(Time(min(ind))/2)+1], 0.02,['SRT when all non-steer tyres in the air'])
     else
         text([floor(Time(min(ind))/2)+1], 0.02,['SRT when lateral acceleration decreases with roll angle'])
+    end
+    
+    text([floor(Time(min(ind))/2)+1], 0.02+0.06,['SRT = ' num2str(floor(SRTt*100)/100) ' g'])
+    
+    if Is.srtRrcu
+        text([floor(Time(min(ind))/2)+1], 0.02+0.03,['SRTrrcu = ' num2str(floor(SRTtrrcu*100)/100) ' g'])
     end
     
     legend(legTitles, 'Location', 'northeastoutside'); legend('boxoff');
@@ -155,4 +139,5 @@ if Is.plotOn
     
     title('Static Rollover Threshold')
     hold off
+end
 end
