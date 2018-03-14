@@ -14,16 +14,19 @@
 %% Change Log
 %% Future Additions
 %
-% * Have function that checks input parameters are correct
 % * Do artic angle and artic angle rate for Yaw Damping
 %
 %
 %% Checks and corrections
 %
-% * Does the programme work for truck trailer combination with dolleys?
+% * Does the programme work for truck trailer combination with dolleys? Yes it looks like it does work
 % * Correct STFD
 % * Correct SRT for lift of all Fz except steer.
 % * Check SRTrrcu
+%
+% [0.9.0] - 2018-03-05
+%
+% * Added SRTrrcu edition of SRT where a stabilising mass is placed 1 mm from the ground on all units except for the rrcu
 %
 % [0.8.0]
 %
