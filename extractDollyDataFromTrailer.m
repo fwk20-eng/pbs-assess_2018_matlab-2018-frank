@@ -43,7 +43,7 @@ for iSplice = 1 : nRawUnits
         % Increase by 2 to accomodate for both dolly and trailer
         iUnit = iUnit + 2; 
     catch
-        % If there are not dolly's, the cell will remain as per the rawSplicedParFile
+        % If there are no dolly's, the cell will remain as per the rawSplicedParFile
         splicedAllParWithDolly = [splicedAllParWithDolly, rawSplicedParFile(iSplice)];
 
         iUnit = iUnit + 1;
