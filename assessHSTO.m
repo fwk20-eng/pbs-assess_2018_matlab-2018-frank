@@ -49,6 +49,7 @@ if Is.plotOn
     plot([0 max(X_A1)], [Ytangent Ytangent], '--r')
     text(0, 0.2,['HSTO = ' num2str(ceil(maxOfftrack*10)/10) ' m'])
     legTitles = {'steer axle'; 'last axle'; 'peak overshoot'};
+    axis([-50 200 -1.5 1.2])
     
     set(gcf,'PaperPosition',[0 0 16 11])
     set(gca,'Xgrid','on');
