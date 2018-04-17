@@ -10,7 +10,7 @@ end
 
 doesFileExist = exist(savePath,'file');
 
-if  doesFileExist == 0 %If file doesnt exist, add workbook
+if  doesFileExist == 0 % If file doesnt exist, add workbook
     ExcelWorkbook = Excel.workbooks.Add;
     ExcelWorkbook.SaveAs(savePath);
     ExcelWorkbook.Close(false);
