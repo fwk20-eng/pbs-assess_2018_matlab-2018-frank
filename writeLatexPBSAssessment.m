@@ -202,7 +202,7 @@ if Is.latexReport
     Report.modifiers = [Report.modifiers; additionalModifiers];
     
     %% Edit PBS assessment and save tex file with the correct name as per project
-    editPBSAssessmentReport(Report, Is);
+    editPbsAssessmentReport(Report, Is);
     
 end
 end
