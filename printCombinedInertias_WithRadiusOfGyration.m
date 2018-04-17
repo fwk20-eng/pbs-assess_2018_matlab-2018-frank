@@ -11,7 +11,7 @@ end
 if exist(savePath,'file') == 0 %If file doesnt exist, add workbook
     ExcelWorkbook = Excel.workbooks.Add;
     ExcelWorkbook.SaveAs(savePath);
-    %ExcelWorkbook.Close(false);
+    ExcelWorkbook.Close(false);
 end
 
 try
@@ -39,11 +39,13 @@ xlswrite1(savePath, {'Vehicle Description'},  sheetName, 'A1');
 xlswrite1(savePath, description,  sheetName, 'B1');
 xlswrite1(savePath, inputHeadings',  sheetName, 'A2');
 xlswrite1(savePath, inputs,  sheetName, 'B2');
+
 %----Results------------------------------------
 xlswrite1(savePath, resultsHeadings',  sheetName, startResultsHeadings);
 xlswrite1(savePath, results',  sheetName, startResults);
     
 invoke(Excel.ActiveWorkbook,'Save');
-Excel.delete
-clear Excel
+Close(Excel.ActiveWorkbook);
+
+delete(Excel);
 end
