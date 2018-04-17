@@ -1,7 +1,5 @@
 function resultsPbs = runPBSAssessment(Is, Project, Combination, Report, ResultCode)
 
-%% Adding the paths containing the required .m files
-addpath('C:\Dropbox\PBS\MatLab\_Global_Scripts\PBS_Data');
 %% Checking booleans
 Is = checkBooleans(Is);
 %% This has to go here to prevent the folder path being changed during a TD run
