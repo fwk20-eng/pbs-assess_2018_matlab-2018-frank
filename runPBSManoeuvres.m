@@ -103,7 +103,7 @@ copyTruckSimRunFiles(MatKey, Project, Is);
 [Tyre, Axle, Hitch, Sprung, Dimensions, PayloadLaden, PayloadUnladen, Dummy, Combination] =...
     runTruckSimDataExtraction(ParDetails, Is, Combination);
 
-[Engine] = getEngineData(Combination.engineModel, Combination.gearboxModel, Tyre.NumberOff);
+[Engine] = getEngineData(Combination, Tyre);
 %%	Constants
 warning off
 
