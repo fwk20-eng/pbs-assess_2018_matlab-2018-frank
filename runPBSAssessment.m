@@ -39,7 +39,7 @@ if Is.carCarrier
     if Is.hsto;         MatKey.hsto    = {'RA_TD', ResultCode.ra_TD};                                 end
 
     if Is.srtRrcu %if there is an srtRrcu, it is assumed a normal srt is also being run
-                        MatKey.srt     = {'SRT_TD', ResultCode.srt; 'SRT_TD', ResultCode.srtrrcu}; % The suffix will remain the same, however the resultcode will be different
+                        MatKey.srt     = {'SRT_TD', ResultCode.srt; 'SRTrrcu_TD', ResultCode.srtrrcu}; % The suffix will remain the same, however the resultcode will be different
         else if Is.srt
                         MatKey.srt     = {'SRT_TD', ResultCode.srt};
         end
