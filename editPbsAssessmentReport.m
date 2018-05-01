@@ -35,6 +35,7 @@ PbsReportFileData = editLinesInCellArray(PbsReportFileData, '\\ReportDay', date(
 PbsReportFileData = editLinesInCellArray(PbsReportFileData, '\\ReportMonth', date(2), '(?<=\{).*(?=\})');
 PbsReportFileData = editLinesInCellArray(PbsReportFileData, '\\ReportYear', date(1), '(?<=\{).*(?=\})');
 PbsReportFileData = editLinesInCellArray(PbsReportFileData, '\\ReportRev', Report.reportRevision, '(?<=\{).*(?=\})');
+PbsReportFileData = editLinesInCellArray(PbsReportFileData, '\\PreparedFor', Report.client, '(?<=\{).*(?=\})');
 
 % Modify the report type to suit the combination being assessed
 PbsReportFileData = editLinesInCellArray(PbsReportFileData, ['\\togglefalse\{', Report.vehicleType], 'true', '(?<=toggle).*(?=\{)');
