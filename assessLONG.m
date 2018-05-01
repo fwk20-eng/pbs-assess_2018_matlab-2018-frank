@@ -95,7 +95,7 @@ while contin
     Favail=sum(0.8*9.81*Axle2(Axle.Driven));
     Fdrive=sin(th)*m*9.81+Frr+FA;
     acc(i)=(min([Fengine Favail])-sin(th)*m*9.81-Frr-FA)/me;    
-    if Fdrive>Fengine;
+    if Fdrive>Fengine
         contin=0; % The engine force is not big enough to generate the required drive
         saturate=0;
     elseif Fdrive>Favail
@@ -181,20 +181,21 @@ if Is.plotOn
     plot(vel(1:i),acc(1:i)*10.0,vel(1:i),gearvec(1:i))
     xlabel('Velocity [km/h]')
     ylabel('Acceleration x 10 [m/s^2] ; gear')
-    legTitles = {'acceleration'; 'gear';};
+    legTitles = {'acceleration'; 'gear'};
     legend(legTitles, 'Location', 'northeastoutside'); legend('boxoff');
     if saturate==0
         text(0.8*floor(GRADB),0.6*max(acc*10.0),['GRADB = ' num2str(floor(GRADB)) ' km/h']);   
         text(0.6*floor(GRADB),0.8*max(acc*10.0),'Limited by torque');
-        plot([floor(GRADB) floor(GRADB)],[0 max(gearvec)],'r:');
+        h_limit = plot([floor(GRADB) floor(GRADB)],[0 max(gearvec)],'r:');
     elseif saturate==1
         text(0.8*floor(GRADB),0.6*max(acc*10.0),['GRADB = ' num2str(floor(GRADB)) ' km/h']);      
         text(0.6*floor(GRADB),0.8*max(acc*10.0),'Tyres saturated');  
-        plot([floor(GRADB) floor(GRADB)],[0 max(gearvec)],'r:')
+        h_limit = plot([floor(GRADB) floor(GRADB)],[0 max(gearvec)],'r:');
     else
         text(0.8*floor(GRADB)-8,0.6*max(acc*10.0),['GRADB >' num2str(floor(max(vel))) ' km/h'])    
         GRADB=floor(max(vel));
     end    
+    set(get(get(h_limit,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
     set(gcf,'PaperPosition',[0 0 16 11])            
     set(gca,'Xgrid','on');
     set(gca,'Ygrid','on');

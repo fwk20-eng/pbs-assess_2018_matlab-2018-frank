@@ -149,8 +149,9 @@ else                                                %eqn C14 p.65
 end
 
 if plotOn
-    plot(tPeak, valPeak, '*r')
+    h_peaks = plot(tPeak, valPeak, '*r');
     text(0.2, Yloc,['D_' num2str(count) ' = ' num2str(floor(DR*100)/100)])
+    set(get(get(h_peaks,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
 end
 
 
