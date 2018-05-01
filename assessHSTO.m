@@ -4,16 +4,16 @@ if nargin == 0  % i.e. program run directly from here
     Axle.NumberOff = 19;
     Combination.totalLength = 41.205;
     Project.savePath = 'C:\Users\A0006942\Documents\PBS calculation results\20151209-Wits-PBS assess-Unitrans-AfritBABquad-Volvo FH86T6HT ver1';
-    Project.truckSimRunsPath = 'C:\Users\Public\Documents\TruckSim_Data\Runs';
+    Project.truckSimRunsDirectory = 'C:\Users\Public\Documents\TruckSim_Data\Runs';
     Project.runKey ='AfritBABquad-Volvo FH86T6HT';
     Is.plotOn = true;
 end
 
 if Dummy.isDummyAxle
     % If a dummy axle is present, the number of axles will not match the last axle index
-    [Data, error] = readSimulationVariables(MatKey, {'X_A1' 'Y_A1' ['X_A' int2str(Dummy.isRealAxleIndex(end))] ['Y_A' int2str(Dummy.isRealAxleIndex(end))]}, ones(1,4), {'' '' '' ''}, [],  Project.savePath, Project.truckSimRunsPath, Project.runKey, [0 0 0 0]);
+    [Data, error] = readSimulationVariables(MatKey, {'X_A1' 'Y_A1' ['X_A' int2str(Dummy.isRealAxleIndex(end))] ['Y_A' int2str(Dummy.isRealAxleIndex(end))]}, ones(1,4), {'' '' '' ''}, [],  Project.savePath, Project.truckSimRunsDirectory, Project.runKey, [0 0 0 0]);
 else
-    [Data, error] = readSimulationVariables(MatKey, {'X_A1' 'Y_A1' ['X_A' int2str(Axle.NumberOff)] ['Y_A' int2str(Axle.NumberOff)]}, ones(1,4), {'' '' '' ''}, [],  Project.savePath, Project.truckSimRunsPath, Project.runKey, [0 0 0 0]);
+    [Data, error] = readSimulationVariables(MatKey, {'X_A1' 'Y_A1' ['X_A' int2str(Axle.NumberOff)] ['Y_A' int2str(Axle.NumberOff)]}, ones(1,4), {'' '' '' ''}, [],  Project.savePath, Project.truckSimRunsDirectory, Project.runKey, [0 0 0 0]);
 end
 
 if error == 1

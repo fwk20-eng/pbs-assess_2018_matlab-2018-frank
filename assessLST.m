@@ -14,7 +14,7 @@ if nargin == 0  % i.e. program run directly from here
     muPeakSteer = 1;    
     laden = true;
     Project.savePath = 'C:\Users\A0006942\Documents\Delete';
-    Project.truckSimRunsPath = 'C:\Dropbox\trucksimDatabase_JAD\Runs';
+    Project.truckSimRunsDirectory = 'C:\Dropbox\trucksimDatabase_JAD\Runs';
     Project.runKey ='Test';
     MatKey = 'LST_FL';
     Is.plotOn = true;
@@ -36,7 +36,7 @@ end
     'Fx_R' 'Fy_R' 'Fz_R'},...
     [Sprung.numberOffUnits*ones(1,7) 1 1 Sprung.numberOffUnits*ones(1,7) 1 1 Axle.NumberOffSteer*ones(1,6)],...
     {'' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' ''},...
-    Combination.dollys, Project.savePath, Project.truckSimRunsPath, Project.runKey,...
+    Combination.dollys, Project.savePath, Project.truckSimRunsDirectory, Project.runKey,...
     [3*ones(1,7) zeros(1,2) 3*ones(1,7) zeros(1,2) ones(1,6)]);
 
 if error == 1

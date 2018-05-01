@@ -22,7 +22,7 @@
 function createRunLog(Is, Project)
 if Is.log %Write run notes and revision to text file
     runLogName = 'runLog.txt';
-    runLogPath = strcat(Project.resultsFolderPath, '\', runLogName);
+    runLogPath = strcat(Project.resultsDirectory, '\', runLogName);
     fRunLog = fopen(runLogPath,'a');
     fprintf(fRunLog,'-------------------------------------------------------------------------------------\n');
     fprintf(fRunLog,strcat(datestr(now,'yyyy-mm-dd'), ':\t' ,Project.runKey, '\n'));

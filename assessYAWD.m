@@ -11,14 +11,14 @@ if nargin == 0  % i.e. program run directly from here
     % -----------------------------------------------------------------
     Sprung.numberOffUnits = 6;
     Project.savePath = 'C:\Users\A0006942\Documents\PBS calculation results\20151209-Wits-PBS assess-Unitrans-AfritBABquad-Volvo FH86T6HT ver1';
-    Project.truckSimRunsPath = 'C:\Users\Public\Documents\TruckSim_Data\Runs';
+    Project.truckSimRunsDirectory = 'C:\Users\Public\Documents\TruckSim_Data\Runs';
     Project.runKey ='AfritBABquad-Volvo FH86T6HT';
     Is.plotOn = true;
     
     % -----------------------------------------------------------------
 end
 
-[Data, errorx] = readSimulationVariables(MatKey, {'Art_H' 'ArtR_H' 'AVz' 'Ay'}, [Sprung.numberOffUnits-1 Sprung.numberOffUnits-1 Sprung.numberOffUnits 1], {'' '' '_' ''}, [], Project.savePath, Project.truckSimRunsPath, Project.runKey, zeros(1,4));
+[Data, errorx] = readSimulationVariables(MatKey, {'Art_H' 'ArtR_H' 'AVz' 'Ay'}, [Sprung.numberOffUnits-1 Sprung.numberOffUnits-1 Sprung.numberOffUnits 1], {'' '' '_' ''}, [], Project.savePath, Project.truckSimRunsDirectory, Project.runKey, zeros(1,4));
 
 if errorx == 1
     Time    = Data{1};      % convert to vector

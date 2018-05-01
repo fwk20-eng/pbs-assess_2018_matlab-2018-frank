@@ -3,7 +3,7 @@ function resultsPbs = runPBSAssessment(Is, Project, Combination, Report, ResultC
 %% Checking booleans
 Is = checkBooleans(Is);
 %% This has to go here to prevent the folder path being changed during a TD run
-Project.runFolderPath = strcat(Project.resultsFolderPath, '\Version_', Project.revision);
+Project.runFolderPath = strcat(Project.resultsDirectory, '\Version_', Project.revision);
 %% Setting matlab keys for run
 % These can be changed as you loop through a project if required
 

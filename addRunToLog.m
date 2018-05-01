@@ -39,7 +39,7 @@
 function addRunToLog(Project, Is, resultsWithLevel, axleLoading, Axle)
 
 runLogName = 'runLog.md';
-runLogPath = strcat(Project.resultsFolderPath, '\', runLogName);
+runLogPath = strcat(Project.resultsDirectory, '\', runLogName);
 
 % Create file if it does not already exist
 if ~exist(runLogPath, 'file')

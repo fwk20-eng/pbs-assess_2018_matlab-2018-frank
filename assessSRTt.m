@@ -12,7 +12,7 @@ if nargin == 0  % i.e. program run directly from here
     Hitch.RollCoupledArray = [false];
     Combination.dollys = [];     % vehicle unit numbers with no reference points (dolly's do not have RPs)
     Project.savePath = 'C:\Users\A0006942\Documents\PBS calculation results\20160419-Wits-PBS-assess-Rolfo-Hercules3A-VolvoFM400FM62TR3LA';
-    Project.truckSimRunsPath = 'C:\Users\A0006942\Documents\TruckSim_Data - 8.1 convert to 8.2a\Runs';
+    Project.truckSimRunsDirectory = 'C:\Users\A0006942\Documents\TruckSim_Data - 8.1 convert to 8.2a\Runs';
     Project.runKey ='Rolfo-Hercules3A-VolvoFM400FM62TR3LA';
     Is.plotOn = true;
     % -----------------------------------------------------------------
@@ -24,11 +24,11 @@ nVehUnits = length(mSprung);
 if Dummy.isDummyAxle
     % If there is a dummy axle, you need to pass through the indices of the valid axles
     [Data, error] = readSimulationVariables_WithDummyAxles(MatKey(1,:), {'Roll' 'Ay_S' 'Fz_L' 'Roll_Tab'}, ...
-        {nVehUnits nVehUnits Dummy.isRealAxleIndex 1}, {'_' '' '' ''}, [], Project.savePath, Project.truckSimRunsPath,...
+        {nVehUnits nVehUnits Dummy.isRealAxleIndex 1}, {'_' '' '' ''}, [], Project.savePath, Project.truckSimRunsDirectory,...
         Project.runKey, [0 2 1 0]);
 else
     [Data, error] = readSimulationVariables(MatKey(1,:), {'Roll' 'Ay_S' 'Fz_L' 'Roll_Tab'}, [nVehUnits nVehUnits Axle.NumberOff 1], ...
-        {'_' '' '' ''}, [], Project.savePath, Project.truckSimRunsPath, Project.runKey,[0 2 1 0]);
+        {'_' '' '' ''}, [], Project.savePath, Project.truckSimRunsDirectory, Project.runKey,[0 2 1 0]);
 end
 
 [Time, AYrcu, SRTt, indiC, ind, SRTreason, SRTtrrcu] = assessSRTtWithSRTrrcu(Data, error, SRTrollThresh, nVehUnits, Axle, Hitch, Combination,...
@@ -41,11 +41,11 @@ if Is.srtRrcu
     if Dummy.isDummyAxle
         % If there is a dummy axle, you need to pass through the indices of the valid axles
         [Data, error] = readSimulationVariables_WithDummyAxles(MatKey(2,:), {'Roll' 'Ay_S' 'Fz_L' 'Roll_Tab'}, ...
-            {nVehUnits nVehUnits Dummy.isRealAxleIndex 1}, {'_' '' '' ''}, [], Project.savePath, Project.truckSimRunsPath,...
+            {nVehUnits nVehUnits Dummy.isRealAxleIndex 1}, {'_' '' '' ''}, [], Project.savePath, Project.truckSimRunsDirectory,...
             Project.runKey, [0 2 1 0]);
     else
         [Data, error] = readSimulationVariables(MatKey(2,:), {'Roll' 'Ay_S' 'Fz_L' 'Roll_Tab'}, [nVehUnits nVehUnits Axle.NumberOff 1], ...
-            {'_' '' '' ''}, [], Project.savePath, Project.truckSimRunsPath, Project.runKey,[0 2 1 0]);
+            {'_' '' '' ''}, [], Project.savePath, Project.truckSimRunsDirectory, Project.runKey,[0 2 1 0]);
     end
     
     [Time_rrcu, AYrcu_rrcu, ~, ~, ind_rrcu, ~, SRTtrrcu] = assessSRTtWithSRTrrcu(Data, error, SRTrollThresh, ...

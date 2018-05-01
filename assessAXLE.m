@@ -32,11 +32,11 @@ function [Axle] = assessAXLE(Axle, MatKey, Project, Is, Dummy)
 
 if Dummy.isDummyAxle
     % If a dummy axle is present, the number of axles will not match the last axle index
-    [Data, errorx] = readSimulationVariables_WithDummyAxles(MatKey, {'Fz_AXL'}, {Dummy.isRealAxleIndex}, {''}, [], Project.savePath, Project.truckSimRunsPath,...
+    [Data, errorx] = readSimulationVariables_WithDummyAxles(MatKey, {'Fz_AXL'}, {Dummy.isRealAxleIndex}, {''}, [], Project.savePath, Project.truckSimRunsDirectory,...
         Project.runKey, [1]);
 else
     % Extract the required data
-    [Data, errorx] = readSimulationVariables(MatKey, {'Fz_AXL'}, [Axle.NumberOff], {''}, [], Project.savePath, Project.truckSimRunsPath,...
+    [Data, errorx] = readSimulationVariables(MatKey, {'Fz_AXL'}, [Axle.NumberOff], {''}, [], Project.savePath, Project.truckSimRunsDirectory,...
         Project.runKey, [1]);
 end
 % Initialising the cell array of strings for the axle loads

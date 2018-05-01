@@ -9,7 +9,7 @@ if nargin == 0  % i.e. program run directly from here
     Sprung.numberOffUnits = 3;
     Combination.dollys = [];     % vehicle unit numbers with no reference points (dolly's do not have RPs)
     Project.savePath = 'C:\Users\A0006942\Documents\Delete';
-    Project.truckSimRunsPath = 'C:\Dropbox\trucksimDatabase_JAD\Runs';
+    Project.truckSimRunsDirectory = 'C:\Dropbox\trucksimDatabase_JAD\Runs';
     Project.runKey ='Test';
     MatKey = 'TASP_FL';
     Is.plotOn = true;
@@ -19,7 +19,7 @@ end
 
 [Data, error] = readSimulationVariables(MatKey, {'X_S1' 'X_S2' 'X_S6' 'X_S7' 'X_S8' 'X_S9' ...
     'Y_S1' 'Y_S2' 'Y_S6' 'Y_S7' 'Y_S8' 'Y_S9'}, Sprung.numberOffUnits*ones(1,12),...
-    {'' '' '' '' '' '' '' '' '' '' '' ''}, Combination.dollys, Project.savePath, Project.truckSimRunsPath,...
+    {'' '' '' '' '' '' '' '' '' '' '' ''}, Combination.dollys, Project.savePath, Project.truckSimRunsDirectory,...
     Project.runKey, 3*ones(1, 12));
 
 if error == 1

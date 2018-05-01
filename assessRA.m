@@ -11,7 +11,7 @@ if nargin == 0  % i.e. program run directly from here
     Hitch.RollCoupledArray = [true true false true true];
     Combination.dollys = [4];     % vehicle unit numbers with no reference points (dolly's do not have RPs) 
     Project.savePath = 'C:\Users\A0006942\Documents\PBS calculation results\20151209-Wits-PBS assess-Unitrans-AfritBABquad-Volvo FH86T6HT ver1';
-    Project.truckSimRunsPath = 'C:\Users\Public\Documents\TruckSim_Data\Runs';
+    Project.truckSimRunsDirectory = 'C:\Users\Public\Documents\TruckSim_Data\Runs';
     Project.runKey ='AfritBABquad-Volvo FH86T6HT';
     Is.plotOn = true;
 end
@@ -19,7 +19,7 @@ end
 
 nVehUnits = length(mSprung);
 
-[Data, errorx] = readSimulationVariables(MatKey, {'Ay_S' 'Ay_S61' 'X_A' 'Y_A' 'LatError'}, [nVehUnits 1 1 1 1], {'' '' '' ''}, [], Project.savePath, Project.truckSimRunsPath, Project.runKey, [2 3 1 1 0]); % must use body fixed Ay in accordance with SAE definition
+[Data, errorx] = readSimulationVariables(MatKey, {'Ay_S' 'Ay_S61' 'X_A' 'Y_A' 'LatError'}, [nVehUnits 1 1 1 1], {'' '' '' ''}, [], Project.savePath, Project.truckSimRunsDirectory, Project.runKey, [2 3 1 1 0]); % must use body fixed Ay in accordance with SAE definition
 %[Data, error] = readSimulationVariables(matKey, {'Ay_S1'}, [nVehUnits], {''}, [], savePath, runsPath, runKey); % must use body fixed Ay in accordance with SAE definition
 % must use body fixed Ay in accordance with SAE definition
 

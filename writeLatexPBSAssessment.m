@@ -102,7 +102,7 @@ if Is.latexReport
     pbsAssessFiguresCopyFromFullPath = strcat(Project.savePath,'\', Project.runKey, '_figures');
     pbsAssessFiguresCopyToFullPath =  strcat(pbsAssessCopyToFullPath, '\fig');
     
-    pbsAssessGACopyFromFullPath = strcat(Project.resultsFolderPath, '\_GA_Images');
+    pbsAssessGACopyFromFullPath = strcat(Project.resultsDirectory, '\_GA_Images');
     
     %% Remove the PBS assessment folder if it already exists
     if exist(pbsAssessCopyToFullPath, 'dir')
@@ -111,7 +111,7 @@ if Is.latexReport
     
     %% Copy the necessary files
     % Copy the PBS assessment template across
-    copyfile(Project.pbsAssessmentTemplatePath, pbsAssessCopyToFullPath);
+    copyfile(Project.pbsAssessmentTemplateDirectory, pbsAssessCopyToFullPath);
     
     % Copy across the assessment figures
     copyfile(pbsAssessFiguresCopyFromFullPath, pbsAssessFiguresCopyToFullPath);
