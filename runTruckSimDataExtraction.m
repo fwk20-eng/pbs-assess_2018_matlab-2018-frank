@@ -274,7 +274,10 @@ Tyre.sizes = ExtractedTyreData.Sizes;
 
 % Find the rolling radius from the first instance of rolling radius (steer tyre)## Should techically be the drive tyre
 tyreRollingRadiusArray = getVariableValuesFromPar(endParLadenFileData, '^RRE(');
-Tyre.RollingRadius = tyreRollingRadiusArray(1);
+
+firstDriveTyreIndex = Axle.NumberOffSteer * 2 + 1; % Assuming single tyres for the steer axle
+
+Tyre.RollingRadius = tyreRollingRadiusArray(firstDriveTyreIndex);
 
 % Tyre widths no need to process for dummy axles, as the steer axle should always be axle 1
 GetTyreWidth.dataSetKeyCell = {'ENTER_PARSFILE Tires\Tire', ...
