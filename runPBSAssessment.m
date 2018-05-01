@@ -11,11 +11,10 @@ if Is.yawD;         MatKey.yawD    = {'YawD', ResultCode.yawD};                 
 if Is.ra;           MatKey.ra      = {'RA', ResultCode.ra};                                  end
 if Is.hsto;         MatKey.hsto    = {'RA', ResultCode.ra};                                  end
 
-if Is.srtRrcu %if there is an srtRrcu, it is assumed a normal srt is also being run
+if Is.srtRrcu % if there is an srtRrcu, it is assumed a normal srt is also being run
                     MatKey.srt     = {'SRT', ResultCode.srt; 'SRTrrcu', ResultCode.srtRrcu}; % The suffix will remain the same, however the resultcode will be different
-    else if Is.srt
+elseif Is.srt
                     MatKey.srt     = {'SRT', ResultCode.srt};
-    end
 end
 
 if Is.tasp;         MatKey.tasp    = {'TASP', ResultCode.tasp};                              end
@@ -37,10 +36,9 @@ if Is.carCarrier
     if Is.hsto;         MatKey.hsto    = {'RA_TD', ResultCode.ra_TD};                                 end
 
     if Is.srtRrcu %if there is an srtRrcu, it is assumed a normal srt is also being run
-                        MatKey.srt     = {'SRT_TD', ResultCode.srt; 'SRTrrcu_TD', ResultCode.srtrrcu}; % The suffix will remain the same, however the resultcode will be different
-        else if Is.srt
-                        MatKey.srt     = {'SRT_TD', ResultCode.srt};
-        end
+                        MatKey.srt     = {'SRT_TD', ResultCode.srt_TD; 'SRTrrcu_TD', ResultCode.srtRrcu_TD}; % The suffix will remain the same, however the resultcode will be different
+    elseif Is.srt
+                        MatKey.srt     = {'SRT_TD', ResultCode.srt_TD};
     end
     
     if Is.tasp;         MatKey.tasp    = {'TASP_TD', ResultCode.tasp_TD};                             end
