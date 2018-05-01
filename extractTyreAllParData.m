@@ -96,7 +96,7 @@ for iAxle = 1 : nAxles
     
     if tyreDualSpacing(iAxle) == 0
         nTyres = 2;
-        reportText = '(singles)';
+        reportText = ' (singles)';
     elseif tyreDualSpacing(iAxle) > 0
         nTyres = 4;
         reportText = sprintf('%s%i%s',' (duals ', tyreDualSpacing(iAxle), ' spacing)');
