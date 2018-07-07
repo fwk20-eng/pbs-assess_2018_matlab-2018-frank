@@ -3,7 +3,9 @@
 %   -> First iteration
 %Ver 2.0
 %   -> Removed error if LatError is less than 25 mm. 2016/11/04 FK
-function [RA] = assessRA(Combination, Hitch, Project, MatKey, Is, mSprung, HcgSprung)
+% Ver 3.0
+%   -> Only consider values after zero time to prevent picking up exageerated initialisations values
+function [RA, maxLatError] = assessRA(Combination, Hitch, Project, MatKey, Is, mSprung, HcgSprung)
 
 if nargin == 0  % i.e. program run directly from here
     mSprung = [7346        6900        5900        1400        6900        5900];
@@ -19,16 +21,17 @@ end
 
 nVehUnits = length(mSprung);
 
-[Data, errorx] = readSimulationVariables(MatKey, {'Ay_S' 'Ay_S61' 'X_A' 'Y_A' 'LatError'}, [nVehUnits 1 1 1 1], {'' '' '' ''}, [], Project.savePath, Project.truckSimRunsDirectory, Project.runKey, [2 3 1 1 0]); % must use body fixed Ay in accordance with SAE definition
-%[Data, error] = readSimulationVariables(matKey, {'Ay_S1'}, [nVehUnits], {''}, [], savePath, runsPath, runKey); % must use body fixed Ay in accordance with SAE definition
 % must use body fixed Ay in accordance with SAE definition
+[Data, errorx] = readSimulationVariables(MatKey, {'Ay_S' 'Ay_S61' 'X_A' 'Y_A' 'LatError'},...
+  [nVehUnits 1 1 1 1], {'' '' '' ''}, [], Project.savePath, Project.truckSimRunsDirectory,...
+  Project.runKey, [2 3 1 1 0]); 
 
 if errorx == 1
-    Time    = Data{1};      % convert to vector
-    Ay      = Data(2,:);    % This is still a cell array
+    Time    = Data{1};    % convert to vector
+    Ay      = Data(2,:);  % This is still a cell array
     AYsteer = Data{3};    % Steer lateral acceleration
-    Xaxle   = Data{4};      % convert to vector
-    Yaxle   = Data{5};      % convert to vector
+    Xaxle   = Data{4};    % convert to vector
+    Yaxle   = Data{5};    % convert to vector
     LatError = Data{6};
 else
     return                  % data not loaded correctly
@@ -37,11 +40,14 @@ end
 maxLatError = max(LatError); % find the peak lateral error
 
 if ~Is.skipManoeuvreChecks
-    %Check to ensure that the lateral error is within the correct limits
+    % Check to ensure that the lateral error is within the correct limits
+    % For this to work, the original definition of error had to be changed to errorx
     if maxLatError > 30
-        error('%s%0.2f%s','Lateral error is above 30 mm: ', maxLatError, ' mm -->> Decrease TPREV_CONSTANT'); %For this to work, the original definition of error had to be changed to errorx
+        error('%s%0.2f%s','Lateral error is above 30 mm: ', maxLatError, ...
+          ' mm -->> Decrease TPREV_CONSTANT'); 
     elseif maxLatError < 25
-        error('%s%0.2f%s','Lateral error is below 25 mm: ', maxLatError, ' mm -->> Increase TPREV_CONSTANT, manoeuvre may be too harsh');
+        error('%s%0.2f%s','Lateral error is below 25 mm: ', maxLatError, ...
+          ' mm -->> Increase TPREV_CONSTANT, manoeuvre may be too harsh');
     end
 end
 
@@ -55,15 +61,26 @@ iRRCU = 1;
 AYrrcu = zeros(length(Ay{iLast}),1);
 denom = 0;
 for i = i1st:iLast
-    if sum(i == Combination.dollys(:)) == 0 % only include unit if not in dollys vector (see C12.3(c)(i, ii & iii) of NTC standards) % evaluated here and not above in case dolly is in the middle of rrcu (i.e. C-dolly)
+  % only include unit if not in dollys vector (see C12.3(c)(i, ii & iii) of NTC standards) 
+  % evaluated here and not above in case dolly is in the middle of rrcu (i.e. C-dolly)
+    if sum(i == Combination.dollys(:)) == 0 
         AYrrcu = AYrrcu + mSprung(i).*HcgSprung(i).*Ay{i};
         denom = denom + mSprung(i)*HcgSprung(i);      
     end
 end
 AYrrcu = AYrrcu/denom;
 
-[maxAYsteer, indMaxAYsteer] = max(abs(AYsteer));  % find peak of steer, could be on return
-[maxAYrrcu, indMaxAY] = max(abs(AYrrcu));  % find peak of rrcu veh unit, could be on return
+% To prevent the script from picking up discrepencies during the manoeuvre, only values after a
+% time value of 0 will be used.
+
+zeroTime = find(Time > 0);
+zeroTime = zeroTime(1); 
+
+[maxAYsteer, indMaxAYsteer] = max(abs(AYsteer(zeroTime:end)));  % find peak of steer, could be on return
+indMaxAYsteer = zeroTime + indMaxAYsteer;
+
+[maxAYrrcu, indMaxAY] = max(abs(AYrrcu(zeroTime:end)));  % find peak of rrcu veh unit, could be on return
+indMaxAY = zeroTime + indMaxAY;
 
 RA = maxAYrrcu/maxAYsteer;    % must compare to lat acc. input at the steer axle
 

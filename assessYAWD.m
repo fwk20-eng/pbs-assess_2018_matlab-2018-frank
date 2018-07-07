@@ -4,7 +4,7 @@
 %Ver 2.0
 %   -> Evalate Ay and not AyBf_SM. Change range to 0.19 to 0.21 g. 2016/11/04 FK
 
-function [Dmin] = assessYAWD(Sprung, Project, Is, MatKey)
+function [Dmin, maxAy] = assessYAWD(Sprung, Project, Is, MatKey)
 
 if nargin == 0  % i.e. program run directly from here
     % Example inputs: 
@@ -18,7 +18,9 @@ if nargin == 0  % i.e. program run directly from here
     % -----------------------------------------------------------------
 end
 
-[Data, errorx] = readSimulationVariables(MatKey, {'Art_H' 'ArtR_H' 'AVz' 'Ay'}, [Sprung.numberOffUnits-1 Sprung.numberOffUnits-1 Sprung.numberOffUnits 1], {'' '' '_' ''}, [], Project.savePath, Project.truckSimRunsDirectory, Project.runKey, zeros(1,4));
+[Data, errorx] = readSimulationVariables(MatKey, {'Art_H' 'ArtR_H' 'AVz' 'Ay'}, ...
+  [Sprung.numberOffUnits-1 Sprung.numberOffUnits-1 Sprung.numberOffUnits 1], {'' '' '_' ''},...
+  [], Project.savePath, Project.truckSimRunsDirectory, Project.runKey, zeros(1,4));
 
 if errorx == 1
     Time    = Data{1};      % convert to vector
@@ -36,15 +38,19 @@ maxAy = max(Ay);
 %the correct levels.
 
 if ~Is.skipManoeuvreChecks
+% For this to work, the original definition of error had to be changed to errorx to avoid issues 
+% with a naming clash of error.
     if maxAy < 0.19
-        error('%s%0.2f%s','Lateral acceleration is below 0.19 g: ', maxAy, ' g -->> Increase STEER_SW_GAIN manoeuvre not harsh enough'); %For this to work, the original definition of error had to be changed to errorx
+        error('%s%0.2f%s','Lateral acceleration is below 0.19 g: ', maxAy,...
+          ' g -->> Increase STEER_SW_GAIN manoeuvre not harsh enough'); 
     elseif maxAy > 0.21
-        error('%s%0.2f%s','Lateral acceleration is above 0.21 g: ', maxAy, ' g -->> Decrease STEER_SW_GAIN maoneouvre may be too harsh');    
+        error('%s%0.2f%s','Lateral acceleration is above 0.21 g: ', maxAy,...
+          ' g -->> Decrease STEER_SW_GAIN maoneouvre may be too harsh');    
     end
 end
 
 A1threshold = 0.25;  % find A1 by looking for first peak with value higher than 1 
-                  % - this is not very robust
+                     % - this is not very robust
 
 if Is.plotOn
     figure('name', 'YawD')
@@ -95,9 +101,10 @@ function [DR] = YD(YR, Time, A1threshold, count, Yloc, plotOn)
 iPeak = 1;
 valPeakRaw(iPeak) = 0;
 for i=1:(length(YR)-1)      %find peaks
-    if (sign(YR(i))*sign(YR(i+1)) == -1 || sign(YR(i)) == 0)       %find sign change - avoids situation where we have an actual 0.00 and sign() returns 0
-       iPeak = iPeak + 1;                           %next peak
-       valPeakRaw(iPeak) = 0;                       %new start for peak value
+  % find sign change - avoids situation where we have an actual 0.00 and sign() returns 0
+    if (sign(YR(i))*sign(YR(i+1)) == -1 || sign(YR(i)) == 0)       
+       iPeak = iPeak + 1;                           % next peak
+       valPeakRaw(iPeak) = 0;                       % new start for peak value
     end
     if (abs(YR(i+1)) > abs(valPeakRaw(iPeak)))    %largest found so far
         tPeakRaw(iPeak) = Time(i+1);
@@ -108,10 +115,12 @@ end
 
 %clean up tPeaks & valPeaks
 
-% [A1, iA1] = max(abs(valPeakRaw));  %note: may not be first peak if response is divergent - will still only get A's >5% and will be in order
+% [A1, iA1] = max(abs(valPeakRaw));  %note: may not be first peak if response is divergent - 
+% will still only get A's >5% and will be in order
 
 % find A1 by looking for first peak with value higher than 0.4 - this is
 % not very robust
+
 iA1 = 1;
 while (valPeakRaw(iA1) < A1threshold) && iA1 < numel(valPeakRaw)
     iA1 = iA1 + 1;
@@ -121,7 +130,7 @@ A1 = valPeakRaw(iA1);
 
 iClean = 1;
 for iRaw = 1:length(tPeakRaw)
-    if (abs(valPeakRaw(iRaw)) >= 0.05*A1) && (iRaw >= iA1)     %PBS standard prescribes 5% cutoff
+    if (abs(valPeakRaw(iRaw)) >= 0.05*A1) && (iRaw >= iA1)     % PBS standard prescribes 5% cutoff
         valPeak(iClean) = valPeakRaw(iRaw);
         tPeak(iClean)   = tPeakRaw(iRaw);
         iClean = iClean + 1;
