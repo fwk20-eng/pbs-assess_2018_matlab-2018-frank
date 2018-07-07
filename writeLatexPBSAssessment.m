@@ -71,10 +71,25 @@ end
     'Reference Points for Laden Combination','ReferencePointsForLadenCombination');
 
 %% Add combination tables to the log file
+% Create filepath
 runLogFileName = strcat('Assessment-Parameters_', Project.revision, '.md');
-runLogFilePath = Project.runFolderPath;
+runLogFileDirectory = Project.runFolderPath;
+runLogFilePath = [runLogFileDirectory, '\', runLogFileName];
 
-createMarkdownFromStructureOfTables(LogTable, runLogFilePath, runLogFileName);
+fid=fopen(runLogFilePath,'w');
+
+% Write the details on manoeuvre criterion
+fprintf(fid,'%s\n', ['Lane change manoeuvre maximum lateral error: ', ...
+  num2str(Project.raMaxLatError), ' mm']);
+
+fprintf(fid,'%s\n', ['Yaw damping manoeuvre maximum lateral acceleration: ', ...
+  num2str(Project.yawDMaxLatAccel), ' g']);
+
+fclose(fid);
+fprintf(['\n... your log file named ', runLogFileName, ' has been modified\n']);
+
+% Write the tables
+createMarkdownFromStructureOfTables(LogTable, runLogFileDirectory, runLogFileName);
 
 if Is.latexReport
     

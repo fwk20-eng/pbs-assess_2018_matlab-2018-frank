@@ -176,7 +176,7 @@ if Is.pbs
         end
     end
     if Is.yawD
-        r.YDC = assessYAWD(Sprung, Project, Is, MatKey.yawD);
+        [r.YDC Project.yawDMaxLatAccel] = assessYAWD(Sprung, Project, Is, MatKey.yawD);
     end
     if Is.hsto
         r.HSTO = assessHSTO(Axle, Combination, Project, MatKey.hsto, Is, Dummy);
@@ -188,7 +188,7 @@ if Is.pbs
         % with the SRT manoeuvre
         if Is.ra
             Lim.RA = computePBSLimitsRA(r);
-            r.RA = assessRA(Combination, Hitch, Project, MatKey.ra, Is, mSprung, HcgSprung);
+            [r.RA Project.raMaxLatError] = assessRA(Combination, Hitch, Project, MatKey.ra, Is, mSprung, HcgSprung);
         end
     end
     if Is.tasp
@@ -249,7 +249,7 @@ if Is.pbs
     disp('-------------------------------------------------------------------------------------')
     resultsPbs = r;
     resultsWithLevel = createTableResults(r, Lim, fullName, nLevels, Is);
-  
+    
     display(resultsWithLevel(:, 1:4));
     warning on
     
