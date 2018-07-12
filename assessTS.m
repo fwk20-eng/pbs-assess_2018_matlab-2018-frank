@@ -50,6 +50,7 @@ if Is.plotOn
             plot(X_RP7{i}(indTS7(i)), Y_RP7{i}(indTS7(i))+(max(Combination.maxWidth)-Axle.SteerAxleOverallWidth)/2000, 'or'); % plot peaks            
             plot(X_RP8{i}(indTS8(i)), Y_RP8{i}(indTS8(i))+(max(Combination.maxWidth)-Axle.SteerAxleOverallWidth)/2000, 'or'); % plot peaks
             plot(X_RP9{i}(indTS9(i)), Y_RP9{i}(indTS9(i))+(max(Combination.maxWidth)-Axle.SteerAxleOverallWidth)/2000, 'or'); % plot peaks
+            legTitles = [legTitles; '', '', '', ''];
         end
     end
 
@@ -59,7 +60,24 @@ if Is.plotOn
            
     axis 'auto x'
     lims=axis;
-    axis([lims(1)+10 15 -1 1])
+    axis_x_min = lims(1)+10;
+    axis_x_max = 15;
+    axis_y_min = -1;
+    axis_y_max = 1;
+    axis([axis_x_min axis_x_max axis_y_min axis_y_max])
+
+%----------------------------------------------
+%      Plotting the level 1 PBS limit
+%----------------------------------------------
+    PBSlevel1Limit = 0.3;
+
+    PBSlimX = [-15 axis_x_max];
+    PBSlimY_level1 = [-PBSlevel1Limit -PBSlevel1Limit];
+    
+    plot(PBSlimX, PBSlimY_level1, '--k');
+    text(axis_x_min+0.5, -0.3,['PBS Level 1 limit']);
+    
+
     
     iPlot = 1;
     for i = 1:Sprung.numberOffUnits
