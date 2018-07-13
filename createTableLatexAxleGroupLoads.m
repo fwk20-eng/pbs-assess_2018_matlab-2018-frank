@@ -116,7 +116,7 @@ Table.headings = {'\textbf{Unit}' '\textbf{Axle}' '\textbf{Fully laden axle grou
 markdownHeadings = {'Unit' 'Axle' 'Fully laden axle group load (kg)' 'Unladen axle group load (kg)' 'Axle Load Rating (kg)'};
 MdTable.data = [markdownHeadings; Table.data];
 
-Table.footNotes = {'\item[1] Discrepencies between axle loads and GCM may occur due to rounding';...
+Table.footNotes = {'\item[1] Discrepancies between axle loads and GCM may occur due to rounding';...
                    '\item[2] Proposed vehicle with no payload, only fuel and driver'};
 
 % Compiling the structure fields required by latexTable
