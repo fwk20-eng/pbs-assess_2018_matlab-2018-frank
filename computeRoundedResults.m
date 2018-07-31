@@ -10,7 +10,7 @@ res.GRAb    = floor(raw.GRAb);                  % round down to nearest 1
 res.ACC     = round([raw.ACC*10])/10;           % round      to nearest 0.1
 res.YDC     = floor(raw.YDC*100)/100;           % round down to nearest 0.01
 res.RA      =  ceil(raw.RA*100)/100;            % round up   to nearest 0.01
-res.HSTO    =  ceil(raw.HSTO*10)/10;            % round up   to nearest 0.01
+res.HSTO    =  ceil(raw.HSTO*10)/10;            % round up   to nearest 0.1
 res.SRTt    = floor(raw.SRTt*100)/100;          % round down to nearest 0.01
 res.SRTtrrcu= floor(raw.SRTtrrcu*100)/100;      % round down to nearest 0.01
 
