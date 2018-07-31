@@ -57,7 +57,6 @@ if Is.australianPBS
     LimReport.DoM =     {'$\leq$0.2' '$\leq$0.2' '$\leq$0.2' '$\leq$0.2'};
     LimReport.STFD =    {'$\leq$80' '$\leq$80' '$\leq$80' '$\leq$80'};
     
-    LimReport.RA =    {'-' '-' '-' '-'};
 elseif ~Is.australianPBS
     Lim.STA = [15 12 10 5];
     Lim.GRAa = [20 15 12 10];
@@ -111,6 +110,5 @@ elseif ~Is.australianPBS
     LimReport.DoM =     {'$\leq$0.25' '$\leq$0.25' '$\leq$0.25' '$\leq$0.25'};
     LimReport.STFD =    {'$\leq$80' '$\leq$80' '$\leq$80' '$\leq$80'};
     
-    LimReport.RA =    {'-' '-' '-' '-'};
 end
 end
