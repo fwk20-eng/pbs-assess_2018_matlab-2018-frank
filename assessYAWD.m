@@ -20,7 +20,7 @@ end
 
 [Data, errorx] = readSimulationVariables(MatKey, {'Art_H' 'ArtR_H' 'AVz' 'Ay'}, ...
   [Sprung.numberOffUnits-1 Sprung.numberOffUnits-1 Sprung.numberOffUnits 1], {'' '' '_' ''},...
-  [], Project.savePath, Project.truckSimRunsDirectory, Project.runKey, zeros(1,4));
+  [], Project.savePath, Project.truckSimRunsDirectory, Project.runKey, [0 0 0 0]);
 
 if errorx == 1
     Time    = Data{1};      % convert to vector
@@ -100,28 +100,37 @@ function [DR] = YD(YR, Time, A1threshold, count, Yloc, plotOn)
 
 iPeak = 1;
 valPeakRaw(iPeak) = 0;
+
 for i=1:(length(YR)-1)      %find peaks
+  
   % find sign change - avoids situation where we have an actual 0.00 and sign() returns 0
-    if (sign(YR(i))*sign(YR(i+1)) == -1 || sign(YR(i)) == 0)       
+    if (sign(YR(i)) * sign(YR(i+1)) == -1 || sign(YR(i)) == 0)       
+      
        iPeak = iPeak + 1;                           % next peak
        valPeakRaw(iPeak) = 0;                       % new start for peak value
+       
     end
-    if (abs(YR(i+1)) > abs(valPeakRaw(iPeak)))    %largest found so far
+    
+    if (abs(YR(i+1)) > abs(valPeakRaw(iPeak)))    % largest found so far
+      
         tPeakRaw(iPeak) = Time(i+1);
-        valPeakRaw(iPeak) = YR(i+1); 
+        valPeakRaw(iPeak) = YR(i+1);
+        
     end
+    
 end
 
 
 %clean up tPeaks & valPeaks
 
 % [A1, iA1] = max(abs(valPeakRaw));  %note: may not be first peak if response is divergent - 
-% will still only get A's >5% and will be in order
+% will still only get A's > 5% and will be in order
 
 % find A1 by looking for first peak with value higher than 0.4 - this is
 % not very robust
 
 iA1 = 1;
+
 while (valPeakRaw(iA1) < A1threshold) && iA1 < numel(valPeakRaw)
     iA1 = iA1 + 1;
 end
@@ -129,12 +138,18 @@ end
 A1 = valPeakRaw(iA1);
 
 iClean = 1;
+
 for iRaw = 1:length(tPeakRaw)
-    if (abs(valPeakRaw(iRaw)) >= 0.05*A1) && (iRaw >= iA1)     % PBS standard prescribes 5% cutoff
+    % PBS standard prescribes 5% cutoff
+    if (abs(valPeakRaw(iRaw)) >= 0.05*A1) && (iRaw >= iA1)
+        
         valPeak(iClean) = valPeakRaw(iRaw);
+        
         tPeak(iClean)   = tPeakRaw(iRaw);
+        
         iClean = iClean + 1;
     end
+    
 end
 
 
