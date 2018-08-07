@@ -18,13 +18,12 @@ if nargin == 0  % i.e. program run directly from here
     Is.plotOn = true;
 end
 
-
 nVehUnits = length(mSprung);
 
 % must use body fixed Ay in accordance with SAE definition
-[Data, errorx] = readSimulationVariables(MatKey, {'Ay_S' 'Ay_S61' 'X_A' 'Y_A' 'LatError'},...
-  [nVehUnits 1 1 1 1], {'' '' '' ''}, [], Project.savePath, Project.truckSimRunsDirectory,...
-  Project.runKey, [2 3 1 1 0]); 
+[Data, errorx] = readSimulationVariables(MatKey, {'Ay' 'Ay_S61' 'X_A' 'Y_A' 'LatError'},...
+  [nVehUnits 1 1 1 1], {'_' '' '' ''}, [], Project.savePath, Project.truckSimRunsDirectory,...
+  Project.runKey, [0 3 1 1 0]); 
 
 if errorx == 1
     Time    = Data{1};    % convert to vector
@@ -95,6 +94,7 @@ if Is.plotOn
     
     plot(Time, AYsteer, 'Color', getColour(1));  % plot next line
     plot(Time, AYrrcu , 'Color', getColour(2));  % plot next line
+    
     plot(Time(indMaxAYsteer),AYsteer(indMaxAYsteer), '*r')    % plot peak
     plot(Time(indMaxAY),AYrrcu(indMaxAY), '*r')    % plot peak
 
@@ -103,6 +103,7 @@ if Is.plotOn
     
     text(0.4, -0.1,['RA = ' num2str(ceil(RA*100)/100)])
     legTitles = {'steer axle'; 'last unit'; 'peak lat. acc.'};
+    
     legend(legTitles, 'Location', 'northeastoutside'); legend('boxoff');
     axis([0 12 -ceil(abs(AYrrcu(indMaxAY))*5)/5 ceil(abs(AYrrcu(indMaxAY))*5)/5])
     
