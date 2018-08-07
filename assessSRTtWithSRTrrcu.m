@@ -21,7 +21,8 @@ end
 for i = 1:Axle.NumberOff
     Fz_L{i} = Fz_L{i}(ind:end); % Discard data when time < 0
 end
-                                                            %% check if rollover angle is reached in any of the units
+
+%% check if rollover angle is reached in any of the units
 % To do this, determine when the angle between the tilt-table and the vehicle is > 30 degrees
 for i = 1:nVehUnits
     if sum((Roll{i}-Roll_Tab) >= SRTrollThresh)

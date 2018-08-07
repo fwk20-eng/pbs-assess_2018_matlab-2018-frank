@@ -60,14 +60,18 @@ end
 iRRCU = 1;
 AYrrcu = zeros(length(Ay{iLast}),1);
 denom = 0;
+
 for i = i1st:iLast
   % only include unit if not in dollys vector (see C12.3(c)(i, ii & iii) of NTC standards) 
   % evaluated here and not above in case dolly is in the middle of rrcu (i.e. C-dolly)
+  
     if sum(i == Combination.dollys(:)) == 0 
         AYrrcu = AYrrcu + mSprung(i).*HcgSprung(i).*Ay{i};
         denom = denom + mSprung(i)*HcgSprung(i);      
     end
+    
 end
+
 AYrrcu = AYrrcu/denom;
 
 % To prevent the script from picking up discrepencies during the manoeuvre, only values after a
