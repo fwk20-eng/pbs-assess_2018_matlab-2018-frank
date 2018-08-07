@@ -14,37 +14,74 @@ if nargin == 0  % i.e. no inputs given then use inputs below
     % -----------------------------------------------------------------
 end
 
-%%
-%Startability
-G=Engine.difStart*Engine.gearsStart(1); %Assume start in first
-m=sum(mTotal);
-me=m+Engine.It/Tyre.RollingRadius/Tyre.RollingRadius+Engine.Ie*G^2/Tyre.RollingRadius/Tyre.RollingRadius;
-Fengine=Engine.engageTNm*Engine.eff_diffStart*Engine.eff_gearStart(1)*G/Tyre.RollingRadius;
-grad=[0:0.1:30];
-contin=1;
-i=0;
-Frr=rolling(0,sum(mTotal),Combination.ch,radial);
+%% --------------------------------------------
+%      ** Startability **
+%----------------------------------------------
+% Assume the engine starts in first gear and calculate the overall gear ratio
+G = Engine.difStart * Engine.gearsStart(1); 
+
+% Total combination GCM
+m = sum(mTotal);
+
+% Calculating the rotational inertia due to the engine and tyres
+totalInertia = Engine.It + Engine.Ie * G^2;
+
+% Calculating the effective mass
+me = m + totalInertia / Tyre.RollingRadius^2;
+
+% Calculating the force of the engine at the wheels
+Fengine = (Engine.engageTNm * Engine.eff_diffStart * Engine.eff_gearStart(1) * G)...
+  /Tyre.RollingRadius; 
+
+
+% Calculate the rolling resistance force
+Frr = rolling(0, sum(mTotal), Combination.ch, radial);
+
+% Initialise the variables for the loop
+grad = [0:0.1:30];
+contin = 1;
+i = 0;
 
 while contin
-    i=i+1;
-    th=atan(grad(i)/100);
-    Favail=sum(0.8*9.81*Axle2(Axle.Driven));
-    Fdrive=sin(th)*m*9.81+Frr;
-    acc(i)=(min([Fengine Favail])-sin(th)*m*9.81-Frr)/me;
+    i = i + 1;
+    
+    th = atan(grad(i)/100);
+
+%----------------------------------------------
+%      ** Check propulsion forces **
+%----------------------------------------------
+    Favail = sum(0.8*9.81*Axle2(Axle.Driven));
+    Fdrive = sin(th)*m*9.81+Frr;
+    
+    acc(i) = (min([Fengine Favail])-sin(th)*m*9.81-Frr) / me;
+   
+%----------------------------------------------
+%      ** Check limiting criterion **
+%----------------------------------------------
     if Fdrive>Fengine;
-        contin=0; % The engine force is not big enough to generate the required drive
+      % The engine force is not big enough to generate the required drive
+        contin=0; 
         saturate=0;
     elseif Fdrive>Favail
-        contin=0; % The available force from the tyres is not big enough to generate the required drive
+      % The available force from the tyres is not big enough to generate the required drive
+        contin=0; 
         saturate=1;
     elseif i==length(grad)
-        contin=0; % There is plenty of engine and available tyre force
+      % There is plenty of engine and available tyre force
+        contin=0; 
         saturate=2;
     end
+    
 end
 
-START=[grad(i-1)];
+%----------------------------------------------
+%      ** Store startability **
+%----------------------------------------------
+START = [grad(i-1)];
 
+%----------------------------------------------
+%      ** Plot the startability performance **
+%----------------------------------------------
 if Is.plotOn
     figure('name', 'START')
 
@@ -78,8 +115,9 @@ if Is.plotOn
     hold off    
 end
 
-%%
-%Gradability A
+%% --------------------------------------------
+%      ** Gradeability A **
+%----------------------------------------------
 [maxTorqueNm j]=max(Engine.TorqueNm);
 Fengine=maxTorqueNm*Engine.eff_gear(1)*Engine.eff_diffStart/Tyre.RollingRadius*Engine.difStart*Engine.gears(1);
 N=Engine.Torquerpm(j);
@@ -138,8 +176,10 @@ if Is.plotOn
     title('Gradability A')
     hold off    
 end
-%%
-%Gradability B
+
+%% --------------------------------------------
+%      ** Gradability B **
+%----------------------------------------------
 vel=[40:0.1:120]; % speeds in km/h
 contin=1;
 i=0;
@@ -208,9 +248,10 @@ if Is.plotOn
     hold off    
 end
 
-%%
-%Acceleration Capability
-%
+%% --------------------------------------------
+%      ** Acceleration Capability **
+%----------------------------------------------
+
 %Determine start gear
 Fengine=Engine.engageTNm*Engine.eff_diffStart/Tyre.RollingRadius*Engine.difStart.*Engine.gears.*Engine.eff_gear;
 Frr=rolling(0,sum(mTotal),Combination.ch,radial);
