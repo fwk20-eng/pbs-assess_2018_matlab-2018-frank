@@ -1,22 +1,38 @@
-function [FS, MoDmax, DoMmax] = assessFS(Sprung, Combination, Is, Project, X_StOut, Y_StOut, X_RP3, Y_RP3, X_RP4, Y_RP4, X_RP5, Y_RP5,...
-    ladentext)
+%% Function Description
+%
+% Calculates the frontal swing of a vehicle combination
 
-FS = assessSPW(Project, Is, X_StOut, Y_StOut, X_RP3{1}, Y_RP3{1}, X_RP4{1}, Y_RP4{1}, X_RP5{1}, Y_RP5{1}, 'FS',...
-    ladentext);
+%% Change Log
+%
+% [0.1.0] - 2018-08-08
+%
+% *Added*
+%
+% * Change log added
+
+function [FS, MoDmax, DoMmax] = assessFS(Sprung, Combination, Is, Project, X_StOut, Y_StOut,...
+  X_RP3, Y_RP3, X_RP4, Y_RP4, X_RP5, Y_RP5, ladentext)
+  
+%% --------------------------------------------
+%      ** Frontal Swing **
+%----------------------------------------------
+FS = assessSPW(Project, Is, X_StOut, Y_StOut, X_RP3{1}, Y_RP3{1}, X_RP4{1}, Y_RP4{1}, X_RP5{1},...
+  Y_RP5{1}, 'FS', ladentext);
 
 XexitTan = [X_StOut(end) X_StOut(end)];
 YexitTan = [0 max(Y_StOut)];
 
 % Determine maximum X of three RPs and combine to X345 Y345
+%----------------------------------------------
 iCurr = 1;
 while iCurr <= Sprung.numberOffUnits
     if sum(iCurr == Combination.dollys(:)) == 0       % Only evaluated if veh unit number not in dollys vector
         j3start=find(X_RP3{iCurr}>=X_StOut(end),1,'first'); % Only start evaluating once X is greater then X_StOut
-        if isempty(j3start), j3start = 1;,end;
+        if isempty(j3start), j3start = 1; end
         j4start=find(X_RP4{iCurr}>=X_StOut(end),1,'first'); % Only start evaluating once X is greater then X_StOut
-        if isempty(j4start), j4start = 1;,end;        
+        if isempty(j4start), j4start = 1; end     
         j5start=find(X_RP5{iCurr}>=X_StOut(end),1,'first'); % Only start evaluating once X is greater then X_StOut
-        if isempty(j5start), j5start = 1;,end;        
+        if isempty(j5start), j5start = 1; end       
             switch min( [ Y_RP3{iCurr}(j3start) Y_RP4{iCurr}(j4start) Y_RP5{iCurr}(j5start)])
             case Y_RP3{iCurr}(j3start) % RP3 has lowest Y when hitting X_StOut
                 X1{iCurr}=X_RP3{iCurr}(j3start:end);
@@ -41,7 +57,7 @@ while iCurr <= Sprung.numberOffUnits
                 Y3{iCurr}=Y_RP3{iCurr}(1:end);
         end
         j=1;
-        while (j<=(length(X1{iCurr}))&(Y1{iCurr}(j)<Y2{iCurr}(end-1))&(Y1{iCurr}(j)<Y3{iCurr}(end-1)))
+        while (j<=(length(X1{iCurr})) && (Y1{iCurr}(j)<Y2{iCurr}(end-1)) && (Y1{iCurr}(j)<Y3{iCurr}(end-1)))
             i2=find(Y1{iCurr}(j)>=Y2{iCurr},1,'last'); % The index when Y2 reaches the same Y as Y1
             X2new=interp1(Y2{iCurr}(i2:i2+1),X2{iCurr}(i2:i2+1),Y1{iCurr}(j));
             i3=find(Y1{iCurr}(j)>=Y3{iCurr},1,'last'); % The index when Y3 reaches the same Y as Y1
@@ -56,7 +72,9 @@ while iCurr <= Sprung.numberOffUnits
     end
 end
 
-%MoD
+%% --------------------------------------------
+%      ** MoD **
+%----------------------------------------------
 iPrev = 1;
 iCurr = 2;
 
@@ -141,8 +159,10 @@ if Is.plotOn
     hold off
 end
 
-%DoM
-[maxPx(1), indMaxPx(1)] = max(X345{1});             %find first maximum
+%% --------------------------------------------
+%      ** DoM **
+%----------------------------------------------
+[maxPx(1), indMaxPx(1)] = max(X345{1});             % find first maximum
 pt{1}(indMaxPx(1));
 iPrev = 1;
 iCurr = 2;
