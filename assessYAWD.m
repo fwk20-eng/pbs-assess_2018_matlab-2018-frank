@@ -1,42 +1,40 @@
 function [Dmin, maxAy] = assessYAWD(Sprung, Project, Is, MatKey)
 
-%% --------------------------------------------
-%      ** Standalone operation **
-%----------------------------------------------
-% To use this script in standalone operation, input the parameters in this section and run the
-% script
+%-------------------------------------------------
+%% *** Standalone operation ***
+%-------------------------------------------------
 
 if nargin == 0
   
-  %      ** Combination parameters **
-  %----------------------------------------------
+  % ** Combination parameters **
+  %-------------------------------------------------
   Sprung.numberOffUnits = 3;
   
-  %      ** Mat file location **
-  %----------------------------------------------
+  % ** Mat file location **
+  %-------------------------------------------------
   Project.truckSimRunsDirectory = 'D:\Dropbox\Wits_TruckSim_PBS_2018\Results';
   MatKey = {'YawD', 'c10b9d5a'};
   
-  %      ** Booleans that may change **
-  %----------------------------------------------
-  Is.plotOn = true;
+  % ** Booleans that may change **
+  %-------------------------------------------------
+  Is.plotOn = 1;
   
-  %      ** Booleans that should remain constant **
-  %----------------------------------------------
+  % ** Booleans that should remain constant **
+  %-------------------------------------------------
   Is.skipManoeuvreChecks = 0;
   Is.save = 0;
   
-  %      ** Inconsequential parameters **
-  %----------------------------------------------
-  % The values of these parameters do not matter
+  % ** Inconsequential parameters **
+  % The values of these parameters do not matter if you are not saving the plot
+  %-------------------------------------------------
   Project.runKey ='yawD test';
   Project.savePath = 'C:\Users\deiss\Desktop\Test';
   
 end
 
-%% --------------------------------------------
-%      ** Read in data **
-%----------------------------------------------
+%-------------------------------------------------
+%% *** Read in data ***
+%-------------------------------------------------
 [Data, errorx] = readSimulationVariables(...
   MatKey,... mat file key
   {'Art_H' 'ArtR_H' 'AVz' 'Ay'},... base variable names
@@ -59,11 +57,9 @@ else
   return
 end
 
-%% --------------------------------------------
-%      ** Manoeuvre parameter checks **
-%----------------------------------------------
-% Check to ensure that the lateral acceleration for the steer axle is within
-% the correct levels.
+%-------------------------------------------------
+%% *** Manoeuvre parameter checks ***
+%-------------------------------------------------
 
 maxAy = max(Ay);
 
@@ -77,9 +73,9 @@ if ~Is.skipManoeuvreChecks
   end
 end
 
-%% --------------------------------------------
-%      ** Determining the minimum damping variable **
-%----------------------------------------------
+%-------------------------------------------------
+%% *** Determining worst-case motion variable ***
+%-------------------------------------------------
 
 motionVariables = {...
   AVz,... Yaw rate of vehicle units
@@ -103,38 +99,32 @@ unitType = {...
 
 for iMotionVar = 1 : numel(motionVariables)
   
-% Set the motion variable and number of units
-%----------------------------------------------
   motionVar = motionVariables{iMotionVar};
-  
   nUnits = units(iMotionVar);
   
-% Calculate the damping ratio for each unit
-%----------------------------------------------
-for iUnit = 1 : nUnits
+  % ** Calculate the damping ratio for each unit **
+  %-------------------------------------------------
+  for iUnit = 1 : nUnits
+    
+    Yloc = max(motionVar{1}) * (1 - iUnit/(Sprung.numberOffUnits+1));
+    [DR(iUnit), ~, ~] = YD(motionVar{iUnit}, Time);
+    
+  end
   
-  Yloc = max(motionVar{1}) * (1 - iUnit/(Sprung.numberOffUnits+1));
-  [DR(iUnit), ~, ~] = YD(motionVar{iUnit}, Time);
-  
-end
-
   motionVarDR(iMotionVar) = min(DR);
-
+  
 end
 
-% Find the minimum damping ratio index to determine the limiting motion variable
-%----------------------------------------------
+% ** Find the minimum damping ratio index to determine the worst-case motion variable **
+%-------------------------------------------------
 [minDR, limitMotionVarIndex] = min(motionVarDR);
 
 limMotionVar = motionVariables{limitMotionVarIndex};
 nUnits = units(limitMotionVarIndex);
 
-
-
-
-%% --------------------------------------------
-%      ** Plot the graph **
-%----------------------------------------------
+%-------------------------------------------------
+%% *** Plot ***
+%-------------------------------------------------
 if Is.plotOn
   figure('name', 'YawD')
   
@@ -153,14 +143,16 @@ if Is.plotOn
   legend(legTitles, 'Location', 'northeastoutside'); legend('boxoff');
 end
 
-%% --------------------------------------------
-%      ** Calculating Yaw Damping **
-%----------------------------------------------
+%-------------------------------------------------
+%% *** Calculate yaw damping of the worst-case motion variable ***
+%-------------------------------------------------
 for i = 1:nUnits
   
   [DR(i), tPeak, valPeak] = YD(limMotionVar{i}, Time);
   Yloc = max(abs(maxPeak)) - (max(abs(maxPeak)) * (i - 1))/5;
   
+  % ** Plot the peaks **
+  %-------------------------------------------------
   if Is.plotOn
     h_peaks = plot(tPeak, valPeak, '*r', 'Color', getColour(i));
     text(7, Yloc,['D_' num2str(i) ' = ' num2str(floor(DR(i)*100)/100)])
@@ -172,16 +164,16 @@ end
 
 Dmin = min(DR);
 
-%% --------------------------------------------
-%      ** Continue plotting **
-%----------------------------------------------
+%-------------------------------------------------
+%% *** Continue plotting ***
+%-------------------------------------------------
 
 if Is.plotOn
   text(3, max(limMotionVar{1})*0.8,['D_m_i_n = ' num2str(floor(Dmin*100)/100)])
   
   temp=axis;
   axis([0 10 (temp(3)+temp(3)*0.1) (temp(4)+temp(4)*0.1)])
-
+  
   set(gcf,'PaperPosition',[0 0 16 11])
   set(gca,'Xgrid','on');
   set(gca,'Ygrid','on');
@@ -196,21 +188,19 @@ end
 
 end
 
-%% --------------------------------------------
-%      ** Peak function **
-%----------------------------------------------
-% This function searches for peaks
+%-------------------------------------------------
+%% *** Find the legitimate peaks ***
+%-------------------------------------------------
 function [DR, tPeak, valPeak] = YD(YR, Time)
 
-%      ** Initialisation **
-%----------------------------------------------
+% ** Initialisation **
+%-------------------------------------------------
 iPeak = 1;
 valPeakRaw(iPeak) = 0;
 
-
-%% --------------------------------------------
-%      ** Search for peaks **
-%----------------------------------------------
+%-------------------------------------------------
+%% *** Search for peaks ***
+%-------------------------------------------------
 for i = 1 : (length(YR)-1)
   
   % Find where the plotted value crosses the x-axis. If it crosses the axis, then you are searching
@@ -240,15 +230,14 @@ for i = 1 : (length(YR)-1)
   
 end
 
-%% --------------------------------------------
-%      ** Remove premature peaks **
-%----------------------------------------------
-
-iA1 = 1;
-
+%-------------------------------------------------
+%% *** Remove premature peaks ***
 % Remove any small peaks at the beginning and end the loop if the full set of peaks is eliminated.
 % Using the absolute value accounts for if the peak is negative or positive.
-%----------------------------------------------
+%-------------------------------------------------
+
+iA1 = 1; % Index of the first peak
+
 while (abs(valPeakRaw(iA1)) < abs(valPeakRaw(iA1+1))) && iA1 < numel(valPeakRaw)
   iA1 = iA1 + 1;
 end
@@ -258,17 +247,17 @@ A1 = valPeakRaw(iA1);
 % If the first peak is not the maximum peak, then the model may be unstable as the yaw is not
 % dampening. This error will help prevent an instable model from going unnoticed. Again the absolute
 % value accounts for if the first peak is positive or negative.
-%----------------------------------------------
+
 if max(abs(valPeakRaw)) > abs(A1)
   error('The first peak is not the maximum peak - check model stability');
 end
 
-%% --------------------------------------------
-%      ** Remove dampened peaks  **
-%----------------------------------------------
+%-------------------------------------------------
+%% *** Remove dampened peaks ***
 % Loop through all of the raw peak values from the first peak and eliminate any peaks below 5% of
 % the maximum peak (cutoff specified by the NTC PBS rules)
-%----------------------------------------------
+%-------------------------------------------------
+
 iClean = 1;
 
 for iRaw = iA1:length(tPeakRaw)
@@ -284,22 +273,23 @@ for iRaw = iA1:length(tPeakRaw)
   
 end
 
-%% --------------------------------------------
-%      ** Calculate A_bar **
-%----------------------------------------------
+%-------------------------------------------------
+%% *** Calculate A_bar ***
 % See page 65 - PBS Scheme - The Standards and Vehicle Assessment Rules
-% DR - Damping Ratio
-%----------------------------------------------
+% DR = Damping Ratio
+%-------------------------------------------------
+
 Abar = 0;
 
 if length(valPeak) == 1
+  
   % If there is only 1 peak, the damping ratio is recorded as 1
-  %----------------------------------------------
   DR = 1;
   
 elseif length(valPeak) < 6
-  % eqn C15 p.65 for less than 6 peaks
-  %----------------------------------------------
+  
+  % ** eqn C15 p.65 for less than 6 peaks **
+  %-------------------------------------------------
   for i=1:(length(valPeak)-1)
     Abar = Abar + abs(valPeak(i)) / abs(valPeak(i+1));
   end
@@ -308,13 +298,15 @@ elseif length(valPeak) < 6
   DR = log(Abar) / sqrt((pi)^2 + log(Abar)^2);
   
 else
-  % eqn C14 p.65 for more than 6 peaks
-  %----------------------------------------------
+  
+  % ** eqn C14 p.65 for more than 6 peaks **
+  %-------------------------------------------------
   for i=1:(length(valPeak)-2)
     Abar = Abar + abs(valPeak(i))/abs(valPeak(i+2));
   end
   Abar = Abar/i;
   DR = log(Abar)/sqrt((2*pi).^2 + log(Abar).^2);
+  
 end
 
 end
