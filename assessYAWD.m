@@ -234,11 +234,15 @@ end
 %% *** Remove premature peaks ***
 % Remove any small peaks at the beginning and end the loop if the full set of peaks is eliminated.
 % Using the absolute value accounts for if the peak is negative or positive.
+% Make the next peak the first peak if the current peak is less than the next peak, or if it is less
+% than 5% of the maximum peak. Stop moving to the next peak if you reach the last peak.
 %-------------------------------------------------
 
 iA1 = 1; % Index of the first peak
 
-while (abs(valPeakRaw(iA1)) < abs(valPeakRaw(iA1+1))) && iA1 < numel(valPeakRaw)
+while ( (abs(valPeakRaw(iA1)) < abs(valPeakRaw(iA1+1)))...
+    || (abs(valPeakRaw(iA1)) < 0.05 * max(abs(valPeakRaw))) )...
+    && iA1 < numel(valPeakRaw)
   iA1 = iA1 + 1;
 end
 
