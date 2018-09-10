@@ -54,4 +54,4 @@ if Is.semi %Doesnt add MoDu, DoMu if it is not a SemiTrailer
 end
 pbsResultsTable = addResultsRow_ForReport(pbsResultsTable, fullName.STFDu  , '\%', num2str(r.STFDu)  , computePBSLevel('<', r.STFDu, Lim.STFD, nLevels), LimReport.STFD);
 
-pbsResultsTable = addResultsRow_ForReport(pbsResultsTable, '$\dagger$ 5.7*SRT'  , '-', num2str(5.7*r.SRTt, '%0.1f')  , '-', LimReport.RA);
+pbsResultsTable = addResultsRow_ForReport(pbsResultsTable, '$\dagger$ 5.7*SRT'  , '-', num2str(5.7*r.SRTtrrcu, '%0.1f')  , '-', {'-' '-' '-' '-'});
