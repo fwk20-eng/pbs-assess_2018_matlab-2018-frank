@@ -109,6 +109,7 @@ while iCurr <= Sprung.numberOffUnits
 end
 
 MoDmax = max(MoD);
+
 if MoDmax<0
     MoDmax=NaN;
 end
@@ -186,6 +187,7 @@ while iCurr <= Sprung.numberOffUnits
 end
 
 DoMmax = max(DoM);
+
 if MoDmax<0
     DoMmax=NaN;
 end
