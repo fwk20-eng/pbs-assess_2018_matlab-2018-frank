@@ -18,7 +18,7 @@
 %
 % * First code
 
-function editPBSAssessmentReport(Report, Is)
+function editPbsAssessmentReport(Report, Is)
 
 PbsReportFileData = readLinesFromFile(Report.pbsAssessmentMainTexFilePath);
 
@@ -29,21 +29,23 @@ for iModifier = 1 : nModifiers
         Report.modifiers{iModifier,2}, '(?<=\}\{).*(?=\}\>)');
 end
 
-% Modify the date the report was generated and version. Cannot use it in report modifiers due to different regexp
-date = strsplit(datestr(now,'yyyy-mmmm-dd'),'-');
-PbsReportFileData = editLinesInCellArray(PbsReportFileData, '\\ReportDay', date(3), '(?<=\{).*(?=\})');
-PbsReportFileData = editLinesInCellArray(PbsReportFileData, '\\ReportMonth', date(2), '(?<=\{).*(?=\})');
-PbsReportFileData = editLinesInCellArray(PbsReportFileData, '\\ReportYear', date(1), '(?<=\{).*(?=\})');
-PbsReportFileData = editLinesInCellArray(PbsReportFileData, '\\ReportRev', Report.reportRevision, '(?<=\{).*(?=\})');
-PbsReportFileData = editLinesInCellArray(PbsReportFileData, '\\PreparedFor', Report.client, '(?<=\{).*(?=\})');
+% Modify the date the report was generated and version. Cannot use it in report modifiers due to
+% different regexp - now manually done in the report.
+
+% date = strsplit(datestr(now,'yyyy-mmmm-dd'),'-');
+% PbsReportFileData = editLinesInCellArray(PbsReportFileData, '\\ReportDay', date(3), '(?<=\{).*(?=\})');
+% PbsReportFileData = editLinesInCellArray(PbsReportFileData, '\\ReportMonth', date(2), '(?<=\{).*(?=\})');
+% PbsReportFileData = editLinesInCellArray(PbsReportFileData, '\\ReportYear', date(1), '(?<=\{).*(?=\})');
+% PbsReportFileData = editLinesInCellArray(PbsReportFileData, '\\ReportRev', Report.reportRevision, '(?<=\{).*(?=\})');
+% PbsReportFileData = editLinesInCellArray(PbsReportFileData, '\\PreparedFor', Report.client, '(?<=\{).*(?=\})');
 
 % Modify the report type to suit the combination being assessed
-PbsReportFileData = editLinesInCellArray(PbsReportFileData, ['\\togglefalse\{', Report.vehicleType], 'true', '(?<=toggle).*(?=\{)');
+% PbsReportFileData = editLinesInCellArray(PbsReportFileData, ['\\togglefalse\{', Report.vehicleType], 'true', '(?<=toggle).*(?=\{)');
 
 % Modify the report based on booleans
-if Is.semi
-    PbsReportFileData = editLinesInCellArray(PbsReportFileData, ['\\togglefalse\{', 'mod'], 'true', '(?<=toggle).*(?=\{)');
-end
+% if Is.semi
+%     PbsReportFileData = editLinesInCellArray(PbsReportFileData, ['\\togglefalse\{', 'mod'], 'true', '(?<=toggle).*(?=\{)');
+% end
 
 % Write main tex file
 fid = fopen(Report.pbsAssessmentMainTexFilePath,'w');
@@ -56,8 +58,8 @@ end
 
 fclose(fid);
 
-% Rename the latex report main tex file
-movefile(Report.pbsAssessmentMainTexFilePath, Report.pbsAssessmentRenamedTexFilePath);
+% Rename the latex report main tex file - no longer needed
+% movefile(Report.pbsAssessmentMainTexFilePath, Report.pbsAssessmentRenamedTexFilePath);
 
 % Generate the latex results table
 if Is.carCarrier

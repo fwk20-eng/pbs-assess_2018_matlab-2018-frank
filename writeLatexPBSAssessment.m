@@ -12,6 +12,12 @@
 %
 %% Change Log
 %
+% [0.3.0]
+%
+% * No longer copy across the PBS template folder since the report can now be made manually and the
+% figures and tables be added seperately as the run is done. This is to help with writting of the
+% report before the final details are known.
+% 
 % [0.2.0]
 %
 % *Added*
@@ -38,9 +44,6 @@ function writeLatexPBSAssessment(Project, Combination, ParDetails, Sprung, Axle,
 
 [Table.suspensionProperties, LogTable.suspensionProperties] = ...
     createTableLatexSuspensionProperties(Axle);
-
-% [Table.axleGroupLoads, LogTable.axleGroupLoads] = ...
-%     createTableLatexAxleGroupLoads(Axle, Axle1, AxleU1);
 
 [Table.hitchDetails, LogTable.hitchDetails] = ...
     createTableLatexHitchDetails(Hitch);
@@ -79,11 +82,13 @@ runLogFilePath = [runLogFileDirectory, '\', runLogFileName];
 fid=fopen(runLogFilePath,'w');
 
 % Write the details on manoeuvre criterion
+fprintf(fid,'%s\n', '# Control parameters');
+
 fprintf(fid,'%s\n', ['Lane change manoeuvre maximum lateral error: ', ...
   num2str(Project.raMaxLatError), ' mm']);
 
 fprintf(fid,'%s\n', ['Yaw damping manoeuvre maximum lateral acceleration: ', ...
-  num2str(Project.yawDMaxLatAccel), ' g']);
+  num2str(Project.yawDMaxLatAccel), ' g\n']);
 
 fclose(fid);
 fprintf(['\n... your log file named ', runLogFileName, ' has been modified\n']);
@@ -104,12 +109,14 @@ if Is.latexReport
     ComTable = createTableLatexCommissioning(Axle, Sprung, Tyre, Hitch, Combination);
     
     %% Generate results tables
-    Report.pbsResultsTable = createTableLatexResults(fullName, Lim, LimReport, computeRoundedResults(resultsPbs, Is), Report, nLevels, Is);
+    Report.pbsResultsTable = createTableLatexResults...
+      (fullName, Lim, LimReport, computeRoundedResults(resultsPbs, Is), Report, nLevels, Is);
     baselineResults = getBaselineResults(Report.baselinePbsCombination);
     Report.pbsBaselineResultsTable = createBaselineResults(baselineResults, Lim, nLevels, Is);
     
     if Is.carCarrier
-        Report.pbsResultsTableTopdeck = createBaselineResults(computeRoundedResults(Topdeck.resultsPbs, Is), Lim, nLevels, Is);
+        Report.pbsResultsTableTopdeck = createBaselineResults...
+          (computeRoundedResults(Topdeck.resultsPbs, Is), Lim, nLevels, Is);
     end
     
     %% Set-up the paths for copying to the assessment folder
@@ -117,26 +124,24 @@ if Is.latexReport
     pbsAssessFiguresCopyFromFullPath = strcat(Project.savePath,'\', Project.runKey, '_figures');
     pbsAssessFiguresCopyToFullPath =  strcat(pbsAssessCopyToFullPath, '\fig');
     
-    pbsAssessGACopyFromFullPath = strcat(Project.resultsDirectory, '\_GA_Images');
-    
     %% Remove the PBS assessment folder if it already exists
     if exist(pbsAssessCopyToFullPath, 'dir')
         rmdir(pbsAssessCopyToFullPath, 's');
     end
     
     %% Copy the necessary files
-    % Copy the PBS assessment template across
+    % Copy the tex files required for the PBS assessment report
     copyfile(Project.pbsAssessmentTemplateDirectory, pbsAssessCopyToFullPath);
     
     % Copy across the assessment figures
     copyfile(pbsAssessFiguresCopyFromFullPath, pbsAssessFiguresCopyToFullPath);
-    copyfile(pbsAssessGACopyFromFullPath, pbsAssessFiguresCopyToFullPath);
     
     % Copying the additional summary image from the topdeck laden assessment for car-carriers
     if Is.carCarrier
-        pbsAssessFiguresTopdeckCopyFromFullPath = strcat(Topdeck.Project.savePath,'\', Topdeck.Project.runKey, '_figures');
-        copyfile(strcat(pbsAssessFiguresTopdeckCopyFromFullPath,'\summary.pdf'), strcat(pbsAssessFiguresCopyToFullPath,...
-            '\summaryTopdeck.pdf'));
+        pbsAssessFiguresTopdeckCopyFromFullPath = strcat(Topdeck.Project.savePath,'\',...
+          Topdeck.Project.runKey, '_figures');
+        copyfile(strcat(pbsAssessFiguresTopdeckCopyFromFullPath,'\summary.pdf'),...
+          strcat(pbsAssessFiguresCopyToFullPath, '\summaryTopdeck.pdf'));
     end
     
     %% Create the necessary latex and log files
@@ -148,16 +153,19 @@ if Is.latexReport
     
     %% Modify the PBS assessment parameters and save to a new file
     % Create the PBS assessment paths
-    Report.pbsAssessmentMainTexFilePath = strcat(pbsAssessCopyToFullPath, '\PBS_Assessment.tex');
-    Report.pbsAssessmentResultsTexFilePath = strcat(pbsAssessCopyToFullPath, '\tex\2-1-CombinationResults.tex');
+    Report.pbsAssessmentMainTexFilePath = strcat(pbsAssessCopyToFullPath, ...
+      '\sty\PBS_assessment_commands.sty');
+    Report.pbsAssessmentResultsTexFilePath = strcat(pbsAssessCopyToFullPath,...
+      '\tex\2-1-CombinationResults.tex');
     
     % Rename tex filename for assessment
     date = strsplit(datestr(now,'yyyy-mm-dd'),'-');
     
-    renamedTexFileName = strcat(date{1}, date{2}, date{3}, '_WITS_PBS-Assessment_', Project.key, '_V',...
-        Report.reportRevision);
+    renamedTexFileName = strcat(date{1}, date{2}, date{3}, '_WITS_PBS-Assessment_',...
+      Project.key, '_V', Report.reportRevision);
     
-    Report.pbsAssessmentRenamedTexFilePath = strcat(pbsAssessCopyToFullPath, '\', renamedTexFileName, '.tex');
+    Report.pbsAssessmentRenamedTexFilePath = strcat(pbsAssessCopyToFullPath, '\',...
+      renamedTexFileName, '.tex');
     
     %% Combining parameters for the report where necessary
     % Generate the overhang modification array
@@ -167,22 +175,26 @@ if Is.latexReport
             frontOverhangDescription = '\\newcommand\{\\pmFrontOverhang\}';
             rearOverhangDescription = '\\newcommand\{\\pmRearOverhang\}';
         else
-            frontOverhangDescription = ['\\newcommand\{\\tl' num2words((iUnit - 1), 'case', 'sentence') 'FrontOverhang\}'];
-            rearOverhangDescription = ['\\newcommand\{\\tl' num2words((iUnit - 1), 'case', 'sentence') 'RearOverhang\}'];
+            frontOverhangDescription = ['\\newcommand\{\\tl' num2words((iUnit - 1), 'case',...
+              'sentence') 'FrontOverhang\}'];
+            rearOverhangDescription = ['\\newcommand\{\\tl' num2words((iUnit - 1), 'case',...
+              'sentence') 'RearOverhang\}'];
         end
         
         if Combination.frontalOverhangs(iUnit) == 0
             frontOverhang = [num2str(Combination.frontalOverhangs(iUnit)) '~mm (no overhang)'];
         else
             frontOverhang = [num2str(Combination.frontalOverhangs(iUnit)) '~mm (' ...
-                num2str(Combination.frontalOverhangsRelativeToDatum(iUnit)) '~mm forward of the hitch point)'];
+                num2str(Combination.frontalOverhangsRelativeToDatum(iUnit))...
+                '~mm forward of the hitch point)'];
         end
         
         if Combination.rearOverhangs(iUnit) == 0
             rearOverhang = [num2str(Combination.rearOverhangs(iUnit)) '~mm (no overhang)'];
         else
             rearOverhang = [num2str(Combination.rearOverhangs(iUnit)) '~mm (' ...
-                num2str(Combination.rearOverhangsRelativeToDatum(iUnit)) '~mm rear of the hitch point)'];
+                num2str(Combination.rearOverhangsRelativeToDatum(iUnit))...
+                '~mm rear of the hitch point)'];
         end
         
         if iUnit == 1 % Create
@@ -198,18 +210,29 @@ if Is.latexReport
     
     %% Add additional report modifiers according to extracted PBS data
     additionalModifiers = {...
-        '\\newcommand\{\\combOverallLength\}', strcat(num2str(Combination.totalLength*0.001, '%0.3f'), '~m');
-        '\\newcommand\{\\combMaxHt\}', strcat(num2str(max(Combination.maxHeight)*0.001, '%0.3f'), '~m');
-        '\\newcommand\{\\combMaxWidth\}', strcat(num2str(max(Combination.maxWidth)*0.001, '%0.3f'), '~m');
-        '\\newcommand\{\\desiredPBSLevel\}', num2str(Combination.pbsLevelDesired);
-        '\\newcommand\{\\combAxles\}', num2str(Axle.NumberOff);
-        '\\newcommand\{\\combGCM\}', strcat(num2str(sum(Axle1)), '~kg');
-        '\\newcommand\{\\combPayload\}', strcat(num2str(sum(cell2mat(PayloadLaden.MassCell).*...
+        '\\newcommand\{\\combOverallLength\}', ...
+        strcat(num2str(Combination.totalLength*0.001, '%0.3f'), '~m');
+        '\\newcommand\{\\combMaxHt\}', ...
+        strcat(num2str(max(Combination.maxHeight)*0.001, '%0.3f'), '~m');
+        '\\newcommand\{\\combMaxWidth\}', ...
+        strcat(num2str(max(Combination.maxWidth)*0.001, '%0.3f'), '~m');
+        '\\newcommand\{\\desiredPBSLevel\}', ...
+        num2str(Combination.pbsLevelDesired);
+        '\\newcommand\{\\combAxles\}', ...
+        num2str(Axle.NumberOff);
+        '\\newcommand\{\\combGCM\}', ...
+        strcat(num2str(sum(Axle1)), '~kg');
+        '\\newcommand\{\\combPayload\}', ...
+        strcat(num2str(sum(cell2mat(PayloadLaden.MassCell) .* ...
         cell2mat(Combination.includedPayloads))), '~kg');
-        '\\newcommand\{\\combVehStr}', convertToRegExSafeText(Combination.combinationVehicleString);
-        '\\newcommand\{\\combClassification\}', Combination.combinationClassification;
-        '\\newcommand\{\\combPbsLevelExec\}', Combination.pbsPerformanceResult;
-        '\\newcommand\{\\combPbsLevel\}', Combination.pbsPerformanceResult;
+        '\\newcommand\{\\combVehStr}', ...
+        convertToRegExSafeText(Combination.combinationVehicleString);
+        '\\newcommand\{\\combClassification\}', ...
+        Combination.combinationClassification;
+        '\\newcommand\{\\combPbsLevelExec\}', ...
+        Combination.pbsPerformanceResult;
+        '\\newcommand\{\\combPbsLevel\}', ...
+        Combination.pbsPerformanceResult;
         };
     
     additionalModifiers = [additionalModifiers; overhangDetails];
