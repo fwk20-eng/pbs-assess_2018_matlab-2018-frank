@@ -167,7 +167,9 @@ if Is.plotOn
     %-------------------------------------------------
     
     xMax = max(ceil(Time(max(ind))), ceil(Time_rrcu(max(ind_rrcu))));
-    axis([floor(Time(min(ind))/2) xMax 0 ceil((SRTt+0.01)*10)/10])  %set axis
+    yMax = max(SRTt, SRTtrrcu);
+    
+    axis([floor(Time(min(ind))/2) xMax 0 ceil((yMax+0.01)*10)/10])  %set axis
     
     for i = 1:(length(AYrcu) - 1)
       
