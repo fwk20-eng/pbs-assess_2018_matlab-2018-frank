@@ -96,6 +96,8 @@ fid = fopen(Report.pbsAssessmentResultsTexFilePath,'w');
 
 nRows = length(resultsTableLatexCode);
 
+fprintf(fid, '%s%s\n\n', '% PBS Assessment results version: ', Report.reportRevision)
+
 for iRow = 1 : nRows
     fprintf(fid,'%s\n',resultsTableLatexCode{iRow});
 end
