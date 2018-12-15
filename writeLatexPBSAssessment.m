@@ -52,12 +52,13 @@ function writeLatexPBSAssessment(Project, Combination, ParDetails, Sprung, Axle,
     createTableLatexUnloadedSprungMassDetails(Sprung);
 
 [Table.payloadDetails, LogTable.payloadDetails] = ...
-    createTableLatexPayloadDetails(Sprung, PayloadLaden, 'Fully Laden Payload Details', 'FullyLadenPayloadDetails');
+    createTableLatexPayloadDetails(Sprung, PayloadLaden, 'Fully Laden Payload Details',...
+    'FullyLadenPayloadDetails');
 
 if Is.carCarrier
     [Table.payloadDetailsTopdeck, LogTable.payloadDetailsTopdeck] = ...
-        createTableLatexPayloadDetails(Sprung, Topdeck.PayloadLaden, 'Top Deck Laden Payload Details',...
-        'TopDeckLadenPayloadDetails');
+        createTableLatexPayloadDetails(Sprung, Topdeck.PayloadLaden,...
+        'Top Deck Laden Payload Details', 'TopDeckLadenPayloadDetails');
 end
 
 [Table.primeMoverSummary, LogTable.primeMoverSummary] = ...
@@ -105,8 +106,6 @@ if Is.latexReport
     
     % Passing back multiple tables, hence pass the structure through and do not create a structure within a structure as
     % then the code will not be able to write the tables
-    %% Create the commissioning tables
-    ComTable = createTableLatexCommissioning(Axle, Sprung, Tyre, Hitch, Combination);
     
     %% Generate results tables
     Report.pbsResultsTable = createTableLatexResults...
@@ -147,66 +146,13 @@ if Is.latexReport
     %% Create the necessary latex and log files
     % Generate the latex tables and save in the PBS assessment tex folder
     createLatexTables(Table, '5-1-CombinationTables.tex', pbsAssessCopyToFullPath);
-    
-    % Generate commissioning tables in a seperate tex tile
-    createLatexTables(ComTable, '6-1-CommissioningTables.tex', pbsAssessCopyToFullPath);
-    
+   
     %% Modify the PBS assessment parameters and save to a new file
     % Create the PBS assessment paths
-    Report.pbsAssessmentMainTexFilePath = strcat(pbsAssessCopyToFullPath, ...
+    Report.pbsAssessmentCommands = strcat(pbsAssessCopyToFullPath, ...
       '\sty\PBS_assessment_commands.sty');
     Report.pbsAssessmentResultsTexFilePath = strcat(pbsAssessCopyToFullPath,...
       '\tex\2-1-CombinationResults.tex');
-    
-    % Rename tex filename for assessment
-    date = strsplit(datestr(now,'yyyy-mm-dd'),'-');
-    
-    renamedTexFileName = strcat(date{1}, date{2}, date{3}, '_WITS_PBS-Assessment_',...
-      Project.key, '_V', Report.reportRevision);
-    
-    Report.pbsAssessmentRenamedTexFilePath = strcat(pbsAssessCopyToFullPath, '\',...
-      renamedTexFileName, '.tex');
-    
-    %% Combining parameters for the report where necessary
-    % Generate the overhang modification array
-    for iUnit = 1:Sprung.numberOffUnits
-        
-        if iUnit == 1
-            frontOverhangDescription = '\\newcommand\{\\pmFrontOverhang\}';
-            rearOverhangDescription = '\\newcommand\{\\pmRearOverhang\}';
-        else
-            frontOverhangDescription = ['\\newcommand\{\\tl' num2words((iUnit - 1), 'case',...
-              'sentence') 'FrontOverhang\}'];
-            rearOverhangDescription = ['\\newcommand\{\\tl' num2words((iUnit - 1), 'case',...
-              'sentence') 'RearOverhang\}'];
-        end
-        
-        if Combination.frontalOverhangs(iUnit) == 0
-            frontOverhang = [num2str(Combination.frontalOverhangs(iUnit)) '~mm (no overhang)'];
-        else
-            frontOverhang = [num2str(Combination.frontalOverhangs(iUnit)) '~mm (' ...
-                num2str(Combination.frontalOverhangsRelativeToDatum(iUnit))...
-                '~mm forward of the hitch point)'];
-        end
-        
-        if Combination.rearOverhangs(iUnit) == 0
-            rearOverhang = [num2str(Combination.rearOverhangs(iUnit)) '~mm (no overhang)'];
-        else
-            rearOverhang = [num2str(Combination.rearOverhangs(iUnit)) '~mm (' ...
-                num2str(Combination.rearOverhangsRelativeToDatum(iUnit))...
-                '~mm rear of the hitch point)'];
-        end
-        
-        if iUnit == 1 % Create
-            overhangDetails = {...
-                frontOverhangDescription, frontOverhang;
-                rearOverhangDescription, rearOverhang};
-        else % Append
-            overhangDetails = [overhangDetails;
-                {frontOverhangDescription, frontOverhang};
-                {rearOverhangDescription, rearOverhang}];
-        end
-    end
     
     %% Add additional report modifiers according to extracted PBS data
     additionalModifiers = {...
@@ -235,12 +181,10 @@ if Is.latexReport
         Combination.pbsPerformanceResult;
         };
     
-    additionalModifiers = [additionalModifiers; overhangDetails];
-    
     Report.modifiers = [Report.modifiers; additionalModifiers];
     
     %% Edit PBS assessment and save tex file with the correct name as per project
-    editPbsAssessmentReport(Report, Is);
+    editPbsAssessmentReport(Report, Project, Is);
     
 end
 end
