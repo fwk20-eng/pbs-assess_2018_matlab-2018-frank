@@ -13,7 +13,7 @@ if nargin == 0
   % ** Mat file location **
   %-------------------------------------------------
   Project.truckSimRunsDirectory = 'D:\Dropbox\Wits_TruckSim_PBS_2018\Results';
-  MatKey = {'YawD', 'c10b9d5a'};
+  MatKey = {'YawD', 'cbadf1ce'};
   
   % ** Booleans that may change **
   %-------------------------------------------------
@@ -80,22 +80,26 @@ end
 motionVariables = {...
   AVz,... Yaw rate of vehicle units
   Art_H,... Articulation angle of the hitch
-  ArtR_H}; % Articulation rate of the hitch
+  ArtR_H... % Articulation rate of the hitch
+}; 
 
 units = [...
   Sprung.numberOffUnits,... number of vehicle units
   (Sprung.numberOffUnits - 1),... number of hitch points
-  (Sprung.numberOffUnits - 1)]; % number of hitch points
+  (Sprung.numberOffUnits - 1)... % number of hitch points
+]; 
 
 yLabels = {...
   'Yaw Rate [deg/s]',...
   'Hitch Articulation Angle [deg]',...
-  'Hitch Articulation Rate [deg/s]'};
+  'Hitch Articulation Rate [deg/s]'...
+};
 
 unitType = {...
   'unit ',...
   'hitch ',...
-  'hitch '};
+  'hitch '
+};
 
 for iMotionVar = 1 : numel(motionVariables)
   
@@ -240,10 +244,12 @@ end
 
 iA1 = 1; % Index of the first peak
 
-while ( (abs(valPeakRaw(iA1)) < abs(valPeakRaw(iA1+1)))...
+while iA1 <= (numel(valPeakRaw)-1) && ... % Must be the first condition to prevent an index error
+    ( (abs(valPeakRaw(iA1)) < abs(valPeakRaw(iA1+1)))...
     || (abs(valPeakRaw(iA1)) < 0.05 * max(abs(valPeakRaw))) )...
-    && iA1 < numel(valPeakRaw)
+    
   iA1 = iA1 + 1;
+
 end
 
 A1 = valPeakRaw(iA1);
