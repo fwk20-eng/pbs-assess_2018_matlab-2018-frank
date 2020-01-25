@@ -257,7 +257,7 @@ Axle.rollCentreHeight = editCombinationCellRegexpBetweenText(Axle.rollCentreData
 [Axle.Grouping, Axle.UnitAndGroup, Axle.UnitCellArray] = computeAxleGrouping(endParLadenFileData, ...
     Axle.XPositionArray, 2000, Dummy);
 
-Axle.NumberOff = length(Axle.UnsprungMassArray);
+Axle.NumberOff = length(Axle.TrackWidthArray);
 % If torque is transferred to the axle from the powertrain, its logic matrix value is set to 1
 axlePowertrainTorqueLogicArray(axlePowertrainTorqueLogicArray > 0) = 1;
 % Only the first 2 axle groups are considered to possibly have driven axles
