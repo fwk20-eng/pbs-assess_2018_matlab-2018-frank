@@ -128,7 +128,8 @@ Sprung.MassCoGzPosition = Sprung.MassCoGzPosition .* 0.001;
 %% Extract axle properties for post processor
 
 % Extracting raw axle data
-Axle.UnsprungMassArray = getVariableValuesFromPar(endParLadenFileData, '^M_US');
+dummy = getVariableValuesFromPar(endParLadenFileData, '^M_US');
+Axle.UnsprungMassArray=dummy(1:3:end)+dummy(2:3:end)++dummy(3:3:end);
 Axle.XPositionArray = getVariableValuesFromPar(endParLadenFileData, '^LX_AXLE');
 Axle.ZPositionArray = getVariableValuesFromPar(endParLadenFileData, '^H_CG_AXLE');
 
