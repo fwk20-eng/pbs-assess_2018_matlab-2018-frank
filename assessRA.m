@@ -120,11 +120,11 @@ if ~Is.skipManoeuvreChecks
   
   if maxLatError > 30
     error('%s%0.2f%s','Lateral error is above 30 mm: ', maxLatError, ...
-      ' mm -->> Decrease TPREV_CONSTANT');
+      ' mm -->> Decrease TPREV_CONSTANT, Preview Time of Driver Model');
     
   elseif maxLatError < 25
     error('%s%0.2f%s','Lateral error is below 25 mm: ', maxLatError, ...
-      ' mm -->> Increase TPREV_CONSTANT, manoeuvre may be too harsh');
+      ' mm -->> Increase TPREV_CONSTANT, Preview Time of Driver Model');
   end
   
 end
