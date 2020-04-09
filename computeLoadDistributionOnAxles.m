@@ -12,20 +12,23 @@ function [] = computeLoadDistributionOnAxles(fileName, savePath, grouping, group
 % First vehicle Second axle group and first axle group
 ii=1;
 loadHeadings = {'Description' 'Steer Axle' 'Total' 'Drive axles'};
+%
+% dLoad{:,1}{:} changed to dLoad{:,1} impact must be assessed
+%
 if isempty(loadCoupled)||~loadCoupled(1) %not receiving hitch load
-    dgaLoad{:,1} = {'Axle' 'Chassis' dLoad{:,1}{:} 'Total'}';
+    dgaLoad{:,1} = {'Axle' 'Chassis' dLoad{:,1} 'Total'}';
     loadMat{:,1} = {dgaLoad{:,1} [A1{2:end,1} sum([A1{:,1}])]' ([A1{2:end,1} sum([A1{2:end,1}])]' + [A2{2:end,1} sum([A2{2:end,1}])]') [A2{2:end,1} sum([A2{2:end,1}])]'}; % Unit 1 Forward pivot loads | total loads | rear pivot loads
 else %receive hitch load
-    dgaLoad{:,1} = {'Hitch' 'Axle' 'Chassis' dLoad{:,1}{:} 'Total'}';
+    dgaLoad{:,1} = {'Hitch' 'Axle' 'Chassis' dLoad{:,1} 'Total'}';
     loadMat{:,1} = {dgaLoad{:,1} [A1{:,1} sum([A1{:,1}])]' ([A1{:,1} sum([A1{:,1}])]' + [A2{:,1} sum([A2{:,1}])]') [A2{:,1} sum([A2{:,1}])]'}; % Unit 1 Forward pivot loads | total loads | rear pivot loads
 end
 Acomb(1) = sum([A1{:,1}]);
 Acomb(2) = sum([A2{:,1}]);
 
 for i=3:1:length(grouping)
-    if loadCoupled(i-2) %axle group is not a dolley
+    if loadCoupled(i-2) %axle group is not a dolly
         ii=ii+1;
-        if (i==3)||loadCoupled(i-3) %axle group in front is not a dolley
+        if (i==3)||loadCoupled(i-3) %axle group in front is not a dolly
             loadHeadings = [loadHeadings {'' 'Description' 'Hitch' 'Total' 'Trailer axles'}];
             dgaLoad{:,ii} = {'Axle' 'Chassis' dLoad{:,i-1} 'Total'}';
             if (i==length(grouping)) %cannot receive hitch load
