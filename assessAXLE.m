@@ -110,7 +110,7 @@ end
 %----------------------------------------------
 if Is.plotOn
   
-  figure('name', 'AXLE_LOADS')
+  figure('name', 'AXLE_LOADS','visible', 'off');
   hold on
   
   legTitles = {};

@@ -62,7 +62,7 @@ end
 START=[grad(i-1)];
 
 if plotOn
-    figure('name', 'START')
+    figure('name', 'START','visible', 'off');
 
     hold on
     plot(grad(1:i),acc(1:i))
@@ -141,7 +141,7 @@ while contin
 end
 GRADA=[grad(i-1)];
 if plotOn
-    figure('name', 'GRAa')
+    figure('name', 'GRAa','visible', 'off');
 
     hold on
     plot(grad(1:i),acc(1:i))
@@ -220,7 +220,7 @@ end
 
 GRADB=vel(i-1);
 if plotOn
-    figure('name', 'GRAb')
+    figure('name', 'GRAb','visible', 'off');
 
     hold on
     plot(vel(1:i),acc(1:i)*10.0,vel(1:i),gearvec(1:i))
@@ -362,7 +362,7 @@ i=find(s>100,1,'first');
 endGear=gearvec(i);
 ACC=[tspan(i)];
 if plotOn
-    figure('name', 'ACC')
+    figure('name', 'ACC','visible', 'off');
 
     hold on
     plot(tspan(1:i),v(1:i),tspan(1:i),gearvec(1:i))

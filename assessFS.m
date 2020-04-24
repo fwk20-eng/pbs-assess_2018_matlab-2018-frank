@@ -115,7 +115,7 @@ if MoDmax<0
 end
 
 if Is.plotOn
-    figure('name', 'MoD')
+    figure('name', 'MoD','visible', 'off');
 
     hold on
     legTitles = {};
@@ -193,7 +193,7 @@ if MoDmax<0
 end
 
 if Is.plotOn
-    figure('name', 'DoM')
+    figure('name', 'DoM','visible', 'off');
 
     hold on
     legTitles = {};

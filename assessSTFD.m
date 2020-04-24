@@ -12,7 +12,7 @@ FricDemand = 100*(numer./denom)./muPeak;
 [STFD, iMax] = max(FricDemand);
 
 if plotOn
-    figure('name', 'STFD')
+    figure('name', 'STFD','visible', 'off');
     
     hold on
     

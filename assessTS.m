@@ -17,7 +17,7 @@ end
 TS_max = max(TS);
 
 if Is.plotOn
-    figure('name', 'TS')
+    figure('name', 'TS','visible', 'off');
 
     hold on
     legTitles = {};

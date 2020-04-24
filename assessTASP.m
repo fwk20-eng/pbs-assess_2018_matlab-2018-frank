@@ -176,7 +176,7 @@ SW99 = SW(ceil(length(SW)/100*99)); % get 99th percentile
 %% *** Plot ***
 %-------------------------------------------------
 if Is.plotOn
-  figure('name', 'TASP')
+  figure('name', 'TASP','visible', 'off');
   
   hold on
   legTitles = {};

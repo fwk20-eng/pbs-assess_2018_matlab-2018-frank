@@ -130,7 +130,7 @@ nUnits = units(limitMotionVarIndex);
 %% *** Plot ***
 %-------------------------------------------------
 if Is.plotOn
-  figure('name', 'YawD')
+  figure('name', 'YawD','visible', 'off');
   
   hold on
   legTitles = {};

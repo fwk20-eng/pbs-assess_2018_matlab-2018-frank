@@ -111,7 +111,7 @@ end
 %      ** Plotting the graph **
 %----------------------------------------------
 if Is.plotOn
-  figure('name', 'HSTO')
+  figure('name', 'HSTO','visible', 'off');
   
   hold on
   plot(X_A1, Y_A1, 'Color', getColour(1))

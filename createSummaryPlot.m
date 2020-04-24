@@ -8,7 +8,7 @@ else
 end
 
 maxX = ceil(max(res)/5)*5+5;
-figure()
+figure('visible', 'off');
 hold on
 
 % blocks indicating failure region

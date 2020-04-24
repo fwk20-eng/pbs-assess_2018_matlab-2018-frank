@@ -117,7 +117,7 @@ end
 % SPWmax = SPWmax   % to print result
 
 if Is.plotOn
-  figure('name', 'LSSP');
+  figure('name', 'LSSP','visible', 'off');
   %     figure(1)
   %     if strcmp(plotTitle, 'LSSP')
   %         if strcmp(ladentext, '_laden')

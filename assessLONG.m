@@ -191,7 +191,7 @@ START = [grad(i-1)];
 %% *** Plot ***
 %-------------------------------------------------
 if Is.plotOn
-  figure('name', 'START')
+  figure('name', 'START','visible', 'off');
   
   hold on
   plot(grad(1:i),acc(1:i))
@@ -263,7 +263,7 @@ GRADA=[grad(i-1)];
 %% *** Plot ***
 %-------------------------------------------------
 if Is.plotOn
-  figure('name', 'GRAa')
+  figure('name', 'GRAa','visible', 'off');
   
   hold on
   plot(grad(1:i),acc(1:i))
@@ -338,7 +338,7 @@ GRADB=vel(i-1);
 %% *** Plot ***
 %-------------------------------------------------
 if Is.plotOn
-  figure('name', 'GRAb')
+  figure('name', 'GRAb','visible', 'off');
   
   hold on
   plot(vel(1:i),acc(1:i)*10.0,vel(1:i),gearvec(1:i))
@@ -489,7 +489,7 @@ ACC=[tspan(i)];
 %% *** Plot ***
 %-------------------------------------------------
 if Is.plotOn
-  figure('name', 'ACC')
+  figure('name', 'ACC','visible', 'off');
   
   hold on
   plot(tspan(1:i),v(1:i),tspan(1:i),gearvec(1:i))

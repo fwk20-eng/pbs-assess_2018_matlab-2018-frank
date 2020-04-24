@@ -149,7 +149,7 @@ end
 %% *** Plot ***
 %-------------------------------------------------
 if Is.plotOn
-  figure('name', 'SRT')
+  figure('name', 'SRT','visible', 'off');
   
   hold on
   legTitles = {};

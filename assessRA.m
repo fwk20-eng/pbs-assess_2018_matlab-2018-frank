@@ -180,7 +180,7 @@ RA = maxAYrrcu/maxAYsteer;
 %      ** Plotting **
 %----------------------------------------------
 if Is.plotOn
-  figure('name', 'RA')
+  figure('name', 'RA','visible', 'off');
   
   hold on
   
