@@ -243,8 +243,10 @@ end
 % Using the absolute value accounts for if the peak is negative or positive.
 % Make the next peak the first peak if the current peak is less than the next peak, or if it is less
 % than limPeak*100% of the maximum peak. Stop moving to the next peak if you reach the last peak.
+% Best would be for limPeak to be 0.05 but used 0.06 to get rid of early
+% spurious peaks
 %-------------------------------------------------
-limPeak=0.051;
+limPeak=0.06;
 
 iA1 = 1; % Index of the first peak
 
