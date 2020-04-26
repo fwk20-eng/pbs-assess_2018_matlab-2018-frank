@@ -149,8 +149,11 @@ end
 %% *** Plot ***
 %-------------------------------------------------
 if Is.plotOn
-  figure('name', 'SRT','visible', 'off');
-  
+  if (isfield(Is,'plotBackground') & Is.plotBackground)
+      figure('name', 'SRT','visible', 'off');
+  else
+      figure('name', 'SRT');
+  end  
   hold on
   legTitles = {};
   

@@ -180,8 +180,11 @@ RA = maxAYrrcu/maxAYsteer;
 %      ** Plotting **
 %----------------------------------------------
 if Is.plotOn
-  figure('name', 'RA','visible', 'off');
-  
+  if (isfield(Is,'plotBackground') & Is.plotBackground)
+      figure('name', 'RA','visible', 'off');
+  else
+      figure('name', 'RA');
+  end
   hold on
   
 % Plot title

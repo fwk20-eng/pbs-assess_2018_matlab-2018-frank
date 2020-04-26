@@ -17,7 +17,11 @@ end
 TS_max = max(TS);
 
 if Is.plotOn
+  if (isfield(Is,'plotBackground') & Is.plotBackground)
     figure('name', 'TS','visible', 'off');
+  else
+    figure('name', 'TS');
+  end
 
     hold on
     legTitles = {};

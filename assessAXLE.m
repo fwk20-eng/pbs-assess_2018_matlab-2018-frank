@@ -109,8 +109,11 @@ end
 %      ** Plot the axle loads **
 %----------------------------------------------
 if Is.plotOn
-  
-  figure('name', 'AXLE_LOADS','visible', 'off');
+  if (isfield(Is,'plotBackground') & Is.plotBackground)
+    figure('name', 'AXLE_LOADS','visible', 'off');
+  else
+    figure('name', 'AXLE_LOADS');
+  end
   hold on
   
   legTitles = {};

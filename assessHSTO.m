@@ -111,8 +111,11 @@ end
 %      ** Plotting the graph **
 %----------------------------------------------
 if Is.plotOn
-  figure('name', 'HSTO','visible', 'off');
-  
+  if (isfield(Is,'plotBackground') & Is.plotBackground)
+      figure('name', 'HSTO','visible', 'off');
+  else
+      figure('name', 'HSTO');
+  end
   hold on
   plot(X_A1, Y_A1, 'Color', getColour(1))
   plot(X_Last, Y_Last, 'Color', getColour(2))

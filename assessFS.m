@@ -115,8 +115,11 @@ if MoDmax<0
 end
 
 if Is.plotOn
-    figure('name', 'MoD','visible', 'off');
-
+  if (isfield(Is,'plotBackground') & Is.plotBackground)
+      figure('name', 'MoD','visible', 'off');
+  else
+      figure('name', 'MoD');
+  end
     hold on
     legTitles = {};
 
@@ -193,8 +196,11 @@ if MoDmax<0
 end
 
 if Is.plotOn
-    figure('name', 'DoM','visible', 'off');
-
+  if (isfield(Is,'plotBackground') & Is.plotBackground)
+      figure('name', 'DoM','visible', 'off');
+  else
+      figure('name', 'DoM');
+  end
     hold on
     legTitles = {};
     
