@@ -262,9 +262,9 @@ A1 = valPeakRaw(iA1);
 % dampening. This error will help prevent an instable model from going unnoticed. Again the absolute
 % value accounts for if the first peak is positive or negative.
 
-%if max(abs(valPeakRaw)) > abs(A1)
-%  error('The first peak is not the maximum peak - check model stability');
-%end
+if max(abs(valPeakRaw)) > abs(A1)
+  error('The first peak is not the maximum peak - check model stability');
+end
 
 %-------------------------------------------------
 %% *** Remove dampened peaks ***
