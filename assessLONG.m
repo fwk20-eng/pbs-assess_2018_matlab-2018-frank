@@ -170,19 +170,19 @@ while contin
     
     % ** Check propulsion forces **
     %-------------------------------------------------
-    Fdrive = sin(th)*m*9.81+Frr;
+    FtotalResist = sin(th)*m*9.81+Frr;
     if isEngine2
         Favail = sum(0.8*9.81*Axle2(Axle.Driven));
         Favail2 = sum(0.8*9.81*Axle2(Axle.Driven2));
-        acc(i) = (min([Fengine Favail])+min([Fengine2 Favail2])-Fdrive) / me;
+        acc(i) = (min([Fengine Favail])+min([Fengine2 Favail2])-FtotalResist) / me;
         % ** Check limiting criterion **
         %-------------------------------------------------
-        if Fdrive>(Fengine+min([Fengine2 Favail2]))
-            % The engine force is not big enough to generate the required drive
+        if FtotalResist>(Fengine+min([Fengine2 Favail2]))
+            % The engine force is not big enough to overcome the total resistance
             contin=0;
             saturate=0;
-        elseif Fdrive>(Favail+min([Fengine2 Favail2]))
-            % The available force from the tyres is not big enough to generate the required drive
+        elseif FtotalResist>(Favail+min([Fengine2 Favail2]))
+            % The available force from the tyres is not big enough to overcome the total resistance
             contin=0;
             saturate=1;
         elseif i==length(grad)
@@ -195,12 +195,12 @@ while contin
         acc(i) = (min([Fengine Favail])-sin(th)*m*9.81-Frr) / me;
         % ** Check limiting criterion **
         %-------------------------------------------------
-        if Fdrive>Fengine
-            % The engine force is not big enough to generate the required drive
+        if FtotalResist>Fengine
+            % The engine force is not big enough to overcome the total resistance
             contin=0;
             saturate=0;
-        elseif Fdrive>Favail
-            % The available force from the tyres is not big enough to generate the required drive
+        elseif FtotalResist>Favail
+            % The available force from the tyres is not big enough to overcome the total resistance
             contin=0;
             saturate=1;
         elseif i==length(grad)
@@ -258,7 +258,7 @@ end
 %-------------------------------------------------
 %% *** Gradeability A ***
 %-------------------------------------------------
-
+clear acc
 [maxTorqueNm j]=max(Engine.TorqueNm);
 Fengine=maxTorqueNm*Engine.eff_gear(1)*Engine.eff_diffStart/Tyre.RollingRadius*Engine.difStart*Engine.gears(1);
 if isEngine2
@@ -275,19 +275,19 @@ Frr=rolling(v,sum(mTotal),Combination.ch,radial);
 while contin
     i=i+1;
     th=atan(grad(i)/100);
-    Fdrive=sin(th)*m*9.81+Frr+FA;
+    FtotalResist=sin(th)*m*9.81+Frr+FA;
     if isEngine2
         Favail = sum(0.8*9.81*Axle2(Axle.Driven));
         Favail2 = sum(0.8*9.81*Axle2(Axle.Driven2));
-        acc(i) = (min([Fengine Favail])+min([Fengine2 Favail2])-Fdrive) / me;
+        acc(i) = (min([Fengine Favail])+min([Fengine2 Favail2])-FtotalResist) / me;
         % ** Check limiting criterion **
         %-------------------------------------------------
-        if Fdrive>(Fengine+min([Fengine2 Favail2]))
-            % The engine force is not big enough to generate the required drive
+        if FtotalResist>(Fengine+min([Fengine2 Favail2]))
+            % The engine force is not big enough to overcome the total resistance
             contin=0;
             saturate=0;
-        elseif Fdrive>(Favail+min([Fengine2 Favail2]))
-            % The available force from the tyres is not big enough to generate the required drive
+        elseif FtotalResist>(Favail+min([Fengine2 Favail2]))
+            % The available force from the tyres is not big enough to overcome the total resistance
             contin=0;
             saturate=1;
         elseif i==length(grad)
@@ -297,12 +297,12 @@ while contin
         end
     else
         Favail=sum(0.8*9.81*Axle2(Axle.Driven));
-        acc(i)=(min([Fengine Favail])-sin(th)*m*9.81-Fdrive)/me;
-        if Fdrive>Fengine
-            contin=0; % The engine force is not big enough to generate the required drive
+        acc(i)=(min([Fengine Favail])-FtotalResist)/me;
+        if FtotalResist>Fengine
+            contin=0; % The engine force is not big enough to overcome the total resistance
             saturate=0;
-        elseif Fdrive>Favail
-            contin=0; % The available force from the tyres is not big enough to generate the required drive
+        elseif FtotalResist>Favail
+            contin=0; % The available force from the tyres is not big enough to overcome the total resistance
             saturate=1;
         elseif i==length(grad)
             contin=0; % There is plenty of engine and available tyre force
@@ -370,7 +370,7 @@ while contin
         FA=drag(Combination.frontalAreaForDrag,Combination.cd,v,Combination.ce);
         Favail=sum(0.8*9.81*Axle1(Axle.Driven));
         Favail2 = sum(0.8*9.81*Axle2(Axle.Driven2));
-        Fdrive=sin(th)*m*9.81+Frr+FA;
+        FtotalResist=sin(th)*m*9.81+Frr+FA;
         Nvec=v/Tyre.RollingRadius*Engine.gears*Engine.difStart*60/2/pi;
         G=Engine.difStart*Engine.gears;
         me=m+Engine.It/Tyre.RollingRadius/Tyre.RollingRadius+Engine.Ie*G.^2/Tyre.RollingRadius/Tyre.RollingRadius;
@@ -380,15 +380,15 @@ while contin
         gearvec(i)=jgear;
         Fengine2 = interp1(Engine2.Torquerpm,Engine2.TorqueNm,v/Tyre.RollingRadius*Engine2.gearing*Engine2.tyre_gearing*60/2/pi,'linear',0)*Engine2.eff_motor*Engine2.eff_gear*Engine2.gearing*Engine2.tyre_gearing/Tyre.RollingRadius;
         Fengine2 = min(Fengine2,Fengine*Engine2.limit);
-        acc(i) = (min([Fengine Favail])+min([Fengine2 Favail2])-Fdrive) / me;
+        acc(i) = (min([Fengine Favail])+min([Fengine2 Favail2])-FtotalResist) / me;
         G=Engine.difStart*Engine.gears(jgear);
         N=v/Tyre.RollingRadius*G*60/2/pi;
-        if Fdrive>(Fengine+min([Fengine2 Favail2]))
-            % The engine force is not big enough to generate the required drive
+        if FtotalResist>(Fengine+min([Fengine2 Favail2]))
+            % The engine force is not big enough to overcome the total resistance
             contin=0;
             saturate=0;
-        elseif Fdrive>(Favail+min([Fengine2 Favail2]))
-            % The available force from the tyres is not big enough to generate the required drive
+        elseif FtotalResist>(Favail+min([Fengine2 Favail2]))
+            % The available force from the tyres is not big enough to overcome the total resistance
             contin=0;
             saturate=1;
         elseif i==length(vel)
@@ -404,7 +404,7 @@ while contin
         Frr=rolling(v,sum(mTotal),Combination.ch,radial);
         FA=drag(Combination.frontalAreaForDrag,Combination.cd,v,Combination.ce);
         Favail=sum(0.8*9.81*Axle1(Axle.Driven));
-        Fdrive=sin(th)*m*9.81+Frr+FA;
+        FtotalResist=sin(th)*m*9.81+Frr+FA;
         Nvec=v/Tyre.RollingRadius*Engine.gears*Engine.difStart*60/2/pi;
         G=Engine.difStart*Engine.gears;
         me=m+Engine.It/Tyre.RollingRadius/Tyre.RollingRadius+Engine.Ie*G.^2/Tyre.RollingRadius/Tyre.RollingRadius;
@@ -414,11 +414,11 @@ while contin
         Fengine=Fengine(jgear);
         G=Engine.difStart*Engine.gears(jgear);
         N=v/Tyre.RollingRadius*G*60/2/pi;
-        if Fdrive>Fengine;
-            contin=0; % The engine force is not big enough to generate the required drive
+        if FtotalResist>Fengine;
+            contin=0; % The engine force is not big enough to overcome the total resistance
             saturate=0;
-        elseif Fdrive>Favail
-            contin=0; % The available force from the tyres is not big enough to generate the required drive
+        elseif FtotalResist>Favail
+            contin=0; % The available force from the tyres is not big enough to overcome the total resistance
             saturate=1;
         elseif i==length(vel)
             contin=0; % There is plenty of engine and available tyre force
