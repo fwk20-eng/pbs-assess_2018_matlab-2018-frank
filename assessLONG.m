@@ -492,6 +492,8 @@ else
 end
 %1 Start gear and release clutch
 % Allow a linear increase up to engageTNm in 1 s
+%"The slip time of a friction clutch, for example, is normally
+%less than 1 sec." 700194 Commercial Vehicle Performance and Fuel Economy
 tspan=[0:0.01:1];
 dt=tspan(2);
 v2=0;
