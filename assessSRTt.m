@@ -15,16 +15,16 @@ if nargin == 0  % i.e. program run directly from here
   
   Hitch.RollCoupledArray = [1 1];
   
-  Axle.NumberOff = 6;
+  Axle.NumberOff = 3;
   Axle.NumberOffSteer = 1;
   
-  Sprung.MassArray = [5759, 3390, 3690];
-  Sprung.MassCoGxPosition = [0.879, 4.494, 5.052];
-  Sprung.MassCoGzPosition = [1.125, 1.394, 1.481];
+  Sprung.MassArray = [22166];
+  Sprung.MassCoGxPosition = [3.239];
+  Sprung.MassCoGzPosition = [2.177];
   
-  PayloadLaden.MassCell = {[75, 411.6, 176.4], 21350, 31450};
-  PayloadLaden.CoGxPositionCell = {[-0.218, 1.917, 1.917], 2.478, 4.485};
-  PayloadLaden.CoGzPositionCell = {[1.815, 0.67, 0.67], 2.071, 2.008};
+  PayloadLaden.MassCell = {0};
+  PayloadLaden.CoGxPositionCell = {0};
+  PayloadLaden.CoGzPositionCell = {0};
   
   % ** Constants for manoeuvre **
   %-------------------------------------------------
