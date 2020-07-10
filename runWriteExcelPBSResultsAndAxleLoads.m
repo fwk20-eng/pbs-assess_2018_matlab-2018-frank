@@ -38,7 +38,7 @@ if Is.fullPBS && Is.save
 end
 
 if Is.fullPBS && Is.plotSummary
-    createSummaryPlot(fullName, r, Lim, Combination.pbsLevelDesired, Project.savePath, Project.runKey, Is.semi)
+    createSummaryPlot(fullName, r, Lim, Combination.pbsLevelDesired, Project.savePath, Project.runKey, Is)
 end
 
 end

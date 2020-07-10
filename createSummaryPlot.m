@@ -1,5 +1,5 @@
-function createSummaryPlot(name, r, Lim, L, savePath, runKey, isSemi)
-if isSemi,
+function createSummaryPlot(name, r, Lim, L, savePath, runKey, Is)
+if Is.semi,
     Ylabs = {name.STA name.GRAa name.GRAb name.SRTt name.YDC name.ACC name.RA name.HSTO name.TASP name.LSSP name.TS name.FS name.MoD name.DoM name.STFD name.LSSPu name.TSu name.FSu name.MoDu name.DoMu name.STFDu};
     res = [r.STA/Lim.STA(L) r.GRAa/Lim.GRAa(L) r.GRAb/Lim.GRAb(L) r.SRTt/Lim.SRT(L) r.YDC/Lim.YDC(L) r.ACC/Lim.ACC(L) r.RA/Lim.RA(L) r.HSTO/Lim.HSTO(L) r.TASP/Lim.TASP(L) r.LSSP/Lim.LSSP(L) r.TS/Lim.TS(L) r.FS/Lim.FS(L) r.MoD/Lim.MoD(L) r.DoM/Lim.DoM(L) r.STFD/Lim.STFD(L) r.LSSPu/Lim.LSSP(L) r.TSu/Lim.TS(L) r.FSu/Lim.FS(L) r.MoDu/Lim.MoD(L) r.DoMu/Lim.DoM(L) r.STFDu/Lim.STFD(L)]*100;
 else
@@ -7,8 +7,12 @@ else
     res = [r.STA/Lim.STA(L) r.GRAa/Lim.GRAa(L) r.GRAb/Lim.GRAb(L) r.SRTt/Lim.SRT(L) r.YDC/Lim.YDC(L) r.ACC/Lim.ACC(L) r.RA/Lim.RA(L) r.HSTO/Lim.HSTO(L) r.TASP/Lim.TASP(L) r.LSSP/Lim.LSSP(L) r.TS/Lim.TS(L) r.FS/Lim.FS(L) r.STFD/Lim.STFD(L) r.LSSPu/Lim.LSSP(L) r.TSu/Lim.TS(L) r.FSu/Lim.FS(L) r.STFDu/Lim.STFD(L)]*100;
 end
 
+if (isfield(Is,'plotBackground') & Is.plotBackground)
+    figure('name', 'SUMMARY','visible', 'off');
+  else
+    figure('name', 'SUMMARY');
+end
 maxX = ceil(max(res)/5)*5+5;
-figure('visible', 'off');
 hold on
 
 % blocks indicating failure region
@@ -22,7 +26,7 @@ set(h2,'BarWidth',1)
 h = barh(res);
 set(h, 'FaceColor', [0.15 0.15 0.58])
 set(h, 'EdgeColor', [0.15 0.15 0.58])
-if isSemi,
+if Is.semi,
     set(gca,'Ytick',[1:1:21])
 else
     set(gca,'Ytick',[1:1:17])

@@ -1,4 +1,8 @@
 function [Lim, LimReport] = getPBSLimits(Is)
+%% Change Log
+%
+% [0.1.0] - 2020-06-30
+% * Changed frontal swing limits to new value of 0.85 m
 
 if ~isfield(Is, 'australianPBS')
     Is.australianPBS = 0;
@@ -15,10 +19,10 @@ if Is.australianPBS
         Lim.FS = [1.5 1.5 1.5 1.5];
     elseif Is.danGoods
         Lim.SRT = [0.4 0.4 0.4 0.4];
-        Lim.FS = [0.7 0.7 0.7 0.7];
+        Lim.FS = [0.85 0.85 0.85 0.85];
     else
         Lim.SRT = [0.35 0.35 0.35 0.35];
-        Lim.FS = [0.7 0.7 0.7 0.7];
+        Lim.FS = [0.85 0.85 0.85 0.85];
     end
     
     Lim.YDC = [0.15 0.15 0.15 0.15];
@@ -41,10 +45,10 @@ if Is.australianPBS
         LimReport.FS =  {'$\leq$1.5' '$\leq$1.5' '$\leq$1.5' '$\leq$1.5'};
     elseif Is.danGoods
         LimReport.SRT = {'$\geq$0.4' '$\geq$0.4' '$\geq$0.4' '$\geq$0.4'};
-        LimReport.FS =  {'$\leq$0.7' '$\leq$0.7' '$\leq$0.7' '$\leq$0.7'};
+        LimReport.FS =  {'$\leq$0.85' '$\leq$0.85' '$\leq$0.85' '$\leq$0.85'};
     else
         LimReport.SRT = {'$\geq$0.35' '$\geq$0.35' '$\geq$0.35'	'$\geq$0.35'};
-        LimReport.FS =  {'$\leq$0.7' '$\leq$0.7' '$\leq$0.7' '$\leq$0.7'};
+        LimReport.FS =  {'$\leq$0.85' '$\leq$0.85' '$\leq$0.85' '$\leq$0.85'};
     end
     
     LimReport.YDC =     {'$\geq$0.15' '$\geq$0.15' '$\geq$0.15' '$\geq$0.15'};
@@ -68,10 +72,10 @@ elseif ~Is.australianPBS
         Lim.FS = [1.5 1.5 1.5 1.5];
     elseif Is.danGoods
         Lim.SRT = [0.4 0.4 0.4 0.4];
-        Lim.FS = [0.7 0.7 0.7 0.7];
+        Lim.FS = [0.85 0.85 0.85 0.85];
     else
         Lim.SRT = [0.35 0.35 0.35 0.35];
-        Lim.FS = [0.7 0.7 0.7 0.7];
+        Lim.FS = [0.85 0.85 0.85 0.85];
     end
     
     Lim.YDC = [0.15 0.15 0.15 0.15];
@@ -94,10 +98,10 @@ elseif ~Is.australianPBS
         LimReport.FS =  {'$\leq$1.5' '$\leq$1.5' '$\leq$1.5' '$\leq$1.5'};
     elseif Is.danGoods
         LimReport.SRT = {'$\geq$0.4' '$\geq$0.4' '$\geq$0.4' '$\geq$0.4'};
-        LimReport.FS =  {'$\leq$0.7' '$\leq$0.7' '$\leq$0.7' '$\leq$0.7'};
+        LimReport.FS =  {'$\leq$0.85' '$\leq$0.85' '$\leq$0.85' '$\leq$0.85'};
     else
         LimReport.SRT = {'$\geq$0.35' '$\geq$0.35' '$\geq$0.35'	'$\geq$0.35'};
-        LimReport.FS =  {'$\leq$0.7' '$\leq$0.7' '$\leq$0.7' '$\leq$0.7'};
+        LimReport.FS =  {'$\leq$0.85' '$\leq$0.85' '$\leq$0.85' '$\leq$0.85'};
     end
     
     LimReport.YDC =     {'$\geq$0.15' '$\geq$0.15' '$\geq$0.15' '$\geq$0.15'};

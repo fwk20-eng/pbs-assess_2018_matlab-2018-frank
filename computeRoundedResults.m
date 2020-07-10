@@ -1,4 +1,8 @@
 function [res] = computeRoundedResults(raw, Is)
+%% Change Log
+%
+% [0.1.0] - 2020-06-30
+% * Changed frontal swing rounding to new value of 0.05 m
 
 if ~isfield(Is, 'australianPBS')
     Is.australianPBS = 0;
@@ -22,13 +26,13 @@ end
 
 res.LSSP    =  ceil(raw.LSSP*10)/10;            % round up   to nearest 0.1
 res.TS      =  ceil(raw.TS*100)/100;            % round up   to nearest 0.01
-res.FS      =  ceil(raw.FS*10)/10;              % round up   to nearest 0.1
+res.FS      =  ceil(raw.FS*20)/20;              % round up   to nearest 0.05
 res.MoD     =  ceil(raw.MoD*100)/100;           % round up   to nearest 0.01
 res.DoM     =  ceil(raw.DoM*100)/100;           % round up   to nearest 0.01
 res.STFD    =  ceil(raw.STFD);                  % round up   to nearest 1%
 res.LSSPu   =  ceil(raw.LSSPu*10)/10;           % round up   to nearest 0.1
 res.TSu     =  ceil(raw.TSu*100)/100;           % round up   to nearest 0.01
-res.FSu     =  ceil(raw.FSu*10)/10;             % round up   to nearest 0.1
+res.FSu     =  ceil(raw.FSu*20)/20;             % round up   to nearest 0.05
 res.MoDu    =  ceil(raw.MoDu*100)/100;          % round up   to nearest 0.01
 res.DoMu    =  ceil(raw.DoMu*100)/100;          % round up   to nearest 0.01
 res.STFDu   =  ceil(raw.STFDu);                 % round up   to nearest 1%

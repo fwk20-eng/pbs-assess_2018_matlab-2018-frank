@@ -14,22 +14,33 @@
 %
 %% Change Log
 %
-% [0.1.0] - 2017-06-04
+% [0.1.0] - 2020-07-03
 %
-% *Added*
+% * Added function to remove sensitive IP from the suspension table
 %
 % * First code, taken from createTableLatexSuspensionDetails
 
-function [PBSreportTable, logTable] = createTableLatexSuspensionProperties(Axle)
+function [PBSreportTable, logTable] = createTableLatexSuspensionProperties(Axle,isRedacted)
 %% Table: Data
 Table.Units = Axle.UnitCellArray;
 Table.AxleDescription = Axle.DescriptionCell;
 Table.AxleSuspensionModel = Axle.complianceReportName;
-Table.AxleRollCentre = Axle.rollCentreHeight;
-Table.AxleTrack = Axle.trackWidth;
-Table.AxleAuxRoll = Axle.auxRollMoment;
-Table.AxleSteerRoll = Axle.steerRollRatio;
-
+if isRedacted
+    for i = 1:length(Axle.rollCentreHeight)
+        for j = 1:length(Axle.rollCentreHeight{i})
+            dummy{i}{j}=' ';
+        end
+    end
+    Table.AxleRollCentre = dummy;
+    Table.AxleTrack = Axle.trackWidth;
+    Table.AxleAuxRoll = dummy;
+    Table.AxleSteerRoll = dummy;
+else
+    Table.AxleRollCentre = Axle.rollCentreHeight;
+    Table.AxleTrack = Axle.trackWidth;
+    Table.AxleAuxRoll = Axle.auxRollMoment;
+    Table.AxleSteerRoll = Axle.steerRollRatio;
+end
 %% Convert Table to a format that will create the latexTable correctly.
 %
 % *Some notes on the conversion*
@@ -77,7 +88,14 @@ MdTable.data = [markdownHeadings; Table.data];
 
 % Compiling the structure fields required by latexTable
 Table.data = [Table.Headings; Table.data];
-Table.footNotes = {'\item[1] Roll centre height relative to the axle centre height (+ above, - below)'};
+
+
+if isRedacted
+    Table.footNotes = {'\item[1] Roll centre height relative to the axle centre height (+ above, - below)';...
+                       '\item[2] Sensitive suspension IP removed but can be obtained directly from manufacturers';};    
+else
+    Table.footNotes = {'\item[1] Roll centre height relative to the axle centre height (+ above, - below)'};
+end
 Table.userAlignment = 'c|c|c|C|C|C|C|';
 Table.tableCaption = 'Suspension Properties';
 Table.tableLabel = 'SuspensionProperties';
