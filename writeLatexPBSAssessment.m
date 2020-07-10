@@ -15,9 +15,9 @@
 % [0.3.0]
 %
 % * No longer copy across the PBS template folder since the report can now be made manually and the
-% figures and tables be added seperately as the run is done. This is to help with writting of the
+% figures and tables be added seperately as the run is done. This is to help with writing of the
 % report before the final details are known.
-% 
+%
 % [0.2.0]
 %
 % *Added*
@@ -39,11 +39,12 @@ function writeLatexPBSAssessment(Project, Combination, ParDetails, Sprung, Axle,
 [Table.unsprungMassDetails, LogTable.unsprungMassDetails] = ...
     createTableLatexUnsprungMassDetails(Axle);
 
+isRedacted = 0;
 [Table.suspensionDetails, LogTable.suspensionDetails] = ...
     createTableLatexSuspensionDetails(Axle);
 
 [Table.suspensionProperties, LogTable.suspensionProperties] = ...
-    createTableLatexSuspensionProperties(Axle);
+    createTableLatexSuspensionProperties(Axle,isRedacted);
 
 [Table.hitchDetails, LogTable.hitchDetails] = ...
     createTableLatexHitchDetails(Hitch);
@@ -86,10 +87,10 @@ fid=fopen(runLogFilePath,'w');
 fprintf(fid,'%s\n', '# Control parameters');
 
 fprintf(fid,'%s\n', ['Lane change manoeuvre maximum lateral error: ', ...
-  num2str(Project.raMaxLatError), ' mm']);
+    num2str(Project.raMaxLatError), ' mm']);
 
 fprintf(fid,'%s\n', ['Yaw damping manoeuvre maximum lateral acceleration: ', ...
-  num2str(Project.yawDMaxLatAccel), ' g\n']);
+    num2str(Project.yawDMaxLatAccel), ' g\n']);
 
 fclose(fid);
 fprintf(['\n... your log file named ', runLogFileName, ' has been modified\n']);
@@ -101,21 +102,21 @@ if Is.latexReport
     
     % Unladen reference points will not be available unless a standard assessment is being run
     [Table.unladenReferencePoints, LogTable.unladenReferencePoints] = ...
-    createTableLatexReferencePoints(Dimensions.RefPointsUnladenCell, Sprung,...
-    Combination, 'Reference Points for Unladen Combination','ReferencePointsForUnladenCombination');
+        createTableLatexReferencePoints(Dimensions.RefPointsUnladenCell, Sprung,...
+        Combination, 'Reference Points for Unladen Combination','ReferencePointsForUnladenCombination');
     
     % Passing back multiple tables, hence pass the structure through and do not create a structure within a structure as
     % then the code will not be able to write the tables
     
     %% Generate results tables
     Report.pbsResultsTable = createTableLatexResults...
-      (fullName, Lim, LimReport, computeRoundedResults(resultsPbs, Is), Report, nLevels, Is);
+        (fullName, Lim, LimReport, computeRoundedResults(resultsPbs, Is), Report, nLevels, Is);
     baselineResults = getBaselineResults(Report.baselinePbsCombination);
     Report.pbsBaselineResultsTable = createBaselineResults(baselineResults, Lim, nLevels, Is);
     
     if Is.carCarrier
         Report.pbsResultsTableTopdeck = createBaselineResults...
-          (computeRoundedResults(Topdeck.resultsPbs, Is), Lim, nLevels, Is);
+            (computeRoundedResults(Topdeck.resultsPbs, Is), Lim, nLevels, Is);
     end
     
     %% Set-up the paths for copying to the assessment folder
@@ -138,21 +139,27 @@ if Is.latexReport
     % Copying the additional summary image from the topdeck laden assessment for car-carriers
     if Is.carCarrier
         pbsAssessFiguresTopdeckCopyFromFullPath = strcat(Topdeck.Project.savePath,'\',...
-          Topdeck.Project.runKey, '_figures');
+            Topdeck.Project.runKey, '_figures');
         copyfile(strcat(pbsAssessFiguresTopdeckCopyFromFullPath,'\summary.pdf'),...
-          strcat(pbsAssessFiguresCopyToFullPath, '\summaryTopdeck.pdf'));
+            strcat(pbsAssessFiguresCopyToFullPath, '\summaryTopdeck.pdf'));
     end
     
+    %% Generate TableRedacted
+    TableRedacted = Table;
+    isRedacted = 1;
+    [TableRedacted.suspensionProperties, LogTable.suspensionProperties] = ...
+        createTableLatexSuspensionProperties(Axle,isRedacted);
     %% Create the necessary latex and log files
     % Generate the latex tables and save in the PBS assessment tex folder
     createLatexTables(Table, '5-1-CombinationTables.tex', pbsAssessCopyToFullPath);
-   
+    createLatexTables(TableRedacted, '5-1-CombinationTablesRedacted.tex', pbsAssessCopyToFullPath);
+    
     %% Modify the PBS assessment parameters and save to a new file
     % Create the PBS assessment paths
     Report.pbsAssessmentCommands = strcat(pbsAssessCopyToFullPath, ...
-      '\sty\PBS_assessment_commands.sty');
+        '\sty\PBS_assessment_commands.sty');
     Report.pbsAssessmentResultsTexFilePath = strcat(pbsAssessCopyToFullPath,...
-      '\tex\2-1-CombinationResults.tex');
+        '\tex\2-1-CombinationResults.tex');
     
     %% Add additional report modifiers according to extracted PBS data
     additionalModifiers = {...
