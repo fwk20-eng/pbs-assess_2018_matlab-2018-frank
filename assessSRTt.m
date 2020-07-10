@@ -33,8 +33,8 @@ if nargin == 0  % i.e. program run directly from here
   
   % ** Mat file location **
   %-------------------------------------------------
-  Project.truckSimRunsDirectory = 'D:\Dropbox\Wits_TruckSim_PBS_2018\Results';
-  MatKey = {'SRT', 'c8237ad4'};
+  Project.truckSimRunsDirectory = 'E:\Wits_TruckSim_PBS_2018\Results';
+  MatKey = {'SRT', '934d5f5e'};
   
   % ** Booleans that may change **
   %-------------------------------------------------

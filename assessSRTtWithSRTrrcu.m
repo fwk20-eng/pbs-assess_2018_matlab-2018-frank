@@ -1,5 +1,10 @@
 function [Time, AYrcu, SRTt, indiC, ind, SRTreason,  SRTtrrcu] = ...
     assessSRTtWithSRTrrcu(Data, error, SRTrollThresh, nVehUnits, Axle, Hitch, Combination, mSprung, HcgSprung)
+%% Change Log
+% [0.1.0] - 2020-07-09
+%
+% Code had AY = sind(Roll_Tab) and later divided by cosd. Simplified to AY = tand(Roll_Tab)
+% Also replaced Ay_tsim with AY as on tilt table all masses see same AY
 %% Sort the data into variables if successfully extracted
 if error == 1
     ind=min(find(Data{1}>=0)); %Starting index for where data is non-zero
@@ -8,7 +13,7 @@ if error == 1
     Ay_tsim = Data(3,:);
     Fz_L    = Data(4,:);
     Roll_Tab= Data{5}(ind:end);
-    AY=sind(Roll_Tab);
+    AY=tand(Roll_Tab);
 else
     return                  % data not loaded correctly
 end
@@ -16,7 +21,7 @@ end
 %% Remove data for time < 0
 for i = 1:nVehUnits
     Roll{i} = Roll{i}(ind:end); % Discard data when time < 0
-    Ay_tsim{i} = Ay_tsim{i}(ind:end); % Discard data when time < 0
+    Ay_tsim{i} = tand(Roll_Tab); % Discard data when time < 0
 end
 for i = 1:Axle.NumberOff
     Fz_L{i} = Fz_L{i}(ind:end); % Discard data when time < 0
@@ -83,22 +88,7 @@ while i1st <= nVehUnits
     end
     
     %
-    AYrcu{iC} = zeros(ind(iC),1); % create AY data for this RCU
-    denom = 0;
-    
-    % Loop through the units in the roll-coupled unit and generate the numerator and denominator as per equation C11.2a
-    for i = i1st:iLast
-        % only include a unit if it is not in the dollys vector (see C11.3(c)(i, ii & iii) of NTC standards)
-        % evaluated here and not above in case dolly is in the middle of rrcu (i.e. C-dolly)
-        
-        if sum(i == Combination.dollys(:)) == 0
-            % Calculate the lateral acceleration of the roll coupled unit according to equation C11.2a (dolly's are ignored as per NTC rules)
-            AYrcu{iC} = AYrcu{iC} + mSprung(i).*HcgSprung(i).*(AY(1:ind(iC))+Ay_tsim{i}(1:ind(iC)));
-            denom = denom + mSprung(i)*HcgSprung(i);
-        end
-    end
-    
-    AYrcu{iC} = AYrcu{iC}/denom./cosd(Roll_Tab(1:ind(iC)));
+    AYrcu{iC} = AY(1:ind(iC)); % create AY data for this RCU
     SRTrcu(iC) = max(AYrcu{iC});
     
     % If the static rollover threshold of the roll coupled unit at the end of the simulation is not equal to the maximum SRT, then the lateral acceleration has decreased with an increasing tilt-table angle and thus condition 3 for rollover has been met. Change the SRT reason to suit.
