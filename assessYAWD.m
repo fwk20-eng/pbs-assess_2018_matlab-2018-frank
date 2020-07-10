@@ -13,7 +13,7 @@ if nargin == 0
     % ** Mat file location **
     %-------------------------------------------------
     Project.truckSimRunsDirectory = 'E:\Wits_TruckSim_PBS_2018\Results';
-    MatKey = {'YawD', 'd57b53b4'};
+    MatKey = {'YawD', '24d9a152'};
     
     % ** Booleans that may change **
     %-------------------------------------------------
