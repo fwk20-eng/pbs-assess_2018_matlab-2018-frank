@@ -59,8 +59,10 @@ while iCurr <= Sprung.numberOffUnits
         j=1;
         while (j<=(length(X1{iCurr})) && (Y1{iCurr}(j)<Y2{iCurr}(end-1)) && (Y1{iCurr}(j)<Y3{iCurr}(end-1)))
             i2=find(Y1{iCurr}(j)>=Y2{iCurr},1,'last'); % The index when Y2 reaches the same Y as Y1
+            if isempty(i2), i2=1; end
             X2new=interp1(Y2{iCurr}(i2:i2+1),X2{iCurr}(i2:i2+1),Y1{iCurr}(j));
             i3=find(Y1{iCurr}(j)>=Y3{iCurr},1,'last'); % The index when Y3 reaches the same Y as Y1
+            if isempty(i3), i3=1; end
             X3new=interp1(Y3{iCurr}(i3:i3+1),X3{iCurr}(i3:i3+1),Y1{iCurr}(j));          
             [X345{iCurr}(j) pt{iCurr}(j)]=max([X1{iCurr}(j) X2new X3new]); %Choose the largest 'swing out' or X for the given Y
             Y345{iCurr}(j)=Y1{iCurr}(j);
@@ -87,6 +89,7 @@ while iCurr <= Sprung.numberOffUnits
                 i=1;
             else
                 i=find(Y345{iCurr}(j)>=Y345{iPrev},1,'last'); % The index when Y{iPrev} reaches the same Y as Y{iCurr}(j)
+                if isempty(i), i=1; end
             end
             X345new=interp1(Y345{iPrev}(i:i+1),X345{iPrev}(i:i+1),Y345{iCurr}(j));  % X345new is the iPrev X at the same Y345 iCurr
             diff{iPrev}(j)=[X345{iCurr}(j) - X345new];                      

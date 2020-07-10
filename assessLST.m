@@ -111,9 +111,9 @@ end
 %-------------------------------------------------
 
 if laden==1
-  ladentext='_laden';
+  ladentext='-laden';
 else
-  ladentext='_unladen';
+  ladentext='-unladen';
 end
 
 %-------------------------------------------------
