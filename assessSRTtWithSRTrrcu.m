@@ -79,7 +79,7 @@ for iUnit=1:nVehUnits
                 dummy=indexVec(iRCUnit);
             end
             SRTreason(iRCUnit)=2;
-            SRTrcu(iRCUnit)=AY(dummy)
+            SRTrcu(iRCUnit)=AY(dummy);
             AYrcu{iRCUnit}=AY;
         end
         ind(iRCUnit) = dummy;
