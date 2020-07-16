@@ -13,7 +13,7 @@
 %
 % * Does the programme work for truck trailer combination with dolleys? Yes it looks like it does work
 % * Correct STFD
-% * Correct SRT for lift of all Fz except steer.
+% * Correct SRT for lift of all Fz except steer. MUST INCLUDE ROLL CRITERIA
 % * Check SRTrrcu
 
 %% [0.9.0] - 2018-03-05

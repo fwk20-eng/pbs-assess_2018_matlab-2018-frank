@@ -1,7 +1,11 @@
 function [Time, AYrcu, SRTt, indiC, ind, SRTreason,  SRTtrrcu] = ...
     assessSRTtWithSRTrrcu(Data, error, SRTrollThresh, nVehUnits, Axle, Hitch, Combination, mSprung, HcgSprung)
 %% Change Log
-% [0.1.0] - 2020-07-09
+% [0.1.1] - 2020-07-14
+%
+% Code had AY = sind(Roll_Tab) and later divided by cosd. Simplified to AY = tand(Roll_Tab)
+% Also replaced Ay_tsim with AY as on tilt table all masses see same AY
+%% [0.1.0] - 2020-07-09
 %
 % Code had AY = sind(Roll_Tab) and later divided by cosd. Simplified to AY = tand(Roll_Tab)
 % Also replaced Ay_tsim with AY as on tilt table all masses see same AY
@@ -21,7 +25,7 @@ end
 %% Remove data for time < 0
 for i = 1:nVehUnits
     Roll{i} = Roll{i}(ind:end); % Discard data when time < 0
-    Ay_tsim{i} = tand(Roll_Tab); % Discard data when time < 0
+    Ay_tsim{i} = tand(Roll_Tab(ind:end)); % Discard data when time < 0
 end
 for i = 1:Axle.NumberOff
     Fz_L{i} = Fz_L{i}(ind:end); % Discard data when time < 0
@@ -41,7 +45,7 @@ end
 %% check if all wheels are in the air
 % Rollover is also achieved if all the tyres along one side (with the exception of the steer axle) have lifted (Fz = 0)
 j=0;
-for i = (Axle.NumberOffSteer+1):1:Axle.NumberOff
+for i = 1:1:Axle.NumberOff
     j=j+1;
     if isempty(find((Fz_L{i} <= 0),1))
         indFz(j)=length(Fz_L{i});
@@ -50,60 +54,43 @@ for i = (Axle.NumberOffSteer+1):1:Axle.NumberOff
     end
 end
 
-% The highest index of Fz=0 will indicate the time of liftoff
-indFzall=max(indFz);
-
 %% Initialise the variables
-i1st = 1;
-iLast = i1st;
-iC = 1; % Variable for rcu
+iRCUnit = 1;
+iLastAxleGroup=1;
+iAxleGroup=1;
 SRTrcu = [];
-
 %% Reasons for liftoff
 % 1 --> Angle of the unit relative to the tilt-table is > 30 degrees
 % 2 --> All tyres (except on the steer axle) have lifted off
-% 3 --> Lateral acceleration is decreasing with an increasing tilt-table angle
+% 3 --> Lateral acceleration is decreases - not feasible if using Ay_tilt
 
 %% Loop through all of the roll-coupled units
-while i1st <= nVehUnits
-    
-    % find first and last units of this coupled set
-    while (iLast < nVehUnits) && Hitch.RollCoupledArray(iLast)
-        iLast = iLast + 1;
+for iUnit=1:nVehUnits
+    iAxleGroup=iAxleGroup+1;
+    if (iUnit==nVehUnits)||(Hitch.RollCoupledArray(iUnit)==0)
+        for jAxleGroup=iLastAxleGroup+1:iAxleGroup %Loop through axle groups in RCUnits and get SRT
+            % Should add roll check here and set reason roll with dummy if
+            % below gives lower then change reason to lift wheels
+            if (exist('dummy','var')==1)
+                indexVec(iRCUnit)=max([indFz(Axle.Grouping{jAxleGroup}) dummy]) ;
+                dummy=indexVec(iRCUnit);
+            else
+                indexVec(iRCUnit)=max(indFz(Axle.Grouping{jAxleGroup})) ;
+                dummy=indexVec(iRCUnit);
+            end
+            SRTreason(iRCUnit)=2;
+            SRTrcu(iRCUnit)=AY(dummy)
+            AYrcu{iRCUnit}=AY;
+        end
+        ind(iRCUnit) = dummy;
+        clear dummy
+        iRCUnit=iRCUnit+1;
+        iLastAxleGroup=iAxleGroup;
     end
-    
-    % Store a cell where each row is a roll coupled unit and i1st, iLast
-    rrcuUnits{iC} = {i1st, iLast};
-    
-    % Find the lowest index where a rollover condition has been achieved
-    ind(iC)=[min([indFzall indRoll(i1st:iLast)])];
-    
-    % Assume rollover is due to the angle of the unit relative to the tilt-table as the initialisation condition
-    SRTreason(iC)=1;
-    
-    % Check if the axles lift off first
-    if ind(iC)==indFzall
-        % If all of the axles lift off first then indicate that rollover is due to all of the axles lifting off
-        SRTreason(iC)=2;
-    end
-    
     %
-    AYrcu{iC} = AY(1:ind(iC)); % create AY data for this RCU
-    SRTrcu(iC) = max(AYrcu{iC});
-    
-    % If the static rollover threshold of the roll coupled unit at the end of the simulation is not equal to the maximum SRT, then the lateral acceleration has decreased with an increasing tilt-table angle and thus condition 3 for rollover has been met. Change the SRT reason to suit.
-    if SRTrcu(iC)~= AYrcu{iC}(end)
-        SRTreason(iC)=3;
-    end
-    
-    iC = iC + 1;
-    i1st  = iLast  + 1;
-    iLast = i1st;
-    
 end
 
-[SRTt indiC]= min(SRTrcu); %indiC is the roll coupled unit that rolls over
+[SRTt indiC]= min(SRTrcu); %indiC is the roll coupled unit that rolls over;
 % Store the rearmost roll-coupled unit SRT result
 SRTtrrcu = SRTrcu(end);
-
 end
