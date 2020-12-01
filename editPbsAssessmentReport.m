@@ -12,6 +12,9 @@
 %
 %% Change Log
 %
+% [0.2.0] - 2020-09-08 Separated that Australian PBS doesn't have the
+% subscripts
+%
 % [0.1.0] - 2017-01-01
 %
 % *Added*
@@ -64,9 +67,11 @@ end
 
 ResultsTable.booktabs = 1;
 ResultsTable.tableBorders = 0;
-ResultsTable.footNotes = {'\item[1] TASP performance relaxation approved by the SMART Truck Review Panel for vehicles assessed and operating in South Africa';
-                          '\item[2] MoD/DoM performance relaxation approved by the SMART Truck Review Panel for vehicles assessed and operating in South Africa';
-                          '\item[3] General FS performance relaxed from 0.7 m to 0.85 m in line with Aus. 2020 update and approved by SMART Truck Review Panel'};
+if ~Is.australianPBS
+    ResultsTable.footNotes = {'\item[1] TASP performance relaxation approved by the SMART Truck Review Panel for vehicles assessed and operating in South Africa';
+        '\item[2] MoD/DoM performance relaxation approved by the SMART Truck Review Panel for vehicles assessed and operating in South Africa';
+        '\item[3] General FS performance relaxed from 0.7 m to 0.85 m in line with Aus. 2020 update and approved by SMART Truck Review Panel'};
+end
 ResultsTable.tableCaption = 'PBS Assessment Results';
 ResultsTable.tableLabel = 'Results';
 resultsTableLatexCode = latexTable(ResultsTable);

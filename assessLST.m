@@ -131,7 +131,7 @@ LSSP = assessSPW(Project, Is, X_Lin, Y_Lin, X_RP3{1}, Y_RP3{1}, X_RP4{1}, Y_RP4{
   Y_RP7, X_RP8, Y_RP8, X_RP9, Y_RP9, ladentext);
 
 STFD = assessSTFD(Time, Axle.NumberOffSteer, MU_PEAK_STEER, Fx_L, Fy_L, Fz_L, Fx_R, Fy_R, Fz_R,...
-  ladentext, Project.savePath, Project.runKey, Is.plotOn, Is.save);
+  ladentext, Project.savePath, Project.runKey, Is, Is.save);
 
 %-------------------------------------------------
 %% Print results if standalone operation

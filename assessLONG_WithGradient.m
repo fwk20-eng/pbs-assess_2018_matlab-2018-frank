@@ -1,4 +1,4 @@
-function [START, GRADA, GRADB, ACC] = assessLONG_WithGradient(mTotal,A,radial,ch,cd,ce,gears,eff_gear,gearsStart,eff_gearStart,eff_diff,dif,eff_diffStart,difStart,Torquerpm,TorqueNm,engageTrpm,engageTNm,changeT,rr,Ie,It,Ndrive,gearshiftregime,savePath, runKey, plotOn, isSave,mAxle,xAxle,zAxle,l,h,mSprung,XcgSprung,HcgSprung,grouping,loadshare1,loadshare2,loadCoupled);
+function [START, GRADA, GRADB, ACC] = assessLONG_WithGradient(mTotal,A,radial,ch,cd,ce,gears,eff_gear,gearsStart,eff_gearStart,eff_diff,dif,eff_diffStart,difStart,Torquerpm,TorqueNm,engageTrpm,engageTNm,changeT,rr,Ie,It,Ndrive,gearshiftregime,savePath, runKey, plotOn, isSave,mAxle,xAxle,zAxle,l,h,mSprung,XcgSprung,HcgSprung,grouping,loadshare1,loadshare2,loadCoupled,Is);
 % START: grade; sat = 0 if tyres not saturated and 1 if yes & 2 if over 30%
 % GRADA: grade; sat = 0 if tyres not saturated and 1 if yes & 2 if over 30%
 % GRADB: speed; sat = 0 if tyres not saturated and 1 if yes & 2 if over 120
@@ -61,8 +61,12 @@ end
 
 START=[grad(i-1)];
 
-if plotOn
-    figure('name', 'START','visible', 'off');
+if Is.plotOn
+    if (isfield(Is,'plotBackground') & Is.plotBackground)
+        figure('name', 'START','visible', 'off');
+    else
+        figure('name', 'START');
+    end
 
     hold on
     plot(grad(1:i),acc(1:i))
@@ -140,8 +144,13 @@ while contin
     end
 end
 GRADA=[grad(i-1)];
-if plotOn
-    figure('name', 'GRAa','visible', 'off');
+
+if Is.plotOn
+    if (isfield(Is,'plotBackground') & Is.plotBackground)
+        figure('name', 'GRAa','visible', 'off');
+    else
+        figure('name', 'GRAa');
+    end    
 
     hold on
     plot(grad(1:i),acc(1:i))
@@ -219,15 +228,16 @@ while contin
 end
 
 GRADB=vel(i-1);
-if plotOn
-    figure('name', 'GRAb','visible', 'off');
+
+if Is.plotOn
+    if (isfield(Is,'plotBackground') & Is.plotBackground)
+        figure('name', 'GRAb','visible', 'off');
+    else
+        figure('name', 'GRAb');
+    end
 
     hold on
-    plot(vel(1:i),acc(1:i)*10.0,vel(1:i),gearvec(1:i))
-    xlabel('Velocity [km/h]')
-    ylabel('Acceleration x 10 [m/s^2] ; gear')
-    legTitles = {'acceleration'; 'gear';};
-    legend(legTitles, 'Location', 'Best');  
+    plot(vel(1:i),acc(1:i)*10.0,vel(1:i),gearvec(1:i));
     if saturate==0
         text(0.8*floor(GRADB),0.6*max(acc*10.0),['GRADB = ' num2str(floor(GRADB)) ' km/h']);   
         text(0.6*floor(GRADB),0.8*max(acc*10.0),'Limited by torque');
@@ -240,6 +250,10 @@ if plotOn
         text(0.8*floor(GRADB)-8,0.6*max(acc*10.0),['GRADB >' num2str(floor(max(vel))) ' km/h'])    
         GRADB=floor(max(vel));
     end    
+    xlabel('Velocity [km/h]')
+    ylabel('Acceleration x 10 [m/s^2] ; gear')
+    legTitles = {'acceleration'; 'gear'; 'GRADB'};
+    legend(legTitles, 'Location', 'Best');      
     set(gcf,'PaperPosition',[0 0 16 11])            
     set(gca,'Xgrid','on');
     set(gca,'Ygrid','on');
@@ -360,10 +374,16 @@ gearvec=gearvec(1:end-1);
 s=cumtrapz(tspan,v);
 i=find(s>100,1,'first');
 endGear=gearvec(i);
-ACC=[tspan(i)];
-if plotOn
-    figure('name', 'ACC','visible', 'off');
 
+ACC=[tspan(i)];
+
+if Is.plotOn
+    if (isfield(Is,'plotBackground') & Is.plotBackground)
+        figure('name', 'ACC','visible', 'off');
+    else
+        figure('name', 'ACC');
+    end
+    
     hold on
     plot(tspan(1:i),v(1:i),tspan(1:i),gearvec(1:i))
     xlabel('Time [s]')

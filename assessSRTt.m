@@ -1,66 +1,6 @@
 function [SRTt, SRTtrrcu] = assessSRTt(Combination, Axle, Hitch,  Project, MatKey,...
   Is, Dummy, LIM_SRT, SRT_ROLL_THRESH, mSprung, HcgSprung)
-%-------------------------------------------------
-%% *** Standalone operation ***
-%-------------------------------------------------
-if nargin == 0  % i.e. program run directly from here
-  
-  % ** Combination parameters **
-  %-------------------------------------------------
-  
-  Is.srtRrcu = 0;
-  
-  Dummy.isDummyAxle = 0;
-  Combination.dollys = [];
-  
-  Hitch.RollCoupledArray = [1 1];
-  
-  Axle.NumberOff = 3;
-  Axle.NumberOffSteer = 1;
-  
-  Sprung.MassArray = [22166];
-  Sprung.MassCoGxPosition = [3.239];
-  Sprung.MassCoGzPosition = [2.177];
-  
-  PayloadLaden.MassCell = {0};
-  PayloadLaden.CoGxPositionCell = {0};
-  PayloadLaden.CoGzPositionCell = {0};
-  
-  % ** Constants for manoeuvre **
-  %-------------------------------------------------
-  SRT_ROLL_THRESH = 30;
-  LIM_SRT = 0.35;
-  
-  % ** Mat file location **
-  %-------------------------------------------------
-  Project.truckSimRunsDirectory = 'E:\Wits_TruckSim_PBS_2018\Results';
-  MatKey = {'SRT', '934d5f5e'};
-  
-  % ** Booleans that may change **
-  %-------------------------------------------------
-  Is.plotOn = 1;
-  Is.skipManoeuvreChecks = 0;
-  
-  % ** Booleans that should remain constant **
-  %-------------------------------------------------
-  Is.save = 0;
-  
-  % ** Inconsequential parameters **
-  %-------------------------------------------------
-  % The values of these parameters do not matter if you are not saving the plot
-  Project.runKey = 'RA_TEST';
-  Project.savePath = 'D:\Personal\Work\WITS PBS\Test Runs\RA';
-  
-  % Determine sprung mass properties of each vehicle unit
-  %-------------------------------------------------
-  [mSprung, ~, HcgSprung] = computeSprungCoG(Sprung.MassArray, Sprung.MassCoGxPosition,...
-    Sprung.MassCoGzPosition, PayloadLaden.MassCell, PayloadLaden.CoGxPositionCell,...
-    PayloadLaden.CoGzPositionCell);
-  
-end
-
 nVehUnits = length(mSprung);
-
 %-------------------------------------------------
 %% *** Extract the data from the mat file ***
 %-------------------------------------------------  
@@ -125,7 +65,7 @@ if Is.plotOn
   % if rrcu is run, then rrcu must be plotted with the data that was extracted in the rrcu script
   %-------------------------------------------------
   
-  if Is.srtRrcu
+  if Is.srtRrcu & MatKey{1,2}~=MatKey{2,2}
     %-------------------------------------------------
     %% *** Plot for if a second rrcu SRT manoeuvre was run ***
     %-------------------------------------------------
@@ -150,6 +90,7 @@ if Is.plotOn
     iRrcu = length(AYrcu); % rearmost roll-coupled unit
     plot(Time_rrcu(1:ind_rrcu(iRrcu)), AYrcu_rrcu{i}(1:ind_rrcu(iRrcu)), 'Color', getColour(iRrcu));
     legTitles = [legTitles; ['roll-coupled unit ' int2str(iRrcu)]];
+
     
     PBSlimX = [0 Time_rrcu(end)];
     PBSlimY = [SRTtrrcu SRTtrrcu];

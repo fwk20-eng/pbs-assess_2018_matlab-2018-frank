@@ -81,7 +81,13 @@ for iCol = 2 : nFields
     
 end
 
-Table.Headings = {'\textbf{Unit}' '\textbf{Axle}' '\textbf{Suspension}' '\textbf{RC height (mm)}\tnote{1}' '\textbf{Track width (mm)}' '\textbf{Auxiliary roll stiffness (Nm/\degree{})}' '\textbf{Steer/roll ratio (\degree{}/\degree{})}'};
+if isRedacted
+    Table.Headings = {'\textbf{Unit}' '\textbf{Axle}' '\textbf{Suspension}' '\textbf{RC height (mm)}\tnote{1,2}' '\textbf{Track width (mm)}' '\textbf{Auxiliary roll stiffness (Nm/\degree{})}\tnote{2}' '\textbf{Steer/roll ratio (\degree{}/\degree{})}\tnote{2}'}; 
+else
+    Table.Headings = {'\textbf{Unit}' '\textbf{Axle}' '\textbf{Suspension}' '\textbf{RC height (mm)}\tnote{1}' '\textbf{Track width (mm)}' '\textbf{Auxiliary roll stiffness (Nm/\degree{})}' '\textbf{Steer/roll ratio (\degree{}/\degree{})}'};
+end
+
+
 
 markdownHeadings = {'Unit' 'Axle' 'Suspension' 'RC height (mm)' 'Track width (mm)' 'Auxiliary roll stiffness (Nm/deg)' 'Steer/roll ratio (deg/deg)'};
 MdTable.data = [markdownHeadings; Table.data];
@@ -96,6 +102,7 @@ if isRedacted
 else
     Table.footNotes = {'\item[1] Roll centre height relative to the axle centre height (+ above, - below)'};
 end
+
 Table.userAlignment = 'c|c|c|C|C|C|C|';
 Table.tableCaption = 'Suspension Properties';
 Table.tableLabel = 'SuspensionProperties';

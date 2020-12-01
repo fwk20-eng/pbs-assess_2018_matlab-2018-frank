@@ -86,11 +86,15 @@ fid=fopen(runLogFilePath,'w');
 % Write the details on manoeuvre criterion
 fprintf(fid,'%s\n', '# Control parameters');
 
+if Is.ra
 fprintf(fid,'%s\n', ['Lane change manoeuvre maximum lateral error: ', ...
     num2str(Project.raMaxLatError), ' mm']);
+end
 
+if Is.yawD
 fprintf(fid,'%s\n', ['Yaw damping manoeuvre maximum lateral acceleration: ', ...
     num2str(Project.yawDMaxLatAccel), ' g\n']);
+end
 
 fclose(fid);
 fprintf(['\n... your log file named ', runLogFileName, ' has been modified\n']);

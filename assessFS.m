@@ -4,10 +4,10 @@
 
 %% Change Log
 %
+% [0.1.1] - 2020-11-03
+% Corrected X-axis of MoD
 % [0.1.0] - 2018-08-08
-%
 % *Added*
-%
 % * Change log added
 
 function [FS, MoDmax, DoMmax] = assessFS(Sprung, Combination, Is, Project, X_StOut, Y_StOut,...
@@ -90,10 +90,14 @@ while iCurr <= Sprung.numberOffUnits
             else
                 i=find(Y345{iCurr}(j)>=Y345{iPrev},1,'last'); % The index when Y{iPrev} reaches the same Y as Y{iCurr}(j)
                 if isempty(i), i=1; end
+            end   
+            if Y345{iCurr}(j)>17,
+                X345new=interp1(Y345{iPrev}(i:i+1),X345{iPrev}(i:i+1),Y345{iCurr}(j));  % X345new is the iPrev X at the same Y345 iCurr
+                diff{iPrev}(j)=[X345{iCurr}(j) - X345new];                      
+                %diffpts{iPrev}(j,1:2)=[pt{iPrev}(i) pt{iCurr}(j)]; %Vehicle unit in front then the one following
+            else
+                diff{iPrev}(j)=[-0.001]; %effectively make the difference zero if initially less than 17 m as the interpolation is inaccurate
             end
-            X345new=interp1(Y345{iPrev}(i:i+1),X345{iPrev}(i:i+1),Y345{iCurr}(j));  % X345new is the iPrev X at the same Y345 iCurr
-            diff{iPrev}(j)=[X345{iCurr}(j) - X345new];                      
-            %diffpts{iPrev}(j,1:2)=[pt{iPrev}(i) pt{iCurr}(j)]; %Vehicle unit in front then the one following
             j=j+1;
         end
         
@@ -145,9 +149,8 @@ if Is.plotOn
     
     plot(XexitTan, YexitTan, '--r')
     
-    axis([floor(XexitTan(1)*2-1)/2 ceil(max(max(cell2mat(X345)))*2)/2 -5 25])
+    axis([floor(XexitTan(1)*2-1)/2 ceil(max(max(cell2mat(X_RP3)))*2)/2+1 -5 25])
     axis 'auto y'
-    set(gca,'XTick',[floor(XexitTan(1)*2-1)/2:0.1:ceil(max(max(cell2mat(X345)))*2)/2]);
     text(floor(XexitTan(1)*2-1)/2 + (XexitTan(1)- floor(XexitTan(1)*2-1)/2)/6, max(Y_StOut)*2/3, ['MoD = ' num2str(ceil(MoDmax*100)/100) ' m'])
     legend(legTitles, 'Location', 'Best');
     
@@ -246,4 +249,3 @@ if Is.plotOn
     
     hold off
 end
-

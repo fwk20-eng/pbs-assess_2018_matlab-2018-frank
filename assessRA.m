@@ -4,6 +4,10 @@
 
 %% Change Log
 
+%% [3.1.0] - 2020-09-30 FK
+%
+% * Corrected that maxLatError looks at negative values too.
+
 %% [3.1.0] - 2018-08-09
 %
 % *Added*
@@ -14,7 +18,7 @@
 %
 % *Added*
 %
-% * Only consider values after zero time to prevent picking up exageerated initialisations values
+% * Only consider values after zero time to prevent picking up exagerated initialisations values
 % * Put the error back if LatError is less than 25mm.
 
 %% [2.0.0] - 2016-11-04
@@ -114,7 +118,7 @@ end
 
 % find the peak lateral error
 %----------------------------------------------
-maxLatError = max(LatError);
+maxLatError = max(abs(LatError));
 
 if ~Is.skipManoeuvreChecks
   

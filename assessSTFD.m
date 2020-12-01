@@ -1,4 +1,4 @@
-function STFD = assessSTFD(Time, nSteer, muPeak, Fx_L, Fy_L, Fz_L, Fx_R, Fy_R, Fz_R, ladentext, savePath, runKey, plotOn, isSave)
+function STFD = assessSTFD(Time, nSteer, muPeak, Fx_L, Fy_L, Fz_L, Fx_R, Fy_R, Fz_R, ladentext, savePath, runKey, Is, isSave)
 
 numer = zeros(length(Fx_L{1}), 1);
 denom = zeros(length(Fx_L{1}), 1);
@@ -11,11 +11,13 @@ end
 FricDemand = 100*(numer./denom)./muPeak;
 [STFD, iMax] = max(FricDemand);
 
-if plotOn
-    figure('name', 'STFD','visible', 'off');
-    
-    hold on
-    
+if Is.plotOn
+  if (isfield(Is,'plotBackground') & Is.plotBackground)
+      figure('name', 'STFD','visible', 'off');
+  else
+      figure('name', 'STFD');
+  end       
+    hold on    
     plot(Time, FricDemand, 'Color', getColour(1));
     plot([0 floor(max(Time)/5)*5], [80 80], '--r');
     plot(Time(iMax), STFD, 'or');

@@ -220,8 +220,8 @@ if Is.plotOn
   axis([0 1400 -2.0 1.5]);
   xlabel('X [m]')
   ylabel('Y [m]')
-  text(50,  0.5, ['Total Swept Width TSW = ' num2str(ceil(TSW*10)/10) ' m'])
-  text(50, -0.5, ['99th percentile TSW = ' num2str(ceil(SW99*10)/10) ' m'])
+  text(50,  0.5, ['Total Swept Width TSW = ' num2str(ceil(TSW*20)/20) ' m'])
+  text(50, -0.5, ['99th percentile TSW = ' num2str(ceil(SW99*20)/20) ' m'])
   
   set(gcf,'PaperPosition',[0 0 16 11])
   set(gca,'Xgrid','on');
