@@ -46,8 +46,8 @@ end
 % *Some notes on the conversion*
 %
 % * For Unit 1 (prime mover) - All axle data is used
-% * For Unit 2 and beyond (trailer or dolly units) - Only the data for the first axle is used (this is because all axles
-% should be identical in a trailer or dolly)
+% * For Unit 2 and beyond (trailer or dolly) use first axle if axles are same
+% * Else use all axle data
 % * Each field in the table structure will become a new column
 % * The table structure should be generated in the order of appearance in the table columns
 
@@ -56,6 +56,17 @@ sFieldNames = fieldnames(Table);
 
 nFields = length(sFieldNames);
 nUnits = length(Table.(sFieldNames{1}));
+% Check if suspensions on a vehicle are all the same or not
+suspensionName = Table.(sFieldNames{3});
+% Loop through the trailer units
+for iUnit = 2 : nUnits
+    % Note the indexing here with the circular brackets.
+    if strcmp(suspensionName{iUnit}(1),suspensionName{iUnit}(end))
+        differentSuspensions(iUnit)=0;
+    else
+        differentSuspensions(iUnit)=1;
+    end
+end
 
 for iField = 1 : nFields
     % Set unit index to the first unit
@@ -68,7 +79,11 @@ for iField = 1 : nFields
     % Loop through the remaining units
     for iUnit = 2 : nUnits
         % Note the indexing here with the circular brackets.
-        tableData{iField} = [tableData{iField}; fieldData{iUnit}(1)'];
+        if differentSuspensions(iUnit)
+            tableData{iField} = [tableData{iField}; fieldData{iUnit}'];
+        else
+            tableData{iField} = [tableData{iField}; fieldData{iUnit}(1)'];
+        end
     end
     
 end
@@ -86,8 +101,6 @@ if isRedacted
 else
     Table.Headings = {'\textbf{Unit}' '\textbf{Axle}' '\textbf{Suspension}' '\textbf{RC height (mm)}\tnote{1}' '\textbf{Track width (mm)}' '\textbf{Auxiliary roll stiffness (Nm/\degree{})}' '\textbf{Steer/roll ratio (\degree{}/\degree{})}'};
 end
-
-
 
 markdownHeadings = {'Unit' 'Axle' 'Suspension' 'RC height (mm)' 'Track width (mm)' 'Auxiliary roll stiffness (Nm/deg)' 'Steer/roll ratio (deg/deg)'};
 MdTable.data = [markdownHeadings; Table.data];
