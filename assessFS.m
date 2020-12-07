@@ -131,12 +131,12 @@ if Is.plotOn
     legTitles = {};
 
     plot(X_StOut, Y_StOut, 'Color', getColour(1))    
-    legTitles = [legTitles; 'steer'];
+    legTitles = [legTitles; 'front steer path'];
     
     for i = 1:Sprung.numberOffUnits                          
         if sum(i == Combination.dollys(:)) == 0       % only plotted if veh unit number not in dollys vector
             plot(X345{i}, Y345{i},'Color', getColour((i+1)));
-            legTitles = [legTitles; ['unit ' int2str(i)]];                        
+            legTitles = [legTitles; ['widest of pts 3-5 on unit ' int2str(i)]];                        
         end
     end
     
@@ -211,12 +211,12 @@ if Is.plotOn
     legTitles = {};
     
     plot(X_StOut, Y_StOut,'Color', getColour(1))    
-    legTitles = [legTitles; 'steer'];
+    legTitles = [legTitles; 'front steer path'];
     
     for i = 1:Sprung.numberOffUnits
         if sum(i == Combination.dollys(:)) == 0       % only plotted if veh unit number not in dollys vector
             plot(X345{i}, Y345{i},'Color', getColour((i-1)+2));
-            legTitles = [legTitles; ['unit ' int2str(i)]];
+            legTitles = [legTitles; ['widest of pts 3-5 on unit ' int2str(i)]];
         end
     end
     
