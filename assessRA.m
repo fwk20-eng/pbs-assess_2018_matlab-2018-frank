@@ -211,7 +211,7 @@ if Is.plotOn
 
 % Legend
 %----------------------------------------------
-  legTitles = {'steer axle'; 'last unit'; 'peak lat. acc.'};  
+  legTitles = {'front steer axle'; 'last unit'; 'peak lat. acc.'};  
   legend(legTitles, 'Location', 'northeastoutside'); legend('boxoff');
   
 % Axis labels
