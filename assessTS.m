@@ -28,7 +28,7 @@ if Is.plotOn
     XDimensions.MaxWidthLaden = [floor(X_RP6{Sprung.numberOffUnits}(1)*5)/5-5 25];
 
     plot(X_StOut, Y_StOut+(max(Combination.maxWidth)-Axle.SteerAxleOverallWidth)/2000, 'Color', getColour(1))
-    legTitles = [legTitles; 'steer'];
+    legTitles = [legTitles; 'steer width'];
 
     plot(XDimensions.MaxWidthLaden, [0 0], '--b')
     legTitles = [legTitles; 'vehicle width'];
@@ -44,7 +44,7 @@ if Is.plotOn
             plot(X_RP8{i}, Y_RP8{i}+(max(Combination.maxWidth)-Axle.SteerAxleOverallWidth)/2000, 'Color', getColour(ind));      % plot next line
             ind=ind+1;            
             plot(X_RP9{i}, Y_RP9{i}+(max(Combination.maxWidth)-Axle.SteerAxleOverallWidth)/2000, 'Color', getColour(ind));      % plot next line            
-            legTitles = [legTitles; ['unit ' int2str(i) ' p1']; ['unit ' int2str(i) ' p2']; ['unit ' int2str(i) ' p3']; ['unit ' int2str(i) ' p4'] ];
+            legTitles = [legTitles; ['unit ' int2str(i) ' pt. 6']; ['unit ' int2str(i) ' pt. 7']; ['unit ' int2str(i) ' pt. 8']; ['unit ' int2str(i) ' pt. 9'] ];
         end
     end
     

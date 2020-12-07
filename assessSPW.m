@@ -161,10 +161,11 @@ if Is.plotOn
     ylabel('Y [m]')
     if strcmp(plotTitle, 'FS')
         text(XplotMin + (XplotMax - XplotMin)*.3, YplotMin + (YplotMax - YplotMin)*.45,['max SPW = ' num2str(ceil(SPWmax*20)/20,'%5.1f') ' m'])
+        legTitles = {'inner path for FS'; 'PM Pt. 3'; 'PM Pt. 4'; 'PM Pt. 5'; 'maximum width'};
     elseif strcmp(plotTitle, 'LSSP')
         text(XplotMin + (XplotMax - XplotMin)*.3, YplotMin + (YplotMax - YplotMin)*.45,['max SPW = ' num2str(ceil(SPWmax*10)/10,'%5.1f') ' m'])
+        legTitles = {'inner path for LSSP'; 'PM Pt. 3'; 'PM Pt. 4'; 'PM Pt. 5'; 'maximum width'};
     end
-    legTitles = {'inner path'; 'outer p1'; 'outer p2'; 'outer p3'; 'maximum width'};
     legend(legTitles, 'Location', 'northeastoutside'); legend('boxoff');
     
     set(gcf,'PaperPosition',[0 0 16 11])
