@@ -121,10 +121,10 @@ while iCurr <= Sprung.numberOffUnits
     
 end
 
-MoDmax = max(MoD);
-
-if MoDmax<0
+if (ceil(MoD*100)/100)<0
     MoDmax=NaN;
+else
+    MoDmax=max(MoD);
 end
 
 if Is.plotOn
@@ -201,10 +201,10 @@ while iCurr <= Sprung.numberOffUnits
     
 end
 
-DoMmax = max(DoM);
-
-if MoDmax<0
+if (ceil(MoD*100)/100)<0
     DoMmax=NaN;
+else
+    DoMmax=max(DoM);
 end
 
 if Is.plotOn
