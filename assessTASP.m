@@ -1,39 +1,10 @@
+%% Function Description
+%
+% Computes the Tracking Ability on a Straight Path
+%% Change Log
+%% [0.1.0] - 2020-02-09
+% * First code removed standalone capability 
 function [SW99] = assessTASP(Sprung, Combination, Project, MatKey, Is)
-
-%-------------------------------------------------
-%% *** Standalone operation ***
-%-------------------------------------------------
-
-if nargin == 0  % i.e. program run directly from here
-  
-  % ** Combination parameters **
-  %-------------------------------------------------
-  Sprung.numberOffUnits = 3; % Number of units excluding dollys
-  Combination.dollys = [];
-  
-  % ** Mat file location **
-  %-------------------------------------------------
-  Project.truckSimRunsDirectory = 'D:\Dropbox\Wits_TruckSim_PBS_2018\Results';
-  MatKey = {'TASP', '9a9582dd'};
-  
-  % ** Booleans that may change **
-  %-------------------------------------------------
-  Is.plotOn = 1;
-  Is.skipManoeuvreChecks = 0;
-  
-  % ** Booleans that should remain constant **
-  %-------------------------------------------------
-  Is.save = 0;
-  
-  % ** Inconsequential parameters **
-  % The values of these parameters do not matter if you are not saving the plot
-  %-------------------------------------------------
-  
-  Project.runKey = 'RA_TEST';
-  Project.savePath = 'D:\Personal\Work\WITS PBS\Test Runs\RA';
-  
-end
-
 %-------------------------------------------------
 %% *** Read in data ***
 %-------------------------------------------------

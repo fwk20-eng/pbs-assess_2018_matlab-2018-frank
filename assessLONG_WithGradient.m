@@ -1,3 +1,11 @@
+%% Function Description
+%
+% Computes the longitudinal performance of a vehicle combination according
+% to PBS standards includes the variation of drive axle vertical
+% load with hitch height
+%% Change Log
+%% [0.1.0] - 2020-02-09
+% * First code
 function [START, GRADA, GRADB, ACC] = assessLONG_WithGradient(mTotal,A,radial,ch,cd,ce,gears,eff_gear,gearsStart,eff_gearStart,eff_diff,dif,eff_diffStart,difStart,Torquerpm,TorqueNm,engageTrpm,engageTNm,changeT,rr,Ie,It,Ndrive,gearshiftregime,savePath, runKey, plotOn, isSave,mAxle,xAxle,zAxle,l,h,mSprung,XcgSprung,HcgSprung,grouping,loadshare1,loadshare2,loadCoupled,Is);
 % START: grade; sat = 0 if tyres not saturated and 1 if yes & 2 if over 30%
 % GRADA: grade; sat = 0 if tyres not saturated and 1 if yes & 2 if over 30%
@@ -7,12 +15,6 @@ function [START, GRADA, GRADB, ACC] = assessLONG_WithGradient(mTotal,A,radial,ch
 % Planned improvements
 % Use ode45 rather than use cumtrapz
 
-if nargin == 0  % i.e. no inputs given then use inputs below
-    % Example inputs:
-    % -----------------------------------------------------------------
-    % Redo
-    % -----------------------------------------------------------------
-end
 %%
 %Startability
 G = difStart*gearsStart(1); %Assume start in first

@@ -1,15 +1,12 @@
 %% Function Description
 %
 % Calculates the frontal swing of a vehicle combination
-
 %% Change Log
-%
-% [0.1.1] - 2020-11-03
+%% [0.1.1] - 2020-11-03
 % Corrected X-axis of MoD
-% [0.1.0] - 2018-08-08
+%% [0.1.0] - 2018-08-08
 % *Added*
 % * Change log added
-
 function [FS, MoDmax, DoMmax] = assessFS(Sprung, Combination, Is, Project, X_StOut, Y_StOut,...
   X_RP3, Y_RP3, X_RP4, Y_RP4, X_RP5, Y_RP5, ladentext)
   

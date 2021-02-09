@@ -1,3 +1,11 @@
+%% Function Description
+%
+% Computes the SRT
+%% Change Log
+%% [0.2.0] - 2020-02-09
+% * Removed standalone operation capability
+%% [0.1.0] - unknown
+% * First code
 function [SRTt, SRTtrrcu] = assessSRTt(Combination, Axle, Hitch,  Project, MatKey,...
   Is, Dummy, LIM_SRT, SRT_ROLL_THRESH, mSprung, HcgSprung)
 nVehUnits = length(mSprung);

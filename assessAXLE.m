@@ -3,51 +3,13 @@
 % Extracts the axle loads from TruckSim
 
 %% Change Log
-
+%% [0.3.0] - 2021-02-09
+% * Removed standalone operation capability
 %% [0.2.0] - 2018-08-08
-%
-% * Added *
-%
-% * Standalone operation capability
-
+% * Added * Standalone operation capability
 %% [0.1.0] - 2017-06-26
-%
-% * Added *
-%
 % * First code
-
 function [Axle] = assessAXLE(Axle, MatKey, Project, Is, Dummy)
-
-%% --------------------------------------------
-% **      ** Standalone operation **
-%----------------------------------------------
-
-% To use this script in standalone operation, input the parameters in this section and run the
-% script
-
-if nargin == 0
-  
-  % Combination parameters 
-  Axle.NumberOff = 9;
-  
-  % Mat file location 
-  Project.truckSimRunsDirectory = 'D:\Dropbox\Wits_TruckSim_PBS_2018\Results';
-  MatKey = {'AXLE', 'a06c5423'};
-  
-  % Booleans that may change 
-  Is.plotOn = 1;
-  
-  % Booleans that should remain constant
-  Is.save = 0;
-  Dummy.isDummyAxle = 0;
-  
-  % Inconsequential parameters
-  % The values of these parameters do not matter if you are not saving the plot
-  Project.runKey = 'AXLE_TEST';
-  Project.savePath = 'D:\Personal\Work\WITS PBS\Test Runs\AXLE';
-  
-end
-
 %% --------------------------------------------
 %      ** Read in data **
 %----------------------------------------------

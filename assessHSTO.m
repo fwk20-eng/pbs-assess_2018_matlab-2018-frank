@@ -1,15 +1,10 @@
 %% Function Description
 %
 % Evaluates the HSTO PBS performance of a combination
-
 %% Change Log
-% [2.0.0] - 2020-12-34
+%% [2.0.0] - 2020-12-34
 % * Removed Standalone operation
-% 
-% [1.0.0] - 2018-08-08
-%
-% *Added*
-%
+%% [1.0.0] - 2018-08-08
 % * First change log
 % * Added standalone functionality
 % * Removed the combination total length requirement as it does not seem to be required unless the

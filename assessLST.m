@@ -1,47 +1,11 @@
+%% Function Description
+%
+% Computes the longitudinal Low-Speed Turn performance measures
+%% Change Log
+%% [0.1.0] - 2020-02-09
+% * First code
 function [LSSP, TS, FS, MoD, DoM, STFD] = assessLST(Sprung, Combination, Axle, Project,...
   MatKey, Is, MU_PEAK_STEER, laden)
-%-------------------------------------------------
-%% *** Standalone operation ***
-% To use this script in standalone operation, input the parameters in this section and run the
-% script
-%-------------------------------------------------
-
-if nargin == 0
-  % ** Combination parameters **
-  %-------------------------------------------------
-  Combination.dollys = [];
-  Combination.maxWidth = 2600;
-  
-  Sprung.numberOffUnits = 3;
-  
-  Axle.NumberOffSteer = 1;
-  Axle.SteerAxleOverallWidth = 2494;
-  
-  laden = 1;
-  
-  MU_PEAK_STEER = 0.8;
-  
-  % Mat file location
-  %-------------------------------------------------
-  Project.truckSimRunsDirectory = 'D:\Dropbox\Wits_TruckSim_PBS_2018\Results';
-  MatKey = {'LST', '45531827'};
-  
-  % Booleans that may change
-  %-------------------------------------------------
-  Is.plotOn = 0;
-  
-  % Booleans that should remain constant
-  %-------------------------------------------------
-  Is.save = 0;
-  Dummy.isDummyAxle = 0;
-  
-  % Inconsequential parameters
-  % The values of these parameters do not matter if you are not saving the plot
-  %-------------------------------------------------
-  Project.runKey = 'AXLE_TEST';
-  Project.savePath = 'D:\Personal\Work\WITS PBS\Test Runs\AXLE';
-end
-
 %-------------------------------------------------
 %% Read in Data
 %-------------------------------------------------

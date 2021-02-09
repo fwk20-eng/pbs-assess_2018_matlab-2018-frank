@@ -1,3 +1,9 @@
+%% Function Description
+%
+% Computes the Steer-Tyre Friction Demand
+%% Change Log
+%% [0.1.0] - 2020-02-09
+% * First code
 function STFD = assessSTFD(Time, nSteer, muPeak, Fx_L, Fy_L, Fz_L, Fx_R, Fy_R, Fz_R, ladentext, savePath, runKey, Is, isSave)
 
 numer = zeros(length(Fx_L{1}), 1);

@@ -1,3 +1,9 @@
+%% Function Description
+%
+% Computes the Yaw Damping
+%% Change Log
+%% [0.1.0] - 2020-02-09
+% * First code and removed standalone operation capability
 function [Dmin, maxAy] = assessYAWD(Sprung, Project, Is, MatKey)
 
 %-------------------------------------------------

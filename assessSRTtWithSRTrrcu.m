@@ -1,14 +1,18 @@
+%% Function Description
+%
+% Computes the SRTrccu
+%% Change Log
+%% [0.2.1] - 2020-07-14
+% Code had AY = sind(Roll_Tab) and later divided by cosd. Simplified to AY = tand(Roll_Tab)
+% Also replaced Ay_tsim with AY as on tilt table all masses see same AY
+%% [0.2.0] - 2020-07-09
+% Code had AY = sind(Roll_Tab) and later divided by cosd. Simplified to AY = tand(Roll_Tab)
+% Also replaced Ay_tsim with AY as on tilt table all masses see same AY
+%% [0.1.0] - unknown
+% * First code
 function [Time, AYrcu, SRTt, indiC, ind, SRTreason,  SRTtrrcu] = ...
     assessSRTtWithSRTrrcu(Data, error, SRTrollThresh, nVehUnits, Axle, Hitch, Combination, mSprung, HcgSprung)
 %% Change Log
-% [0.1.1] - 2020-07-14
-%
-% Code had AY = sind(Roll_Tab) and later divided by cosd. Simplified to AY = tand(Roll_Tab)
-% Also replaced Ay_tsim with AY as on tilt table all masses see same AY
-%% [0.1.0] - 2020-07-09
-%
-% Code had AY = sind(Roll_Tab) and later divided by cosd. Simplified to AY = tand(Roll_Tab)
-% Also replaced Ay_tsim with AY as on tilt table all masses see same AY
 %% Sort the data into variables if successfully extracted
 if error == 1
     ind=min(find(Data{1}>=0)); %Starting index for where data is non-zero

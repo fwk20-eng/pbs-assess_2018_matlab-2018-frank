@@ -1,3 +1,9 @@
+%% Function Description
+%
+% Computes the Tailswing
+%% Change Log
+%% [0.1.0] - 2020-02-09
+% * First code
 function [TS_max] = assessTS(Sprung, Combination, Axle, Project, Is, X_StOut, Y_StOut, X_RP6, Y_RP6, X_RP7, Y_RP7,...
     X_RP8, Y_RP8, X_RP9, Y_RP9, ladentext)
 

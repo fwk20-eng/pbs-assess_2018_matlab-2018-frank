@@ -1,15 +1,14 @@
 %% Function Description
 %
-% Computes the longitudinal performance of a vehicle combination according to PBS standards
+% Computes the longitudinal performance of a vehicle combination according
+% to PBS standards does not include the variation of drive axle vertical
+% load with hitch height
 
 %% Change Log
-
+%% [0.2.0] - 2020-02-09
+% * Removed standalone operation capability
 %% [0.1.0] - 2018-08-08
-%
-% *Added*
-%
-% * First changelog
-
+% * First code
 function [START, GRADA, GRADB, ACC] = assessLONG(Combination, Engine, Tyre, Axle, Project, Is,...
     mTotal,Axle1,Axle2, radial,Engine2)
 % START: grade; sat = 0 if tyres not saturated and 1 if yes & 2 if over 30%
@@ -20,111 +19,6 @@ function [START, GRADA, GRADB, ACC] = assessLONG(Combination, Engine, Tyre, Axle
 % Planned improvements
 % Use ode45 rather than use cumtrapz
 
-%-------------------------------------------------
-%% *** Standalone operation ***
-%-------------------------------------------------
-
-if nargin == 0
-    
-    % ** Road condition factor **
-    % Combination.ch = 1 for a good road, 1.2 for a fair road and 1.5 for a poor road
-    %-------------------------------------------------
-    Combination.ch = 1;
-    
-    % ** Coefficient of drag **
-    % Combination.cd = 0.9 with no aerodynamic shields and 0.7 with shields Lohr EC16303 Results
-    %-------------------------------------------------
-    Combination.cd = 1;
-    
-    % ** Elevation factor **
-    % Combination.ce =1 at sea level, 0.86 at 5000 ft and 0.74 at 10000 ft
-    %-------------------------------------------------
-    Combination.ce = 1;
-    
-    % ** Combination parameters **
-    % Combination.diffRatio can be used if overwritting the diff ratio for the specified gearbox model
-    %-------------------------------------------------
-    Combination.engineModel = 'Volvo D13A440';
-    Combination.gearboxModel = 'Volvo AT2612F (2.83 diff ratio)';
-    Combination.diffRatio       = 2.85; % Optional for now - will remove diff ratio from engine data
-    
-    %Combination.engine2Model    = 'Lohr Axeal';
-    %Combination.gearing2Model   = 'Lohr Axeal';
-    
-    Tyre.NumberOff = 1 * 2 + 4 * 4;
-    Tyre.RollingRadius = 0.492;
-    Axle.Driven = [2];
-    
-    Combination.frontalAreaForDrag = 4.6 * 2.6;
-    
-    % ** Axle load calculation inputs **
-    %-------------------------------------------------
-    Axle.UnsprungMassArray = [750, 1300, 1000, 760, 1020];
-    
-    Axle.XPositionArray = [0, 5.6, 6.965, 7.29, 8.65];
-    Axle.ZPositionArray = [0.461, 0.477, 0.477, 0.363, 0.363];
-    
-    Hitch.XPositionArray = [8.350];
-    Hitch.ZPositionArray = [1.25];
-    
-    Axle.Grouping = {1; [2,3]; [4,5]};
-    
-    Combination.loadshare1 = [1, 0.558, 0.442, 0.492, 0.508];
-    Combination.loadshare2 = Combination.loadshare1;
-    
-    Hitch.LoadCoupledArray = [1];
-    
-    % ** Sprung mass calculation inputs **
-    %-------------------------------------------------
-    Sprung.MassArray = [6051, 8390];
-    Sprung.MassCoGxPosition = [1.620, 6.879];
-    Sprung.MassCoGzPosition = [1.301, 1.015];
-    
-    PayloadLaden.MassCell = {[75, 6185, 7375], 7780};
-    PayloadLaden.CoGxPositionCell = {[-0.218, 4.98, 4.771], 7.434};
-    PayloadLaden.CoGzPositionCell = {[1.815, 1.8, 2.244], 2.102};
-    
-    % ** Booleans that may change **
-    %-------------------------------------------------
-    Is.plotOn = 1;
-    
-    % ** Get the engine parameters **
-    %-------------------------------------------------
-    [Engine] = getEngineData(Combination, Tyre);
-    % ** Sprung mass calculation **
-    %-------------------------------------------------
-    [mSprung, XcgSprung, HcgSprung] = computeSprungCoG(Sprung.MassArray, Sprung.MassCoGxPosition,...
-        Sprung.MassCoGzPosition, PayloadLaden.MassCell, PayloadLaden.CoGxPositionCell,...
-        PayloadLaden.CoGzPositionCell);
-    
-    mTotal = sum(Sprung.MassArray) + sum([PayloadLaden.MassCell{:}]) + sum(Axle.UnsprungMassArray);
-    
-    % ** Axle load calculation **
-    %-------------------------------------------------
-    
-    % Loaded axles loads for normal operation
-    Axle1 = computeAxleLoadWithGradient(0, Axle.UnsprungMassArray, Axle.XPositionArray,...
-        Axle.ZPositionArray, Hitch.XPositionArray, Hitch.ZPositionArray, mSprung, XcgSprung,...
-        HcgSprung, Axle.Grouping, Combination.loadshare1, Hitch.LoadCoupledArray);
-    
-    % Loaded axles loads for Startability
-    Axle2 = computeAxleLoadWithGradient(0, Axle.UnsprungMassArray, Axle.XPositionArray,...
-        Axle.ZPositionArray, Hitch.XPositionArray, Hitch.ZPositionArray, mSprung, XcgSprung,...
-        HcgSprung, Axle.Grouping, Combination.loadshare2, Hitch.LoadCoupledArray);
-    
-    % ** Booleans that should remain constant **
-    %-------------------------------------------------
-    Is.save = 0;
-    radial = 1;
-    
-    % ** Inconsequential parameters **
-    % The values of these parameters do not matter if you are not saving the plot
-    %-------------------------------------------------
-    
-    Project.runKey = 'AXLE_TEST';
-    Project.savePath = 'D:\Personal\Work\WITS PBS\Test Runs\AXLE';
-end
-%
 if isfield(Combination,'engine2Model')
     [Engine2] = getEngineData2(Combination);
     isEngine2 = 1;
