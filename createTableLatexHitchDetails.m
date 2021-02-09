@@ -54,7 +54,7 @@ MdTable.data = [markdownHeadings; Table.data];
 % Compiling the structure fields required by latexTable
 Table.data = [Table.Headings; Table.data];
 Table.footNotes = {'\item[1] SAE up co-ordinate system and origin taken from centre of steer axle or hitch point at ground level';
-                   '\item[2] Laden condition; heights can vary between GAs and is often adjustable by the driver'};
+                   '\item[2] Laden condition; heights can vary between GAs. Heights are adjustable for air suspensions.'};
 Table.tableCaption = 'Hitch Details';
 Table.tableLabel = 'HitchDetails';
 Table.booktabs = 0;
