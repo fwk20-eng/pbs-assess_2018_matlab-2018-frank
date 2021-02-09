@@ -1,39 +1,6 @@
 function [Dmin, maxAy] = assessYAWD(Sprung, Project, Is, MatKey)
 
 %-------------------------------------------------
-%% *** Standalone operation ***
-%-------------------------------------------------
-
-if nargin == 0
-    
-    % ** Combination parameters **
-    %-------------------------------------------------
-    Sprung.numberOffUnits = 3;
-    
-    % ** Mat file location **
-    %-------------------------------------------------
-    Project.truckSimRunsDirectory = 'E:\Wits_TruckSim_PBS_2018\Results';
-    MatKey = {'YawD', '24d9a152'};
-    
-    % ** Booleans that may change **
-    %-------------------------------------------------
-    Is.plotOn = 1;
-    
-    % ** Booleans that should remain constant **
-    %-------------------------------------------------
-    Is.skipManoeuvreChecks = 0;
-    Is.save = 0;
-    Is.yawDFirstPeakCheck = 0;
-    
-    % ** Inconsequential parameters **
-    % The values of these parameters do not matter if you are not saving the plot
-    %-------------------------------------------------
-    Project.runKey ='yawD test';
-    Project.savePath = 'C:\Users\Wits-User\Desktop';
-    
-end
-
-%-------------------------------------------------
 %% *** Read in data ***
 %-------------------------------------------------
 [Data, errorx] = readSimulationVariables(...
