@@ -16,8 +16,11 @@ Data(1) = {Time};
 % copy all variables in varNames into Data
 for iVar = 1:length(varNames)       
     for iUnit = 1:varLengths(iVar)
+        % For tyre forces iUnit is not really iUnit for tyre forces the axle        
+        if specialNumbering(iVar) == 4
+            Data(iVar+1, iUnit) = {eval([varNames{iVar} spacer{iVar} int2str(iUnit)])};
         % Unit 1 reference points with 2017.1 sensors
-        if iUnit == 1 && specialNumbering(iVar) == 3
+        elseif iUnit == 1 && specialNumbering(iVar) == 3
             Data(iVar+1, iUnit) = {eval([varNames{iVar}])};
             
         % Unit 2 and above reference points with 2017.1 sensors
@@ -33,10 +36,10 @@ for iVar = 1:length(varNames)
         elseif iUnit == 1 && ~specialNumbering(iVar) 
             Data(iVar+1, iUnit) = {eval([varNames{iVar}])};
             
-        % only process if iUnit does not appear in skip or 1st entry does include a 1 (e.g. tyre forces) 
+        % only process if iUnit does not appear in skip or 1st entry does include a 1 (e.g. maybe axle positions) 
         elseif sum(iUnit == skip(:)) == 0        
             Data(iVar+1, iUnit) = {eval([varNames{iVar} spacer{iVar} int2str(iUnit)])};
-        end       
+        end   
     end
 end
 

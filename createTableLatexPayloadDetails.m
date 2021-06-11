@@ -14,6 +14,7 @@
 % * PBSreportTable: cell array structured correctly to be used with latexTable function
 %
 %% Change Log
+% [1.1.0] - 2021-06-11 change Table.userAlignment to prevent
 %
 % [0.1.0] - 2017-05-09
 %
@@ -91,7 +92,8 @@ MdTable.data = [markdownHeadings; Table.data];
 % Compiling the structure fields required by latexTable
 Table.data = [Table.Headings; Table.data];
 Table.footNotes = {'\item[1] SAE up co-ordinate system and origin taken from centre of steer axle or hitch point at ground level'};
-Table.userAlignment = 'c|C|C|C|C|';
+%Table.userAlignment = 'c|C|C|C|C|';
+Table.userAlignment = 'c|C|C|p{0.22\textwidth}|p{0.17\textwidth}|';
 Table.tableCaption = caption;
 Table.tableLabel = label;
 Table.booktabs = 0;

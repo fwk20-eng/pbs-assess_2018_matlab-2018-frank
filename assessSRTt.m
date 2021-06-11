@@ -88,7 +88,7 @@ if Is.plotOn
     
     for i = 1:(length(AYrcu) - 1)
       
-      plot(Time(1:ind(i)), AYrcu{i}(1:ind(i)), 'Color', getColour(i));
+      plot(Time(1:ind(i)), AYrcu{i}(1:ind(i)), 'Color', getColour(i),'LineWidth',2);
       legTitles = [legTitles; ['roll-coupled unit ' int2str(i)]];
       
     end

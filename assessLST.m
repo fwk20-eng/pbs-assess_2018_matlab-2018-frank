@@ -23,9 +23,9 @@ function [LSSP, TS, FS, MoD, DoM, STFD] = assessLST(Sprung, Combination, Axle, P
   Sprung.numberOffUnits*ones(1,7)...
   1 1 ...
   Axle.NumberOffSteer*ones(1,6)],...
-  {'' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' ''},...
+  {'' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' '' ''},...
   Combination.dollys, Project.savePath, Project.truckSimRunsDirectory, Project.runKey,...
-  [3*ones(1,7) zeros(1,2) 3*ones(1,7) zeros(1,2) ones(1,6)]);
+  [3*ones(1,7) zeros(1,2) 3*ones(1,7) zeros(1,2) 4*ones(1,6)]);
 
 if error == 1
   Time    = Data{1};      % convert to vector
@@ -96,24 +96,6 @@ LSSP = assessSPW(Project, Is, X_Lin, Y_Lin, X_RP3{1}, Y_RP3{1}, X_RP4{1}, Y_RP4{
 
 STFD = assessSTFD(Time, Axle.NumberOffSteer, MU_PEAK_STEER, Fx_L, Fy_L, Fz_L, Fx_R, Fy_R, Fz_R,...
   ladentext, Project.savePath, Project.runKey, Is, Is.save);
-
-%-------------------------------------------------
-%% Print results if standalone operation
-%-------------------------------------------------
-
-if nargin == 0
-  
-  disp('==============================');
-  disp('LST PBS Performance');
-  disp('==============================');
-  disp(['LSSP: ', num2str(LSSP), ' m']);
-  disp(['TS: ', num2str(TS), ' m']);
-  disp(['FS: ', num2str(FS), ' m']);
-  disp(['MoD: ', num2str(MoD), ' m']);
-  disp(['DoM: ', num2str(DoM), ' m']);
-  disp(['STFD: ', num2str(TS), ' m']);
-  
-end
 
 end
 
