@@ -76,4 +76,4 @@ else
 end
 pbsResultsTable = addResultsRow_ForReport(pbsResultsTable, fullName.STFDu  , '\%', num2str(r.STFDu,'%.0f')  , computePBSLevel('<', r.STFDu, Lim.STFD, nLevels), LimReport.STFD);
 
-pbsResultsTable = addResultsRow_ForReport(pbsResultsTable, '$\dagger$ 5.7*SRT'  , '-', num2str(5.7*r.SRTtrrcu, '%0.1f')  , '-', {'-' '-' '-' '-'});
+pbsResultsTable = addResultsRow_ForReport(pbsResultsTable, '$\dagger$ 5.7*SRTrrcu'  , '-', num2str(Lim.RA(1), '%0.2f')  , '-', {'-' '-' '-' '-'});
