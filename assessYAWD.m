@@ -220,7 +220,11 @@ end
 % Make the next peak the first peak if the current peak is less than the next peak, or if it is less
 % than limPeak*100% of the maximum peak. Stop moving to the next peak if you reach the last peak.
 %-------------------------------------------------
-limPeak=0.05;
+if isfield(Is, 'limPeak')
+    limPeak=Is.limPeak;
+else
+    limPeak = 0.05;
+end
 
 iA1 = 1; % Index of the first peak
 
