@@ -76,9 +76,11 @@ end
 
 %% Extracting data for unit 2 and beyond
 
-% Extract all trailer unit data
-keyCell = {'ENTER_PARSFILE Vehicles\Trailer', 'EXIT_PARSFILE Vehicles\Trailer'};
-SplicedAllPar.units = [SplicedAllPar.units, spliceAllPar(allParFileData, keyCell)];
+if Sprung.numberOffUnits > 1
+    % Extract all trailer unit data
+    keyCell = {'ENTER_PARSFILE Vehicles\Trailer', 'EXIT_PARSFILE Vehicles\Trailer'};
+    SplicedAllPar.units = [SplicedAllPar.units, spliceAllPar(allParFileData, keyCell)];
+end
 
 % Extracting the dolly dataset if present
 SplicedAllPar.units = extractDollyDataFromTrailer(SplicedAllPar.units);

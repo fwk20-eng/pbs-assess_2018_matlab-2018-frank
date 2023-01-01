@@ -22,7 +22,7 @@
 % *Added*
 %
 % * Dolly support
-% 
+%
 % [0.1.0] - 2017-05-08
 %
 % *Added*
@@ -49,7 +49,7 @@ tyreDatasetArray = getDatasetNameFromPar(SplicedAllPar.units{iUnit}, 'LOG_ENTRY 
 iTyreIndex = 1;
 for iAxle = 1 : nAxles
     % disp('Note: code assumes 0 dual spacing indicates single tyres');
-       
+    
     % Note the tyreDataset must be named according to 315/80R22.5 (lag). A single space seperates the tyre size from the
     % lag/no lag modifier.
     tyreDataset = tyreDatasetArray{iTyreIndex};
@@ -74,45 +74,46 @@ end
 
 %% Extracting data for unit 2 and beyond
 % Continuing with the remaining units
-
-% Extract all trailer unit data
-keyCell = {'ENTER_PARSFILE Vehicles\Trailer', 'EXIT_PARSFILE Vehicles\Trailer'};
-SplicedAllPar.units = [SplicedAllPar.units, spliceAllPar(allParFileData, keyCell)];
+if Sprung.numberOffUnits > 1
+    % Extract all trailer unit data
+    keyCell = {'ENTER_PARSFILE Vehicles\Trailer', 'EXIT_PARSFILE Vehicles\Trailer'};
+    SplicedAllPar.units = [SplicedAllPar.units, spliceAllPar(allParFileData, keyCell)];
+end
 
 % Extracting the dolly dataset if present
 [SplicedAllPar.units, dollyUnits] = extractDollyDataFromTrailer(SplicedAllPar.units);
 
 for iUnit = 2:Sprung.numberOffUnits
     
-tyreDualSpacing = getVariableValuesFromPar(SplicedAllPar.units{iUnit}, '\<L_DUAL');
-nAxles = length(tyreDualSpacing);
-
-% Extracting the the dataset for each tyre
-tyreDatasetArray = getDatasetNameFromPar(SplicedAllPar.units{iUnit}, 'LOG_ENTRY Used Dataset: Tire;', '} ');
-
-iTyreIndex = 1;
-for iAxle = 1 : nAxles
-    % disp('Note: code assumes 0 dual spacing indicates single tyres');
+    tyreDualSpacing = getVariableValuesFromPar(SplicedAllPar.units{iUnit}, '\<L_DUAL');
+    nAxles = length(tyreDualSpacing);
     
-    if tyreDualSpacing(iAxle) == 0
-        nTyres = 2;
-        reportText = ' (singles)';
-    elseif tyreDualSpacing(iAxle) > 0
-        nTyres = 4;
-        reportText = sprintf('%s%i%s',' (duals ', tyreDualSpacing(iAxle), ' spacing)');
+    % Extracting the the dataset for each tyre
+    tyreDatasetArray = getDatasetNameFromPar(SplicedAllPar.units{iUnit}, 'LOG_ENTRY Used Dataset: Tire;', '} ');
+    
+    iTyreIndex = 1;
+    for iAxle = 1 : nAxles
+        % disp('Note: code assumes 0 dual spacing indicates single tyres');
+        
+        if tyreDualSpacing(iAxle) == 0
+            nTyres = 2;
+            reportText = ' (singles)';
+        elseif tyreDualSpacing(iAxle) > 0
+            nTyres = 4;
+            reportText = sprintf('%s%i%s',' (duals ', tyreDualSpacing(iAxle), ' spacing)');
+        end
+        
+        tyreDataset = tyreDatasetArray{iTyreIndex};
+        tyreDatasetSplitWithLag = strsplit(tyreDataset{:}, ' ');
+        
+        tyreSize = tyreDatasetSplitWithLag{1};
+        
+        % Increase the tyre index depending on number of tyres on the axle
+        iTyreIndex = iTyreIndex + nTyres;
+        
+        ExtractedTyreData.Datasets{:,iUnit}{iAxle} = tyreDataset;
+        ExtractedTyreData.Sizes{:,iUnit}{iAxle} = strcat(tyreSize, reportText);
     end
-    
-    tyreDataset = tyreDatasetArray{iTyreIndex};
-    tyreDatasetSplitWithLag = strsplit(tyreDataset{:}, ' ');
-    
-    tyreSize = tyreDatasetSplitWithLag{1};
-    
-    % Increase the tyre index depending on number of tyres on the axle
-    iTyreIndex = iTyreIndex + nTyres;
-    
-    ExtractedTyreData.Datasets{:,iUnit}{iAxle} = tyreDataset;
-    ExtractedTyreData.Sizes{:,iUnit}{iAxle} = strcat(tyreSize, reportText);
-end
     
 end
 

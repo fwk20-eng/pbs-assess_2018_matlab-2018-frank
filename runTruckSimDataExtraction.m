@@ -134,7 +134,11 @@ Axle.XPositionArray = getVariableValuesFromPar(endParLadenFileData, '^LX_AXLE');
 Axle.ZPositionArray = getVariableValuesFromPar(endParLadenFileData, '^H_CG_AXLE');
 
 % Axle track regular expression modified to ensure no erroneous values from initialisation equations
-Axle.TrackWidthArray = getVariableValuesFromPar(endParLadenFileData, '^L_TRACK\(\d,\d\)\s');
+if Sprung.numberOffUnits > 1
+    Axle.TrackWidthArray = getVariableValuesFromPar(endParLadenFileData, '^L_TRACK\(\d,\d\)\s');
+else
+    Axle.TrackWidthArray = getVariableValuesFromPar(endParLadenFileData, '^L_TRACK\(\d\)\s');
+end
 
 % Determine which axles are driven, this will not work if there are driven axles other than on the prime mover
 axlePowertrainTorqueLogicArray = getVariableValuesFromPar(endParLadenFileData, '^R_DRIVE_SC');
@@ -288,6 +292,7 @@ GetTyreWidth.keySeperator = ' ';
 Tyre.width = extractAxleAllParData(allParLadenFileData, GetTyreWidth, Sprung);
 
 % Calculating the overall steer axle width
+
 Axle.SteerAxleOverallWidth = Axle.TrackWidthArray(1) + str2double(Tyre.width{1}{1});
 
 % Converting to the correct units for the Post Processor
@@ -398,7 +403,12 @@ if Is.lst || Is.lsunt
     %% Check centre of last axle group
     centreOfLastAxleGroup = getDatasetNameFromPar(allParLadenFileData, 'DEFINE_OUTPUT X_ALin', {'= ', ';'});
     centreOfLastAxleGroup = strsplit(centreOfLastAxleGroup{1}{1}, {'(', '/2', ')'});
-    Combination.centreOfLastAxleGroup = centreOfLastAxleGroup{2};
+    
+    if Sprung.numberOffUnits > 1
+        Combination.centreOfLastAxleGroup = centreOfLastAxleGroup{2};
+    else
+        Combination.centreOfLastAxleGroup = eraseBetween(centreOfLastAxleGroup{1},1,1);
+    end
     
     % Determine the actual centre of axle group
     lastAxleGroupIndices = Axle.Grouping{end};

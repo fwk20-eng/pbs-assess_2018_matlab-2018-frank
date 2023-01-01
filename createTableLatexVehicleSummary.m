@@ -27,7 +27,7 @@
 %
 % * First code
 
-function [PBSreportTable, axleDescriptionCellArray, logTable] = createTableLatexVehicleSummary(Tyre, Axle)
+function [PBSreportTable, axleDescriptionCellArray, logTable] = createTableLatexVehicleSummary(Tyre, Axle, nUnits)
 %% Generating the Latex Tables (this should be moved to a standalone function file when suitably tested.
 %% Table 1: Summary of Vehicle
 % Extracting table contents
@@ -59,7 +59,6 @@ Table.RimMaterial = Axle.rimMaterial;
 sFieldNames = fieldnames(Table);
 
 nFields = length(sFieldNames);
-nUnits = length(Table.(sFieldNames{1}));
 
 for iField = 1 : nFields
     % Set unit index to the first unit

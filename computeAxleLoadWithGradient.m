@@ -56,8 +56,14 @@ end
 % Need to adjust the wheelbase if there are multiple steer axles. The centre of the steer axle group will be the datum
 steerGroupCentre = sum(xA(grouping{1}).*loadshare(grouping{1}));
 WB=sum(xA(grouping{2}).*loadshare(grouping{2}))-steerGroupCentre;
-Agroup=(sum(((cos(th)*(xA(grouping{2})-steerGroupCentre)-sin(th)*(0-zA(grouping{2}))).*mA(grouping{2})))...
+if isempty(h)
+    Agroup=(sum(((cos(th)*(xA(grouping{2})-steerGroupCentre)-sin(th)*(0-zA(grouping{2}))).*mA(grouping{2})))...
+    +(cos(th)*(xSpr(1)-steerGroupCentre)-sin(th)*(0-zSpr(1)))*mSpr(1) )/WB;
+    Z = 0;
+else
+    Agroup=(sum(((cos(th)*(xA(grouping{2})-steerGroupCentre)-sin(th)*(0-zA(grouping{2}))).*mA(grouping{2})))...
     +(cos(th)*(xSpr(1)-steerGroupCentre)-sin(th)*(0-zSpr(1)))*mSpr(1)+(l(1)-steerGroupCentre)*Z+(h(1)-0)*X )/WB;
+end    
 
 % Multiply the total axle group load with the load distribution vector
 A(grouping{2})=Agroup*loadshare(grouping{2});

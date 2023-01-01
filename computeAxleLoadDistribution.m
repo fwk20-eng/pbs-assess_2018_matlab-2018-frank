@@ -90,10 +90,12 @@ steerAxleCentre = sum(xAxle(grouping{1}).*loadshare1(grouping{1}));
 wb=sum(xAxle(grouping{i}).*loadshare1(grouping{i})) - steerAxleCentre;
 %
 kk=1; %Hitch loads
-ma=sum([A1{:,i}]);
-wa=l(i-1) - steerAxleCentre;
-A2{kk,i-1}=wa/wb*ma;
-A1{kk,i-1}=(wb-wa)/wb*ma;
+if exist("A1")
+    ma=sum([A1{:,i}]);
+    wa=l(i-1) - steerAxleCentre;
+    A2{kk,i-1}=wa/wb*ma;
+    A1{kk,i-1}=(wb-wa)/wb*ma;    
+end
 %
 kk=2; %Axle masses
 ma=sum(mAxle(grouping{i}))+sum(mAxle(grouping{i-1}));

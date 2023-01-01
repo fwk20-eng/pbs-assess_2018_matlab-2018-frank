@@ -34,7 +34,7 @@ function writeLatexPBSAssessment(Project, Combination, ParDetails, Sprung, Axle,
     fullName, Lim, LimReport, resultsPbs, nLevels, Is, PayloadLaden, Axle1, AxleU1, Tyre, Topdeck)
 %% Create the tables for latex and the log file
 [Table.vehicleSummary, Axle.DescriptionCell, LogTable.vehicleSummary] = ...
-    createTableLatexVehicleSummary(Tyre, Axle);
+    createTableLatexVehicleSummary(Tyre, Axle, Sprung.numberOffUnits);
 
 [Table.unsprungMassDetails, LogTable.unsprungMassDetails] = ...
     createTableLatexUnsprungMassDetails(Axle);
