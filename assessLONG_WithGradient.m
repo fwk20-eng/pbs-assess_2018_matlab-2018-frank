@@ -37,7 +37,7 @@ while contin
     Frr = FrrD + FrrN;
     
     Fengine = (engageTNm*eff_diffStart*eff_gearStart(1)*G/rr) - FrrD;
-    Favail=sum(0.8*9.81*Axle(Ndrive)); % Add the gradient to this 
+    Favail=sum(0.8*9.81*Axle(Ndrive)); % Add the gradient to this
     Freq = sin(th)*m*9.81 + FrrN;
     Ftractive = min([Fengine Favail]);
     
@@ -69,24 +69,24 @@ if Is.plotOn
     else
         figure('name', 'START');
     end
-
+    
     hold on
     plot(grad(1:i),acc(1:i))
-    plot([0 floor(START)],[0 0],'r:')            
+    plot([0 floor(START)],[0 0],'r:')
     if saturate==0
-        text(0.8*floor(START),0.6*max(acc),['START = ' num2str(floor(START)) '%']);   
+        text(0.8*floor(START),0.6*max(acc),['START = ' num2str(floor(START)) '%']);
         text(0.6*floor(START),0.8*max(acc),'Limited by torque');
         plot([floor(START) floor(START)],[min(acc(1:i)) max(acc(1:i))],'r:');
     elseif saturate==1
-        text(0.8*floor(START),0.6*max(acc),['START = ' num2str(floor(START)) '%']);      
-        text(0.6*floor(START),0.8*max(acc),'Tyres saturated');  
+        text(0.8*floor(START),0.6*max(acc),['START = ' num2str(floor(START)) '%']);
+        text(0.6*floor(START),0.8*max(acc),'Tyres saturated');
         plot([floor(START) floor(START)],[min(acc(1:i)) max(acc(1:i))],'r:')
     else
-        text(0.8*floor(START),0.6*max(acc),['START >' num2str(floor(max(grad))) '%'])    
+        text(0.8*floor(START),0.6*max(acc),['START >' num2str(floor(max(grad))) '%'])
         START=[floor(max(grad))];
-    end    
+    end
     
-    set(gcf,'PaperPosition',[0 0 16 11])            
+    set(gcf,'PaperPosition',[0 0 16 11])
     set(gca,'Xgrid','on');
     set(gca,'Ygrid','on');
     xlabel('Gradient [%]')
@@ -97,7 +97,7 @@ if Is.plotOn
     end
     
     title('Startability')
-    hold off    
+    hold off
 end
 
 %%
@@ -132,7 +132,7 @@ while contin
             acc(i) = (Ftractive - Freq - FrrN)/me; % Need to consider only the non-driven rolling resistance as the driven rolling resistance is included in the Fengine term
         end
     end
-        
+    
     
     if Freq>Fengine
         contin=0; % The engine force is not big enough to generate the required drive
@@ -152,35 +152,35 @@ if Is.plotOn
         figure('name', 'GRAa','visible', 'off');
     else
         figure('name', 'GRAa');
-    end    
-
+    end
+    
     hold on
     plot(grad(1:i),acc(1:i))
-    plot([0 floor(GRADA)],[0 0],'r:')            
+    plot([0 floor(GRADA)],[0 0],'r:')
     if saturate==0
-        text(0.8*floor(GRADA),0.6*max(acc),['GRADA = ' num2str(floor(GRADA)) '%']);   
+        text(0.8*floor(GRADA),0.6*max(acc),['GRADA = ' num2str(floor(GRADA)) '%']);
         text(0.6*floor(GRADA),0.8*max(acc),'Limited by torque');
         plot([floor(GRADA) floor(GRADA)],[min(acc(1:i)) max(acc(1:i))],'r:');
     elseif saturate==1
-        text(0.8*floor(GRADA),0.6*max(acc),['GRADA = ' num2str(floor(GRADA)) '%']);      
-        text(0.6*floor(GRADA),0.8*max(acc),'Tyres saturated');  
+        text(0.8*floor(GRADA),0.6*max(acc),['GRADA = ' num2str(floor(GRADA)) '%']);
+        text(0.6*floor(GRADA),0.8*max(acc),'Tyres saturated');
         plot([floor(GRADA) floor(GRADA)],[min(acc(1:i)) max(acc(1:i))],'r:')
     else
-        text(0.8*floor(GRADA),0.6*max(acc),['GRADA >' num2str(floor(max(grad))) '%'])    
+        text(0.8*floor(GRADA),0.6*max(acc),['GRADA >' num2str(floor(max(grad))) '%'])
         GRADA=[floor(max(grad))];
     end
-    set(gcf,'PaperPosition',[0 0 16 11])            
+    set(gcf,'PaperPosition',[0 0 16 11])
     set(gca,'Xgrid','on');
     set(gca,'Ygrid','on');
     xlabel('Gradient [%]')
     ylabel('Acceleration [m/s^2]')
     
     if isSave
-        savePlot(savePath, runKey, 'GRADA')    
+        savePlot(savePath, runKey, 'GRADA')
     end
     
     title('Gradability A')
-    hold off    
+    hold off
 end
 %%
 %Gradability B
@@ -200,23 +200,23 @@ while contin
     FrrN = rolling(v,(sum(mTotal) - sum(Axle(Ndrive))),ch,radial);
     Frr = FrrD + FrrN;
     
-    FA = drag(A,cd,v,ce);    
+    FA = drag(A,cd,v,ce);
     
     Favail = sum(0.8*9.81*Axle(Ndrive));
-    Freq = sin(th)*m*9.81 + FrrN + FA;       
+    Freq = sin(th)*m*9.81 + FrrN + FA;
     
-    Nvec=v/rr*gears*difStart*60/2/pi;    
-    G=difStart*gears;    
-    me=m+It/rr/rr+Ie*G.^2/rr/rr;    
+    Nvec=v/rr*gears*difStart*60/2/pi;
+    G=difStart*gears;
+    me=m+It/rr/rr+Ie*G.^2/rr/rr;
     
     Fengine = (interp1(Torquerpm,TorqueNm,Nvec,'linear',0)*eff_diffStart/rr*difStart.*gears.*eff_gear) - FrrD;
     
     [acc(i) jgear]=max((Fengine-sin(th)*m*9.81-FrrN-FA)./me);
     
     gearvec(i)=jgear;
-    Fengine=Fengine(jgear);    
+    Fengine=Fengine(jgear);
     G=difStart*gears(jgear);
-    N=v/rr*G*60/2/pi;    
+    N=v/rr*G*60/2/pi;
     if Freq>Fengine;
         contin=0; % The engine force is not big enough to generate the required drive
         saturate=0;
@@ -237,26 +237,26 @@ if Is.plotOn
     else
         figure('name', 'GRAb');
     end
-
+    
     hold on
     plot(vel(1:i),acc(1:i)*10.0,vel(1:i),gearvec(1:i));
     if saturate==0
-        text(0.8*floor(GRADB),0.6*max(acc*10.0),['GRADB = ' num2str(floor(GRADB)) ' km/h']);   
+        text(0.8*floor(GRADB),0.6*max(acc*10.0),['GRADB = ' num2str(floor(GRADB)) ' km/h']);
         text(0.6*floor(GRADB),0.8*max(acc*10.0),'Limited by torque');
         plot([floor(GRADB) floor(GRADB)],[0 max(gearvec)],'r:');
     elseif saturate==1
-        text(0.8*floor(GRADB),0.6*max(acc*10.0),['GRADB = ' num2str(floor(GRADB)) ' km/h']);      
-        text(0.6*floor(GRADB),0.8*max(acc*10.0),'Tyres saturated');  
+        text(0.8*floor(GRADB),0.6*max(acc*10.0),['GRADB = ' num2str(floor(GRADB)) ' km/h']);
+        text(0.6*floor(GRADB),0.8*max(acc*10.0),'Tyres saturated');
         plot([floor(GRADB) floor(GRADB)],[0 max(gearvec)],'r:')
     else
-        text(0.8*floor(GRADB)-8,0.6*max(acc*10.0),['GRADB >' num2str(floor(max(vel))) ' km/h'])    
+        text(0.8*floor(GRADB)-8,0.6*max(acc*10.0),['GRADB >' num2str(floor(max(vel))) ' km/h'])
         GRADB=floor(max(vel));
-    end    
+    end
     xlabel('Velocity [km/h]')
     ylabel('Acceleration x 10 [m/s^2] ; gear')
     legTitles = {'acceleration'; 'gear'; 'GRADB'};
-    legend(legTitles, 'Location', 'Best');      
-    set(gcf,'PaperPosition',[0 0 16 11])            
+    legend(legTitles, 'Location', 'Best');
+    set(gcf,'PaperPosition',[0 0 16 11])
     set(gca,'Xgrid','on');
     set(gca,'Ygrid','on');
     
@@ -265,7 +265,7 @@ if Is.plotOn
     end
     
     title('Gradability B')
-    hold off    
+    hold off
 end
 
 %%
@@ -317,7 +317,7 @@ tspan(i+1)=tspan(i)+dt;
 % increase to full value
 for j=1:100
     i=i+1;
-    Freq1=interp1(Torquerpm,TorqueNm,N,'linear',0)*eff_gear(startGear)*eff_diffStart/rr*difStart*gears(startGear);    
+    Freq1=interp1(Torquerpm,TorqueNm,N,'linear',0)*eff_gear(startGear)*eff_diffStart/rr*difStart*gears(startGear);
     Freq2=engageTNm*eff_gear(startGear)*eff_diffStart/rr*difStart*gears(startGear);
     Freq=Freq1*j/100+Freq2*(100-j)/100;
     tspan(i)=tspan(end)+0.01;
@@ -393,9 +393,9 @@ if Is.plotOn
     text(tspan(i)-5,2,['ACC = ' num2str(round(tspan(i)*10)/10) ' s'])
     legTitles = {'velocity'; 'gear';};
     legend(legTitles, 'Location', 'NE');
-    set(gcf,'PaperPosition',[0 0 16 11])            
+    set(gcf,'PaperPosition',[0 0 16 11])
     set(gca,'Xgrid','on');
-    set(gca,'Ygrid','on');    
+    set(gca,'Ygrid','on');
     
     if isSave
         savePlot(savePath, runKey, 'ACC')

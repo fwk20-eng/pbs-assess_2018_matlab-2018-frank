@@ -75,6 +75,10 @@ end
     createTableLatexReferencePoints(Dimensions.RefPointsLadenCell, Sprung, Combination,...
     'Reference Points for Laden Combination','ReferencePointsForLadenCombination');
 
+% Park for now
+%[Table.ladenReferencePoints] = createTableLatexCommissioningReferencePoints(Dimensions.RefPointsLadenCell, Sprung, Combination,...
+%    'Reference Points for Laden Combination','ReferencePointsForLadenCombination');
+
 %% Add combination tables to the log file
 % Create filepath
 runLogFileName = strcat('Assessment-Parameters_', Project.revision, '.md');
@@ -153,11 +157,17 @@ if Is.latexReport
     isRedacted = 1;
     [TableRedacted.suspensionProperties, LogTable.suspensionProperties] = ...
         createTableLatexSuspensionProperties(Axle,isRedacted);
-    %% Create the necessary latex and log files
+    %% Create the latex files 5-1-CombinationTables.tex and 5-1-CombinationTablesRedacted.tex
     % Generate the latex tables and save in the PBS assessment tex folder
     createLatexTables(Table, '5-1-CombinationTables.tex', pbsAssessCopyToFullPath);
     createLatexTables(TableRedacted, '5-1-CombinationTablesRedacted.tex', pbsAssessCopyToFullPath);
-    
+    %% Create the CommissioningTable    
+    [CommissioningTable.vehicleAndAssessor] = createTableLatexCommissioningVehicleAndAssessor;
+    nUnits = length(Axle.UnitCellArray);
+    for iUnit = 1 : nUnits
+        eval(['CommissioningTable.Unit' num2str(iUnit) ' = createTableLatexCommissioningUnits(Tyre, Axle, Hitch,Combination.dollys,Dimensions.RefPointsLadenCell,iUnit);']);
+    end
+    createLatexTables(CommissioningTable, '6-1-CommissioningTables.tex', pbsAssessCopyToFullPath);
     %% Modify the PBS assessment parameters and save to a new file
     % Create the PBS assessment paths
     Report.pbsAssessmentCommands = strcat(pbsAssessCopyToFullPath, ...

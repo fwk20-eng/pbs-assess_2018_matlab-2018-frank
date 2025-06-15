@@ -15,8 +15,7 @@ function [A] =  computeAxleLoadWithGradient(grad,mA,xA,zA,l,h,mSpr,xSpr,zSpr,gro
 % ver e
 %     Uses loadCoupled
 %
-% Note presently it is assumed the drive force is given by the first
-% trailer unit
+% Note presently it is assumed the drive force is given by the first unit
 %
 % ver f
 %   Added the ability to calculate axle load with multiple steer axles

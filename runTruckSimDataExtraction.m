@@ -277,6 +277,9 @@ Axle.NumberOffSteer = length(Axle.Grouping{1});
 % Tyre sizes
 Tyre.sizes = ExtractedTyreData.Sizes;
 
+% Tyre indices
+Tyre.loadindices = ExtractedTyreData.LoadIndices;
+
 % Find the rolling radius from the first instance of rolling radius (steer tyre)## Should techically be the drive tyre
 tyreRollingRadiusArray = getVariableValuesFromPar(endParLadenFileData, '^RRE(');
 
@@ -379,6 +382,12 @@ Dimensions.RefPointsLadenCell = extractReferencePoints(allParLadenFileData, Spru
 if Is.lsunt
     Dimensions.RefPointsUnladenCell = extractReferencePoints(allParUnladenFileData, Sprung, Combination);
 end
+%% Extract commissioning reference points
+% Reference points are extracted into a cell where each row is a unit. Column 1 = X, Column 2 = Y, Column 3 = Z. Each
+% column is a column array of the X, Y or Z reference points for that particular unit.
+
+%% park for now
+%Dimensions.CommissioningRefPointsLadenCell = extractCommissioningReferencePoints(allParLadenFileData, Sprung, Combination);
 
 %% Extract LST parameters to ensure that the correct inputs have been used
 
@@ -411,8 +420,9 @@ if Is.lst || Is.lsunt
     end
     
     % Determine the actual centre of axle group
-    lastAxleGroupIndices = Axle.Grouping{end};
-    nAxlesInLastGroup = length(lastAxleGroupIndices);
+    selfSteerIndices = strcmp(Axle.type{end}, 'Self-Steer'); % Determine Self-Steer indices
+    lastAxleGroupIndices = Axle.Grouping{end}(~selfSteerIndices); % Ignore self steering axles
+    nAxlesInLastGroup = length(lastAxleGroupIndices); 
     
     switch nAxlesInLastGroup
         case 1

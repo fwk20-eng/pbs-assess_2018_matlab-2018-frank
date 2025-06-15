@@ -3,11 +3,16 @@
 % Compiles all of the data for table one into a single structure that can be used to generate a latex table with the
 % latexTable function
 %
+%% To be improved
+%
+% Only put single axle description if all axles are the same
+% Correct input nUnits != Hitch
+% axleDescriptionCellArray ???
 %% Inputs
 %
-% * allParLadenFileData 
-% * Sprung
+% * Tyre 
 % * Axle
+% * nUnits
 %
 %% Outputs
 %
@@ -31,11 +36,6 @@ function [PBSreportTable, axleDescriptionCellArray, logTable] = createTableLatex
 %% Generating the Latex Tables (this should be moved to a standalone function file when suitably tested.
 %% Table 1: Summary of Vehicle
 % Extracting table contents
-% Note: This section will need to be developed as various vehicle configurations are assessed. It has currently been
-% tested with:
-%
-% * Semi-trailer
-% * B-Double
 
 %% Table One: Units
 Table.Units = Axle.UnitCellArray;
@@ -44,6 +44,7 @@ axleDescriptionCellArray = Table.AxleDescription;
 Table.AxleConfiguration = computeAxleGroupType(Axle);
 Table.AxleSpringType = Axle.springType;
 Table.TyreSize = Tyre.sizes;
+Table.TyreLoadIndex = Tyre.loadindices;
 Table.RimMaterial = Axle.rimMaterial;
 %% Convert Table to a format that will create the latexTable correctly.
 %
@@ -64,14 +65,17 @@ for iField = 1 : nFields
     % Set unit index to the first unit
     iUnit = 1;
     
-    fieldData = Table.(sFieldNames{iField});
-    
+    fieldData = Table.(sFieldNames{iField});    
     tableData{iField} = fieldData{iUnit}';
     
     % Loop through the remaining units
     for iUnit = 2 : nUnits
         % Note the indexing here with the circular brackets.
-        tableData{iField} = [tableData{iField}; fieldData{iUnit}(1)'];
+        if all(strcmp(Table.TyreSize{iUnit}, Table.TyreSize{iUnit}{1}))
+            tableData{iField} = [tableData{iField}; fieldData{iUnit}(1)'];
+        else
+            tableData{iField} = [tableData{iField}; fieldData{iUnit}'];
+        end
     end
     
 end
@@ -84,9 +88,9 @@ for iCol = 2 : nFields
     
 end
 
-Table.Headings = {'\textbf{Unit}' '\textbf{Axle}' '\textbf{Axle configuration}' '\textbf{Suspension type}' '\textbf{Tyre size}' '\textbf{Rim material}'};
+Table.Headings = {'\textbf{Unit}' '\textbf{Axle}' '\textbf{Axle configuration}' '\textbf{Suspension type}' '\textbf{Tyre size}' '\textbf{Load index}' '\textbf{Rim material}'};
 
-markdownHeadings = {'Unit' 'Axle' 'Axle configuration' 'Suspension type' 'Tyre size' 'Rim material'};
+markdownHeadings = {'Unit' 'Axle' 'Axle configuration' 'Suspension type' 'Tyre size' 'Load index' 'Rim material'};
 MdTable.data = [markdownHeadings; Table.data];
 
 % Compiling the structure fields required by latexTable

@@ -14,6 +14,7 @@
 % * ExtractedTyreData: A structure with the following data
 % * Datasets: The original dataset names used in the simulation
 % * Sizes: The tyre sizes and spacing if relevant formatted to the style used in all PBS reports
+% * LoadIndices: The Load Indices
 %
 %% Change Log
 %
@@ -56,6 +57,21 @@ for iAxle = 1 : nAxles
     tyreDatasetSplitWithLag = strsplit(tyreDataset{:}, ' ');
     tyreSize = tyreDatasetSplitWithLag{1};
     
+    % Extract number after "dataset"
+    tyreDatasetNumber = regexp(tyreDataset{:}, 'dataset\s+(\d+)', 'tokens');
+    switch tyreDatasetNumber{1}{:}
+        case '2'
+            tyreLoadIndex = '134';
+        case '3'
+            tyreLoadIndex = '138';
+        case '7'
+            tyreLoadIndex = '156';
+        case '8'
+            tyreLoadIndex = '158';
+        otherwise
+            tyreLoadIndex = 'error';
+    end
+    
     if tyreDualSpacing(iAxle) == 0
         nTyres = 2;
         reportText = ' (singles)';
@@ -69,7 +85,7 @@ for iAxle = 1 : nAxles
     
     ExtractedTyreData.Datasets{:,iUnit}{iAxle} = tyreDataset;
     ExtractedTyreData.Sizes{:,iUnit}{iAxle} = strcat(tyreSize, reportText);
-    
+    ExtractedTyreData.LoadIndices{:,iUnit}{iAxle} = tyreLoadIndex;
 end
 
 %% Extracting data for unit 2 and beyond
@@ -108,13 +124,30 @@ for iUnit = 2:Sprung.numberOffUnits
         
         tyreSize = tyreDatasetSplitWithLag{1};
         
+        % Extract number after "dataset"
+        tyreDatasetNumber = regexp(tyreDataset{:}, 'dataset\s+(\d+)', 'tokens');
+        switch tyreDatasetNumber{1}{:}
+            case '2'
+                tyreLoadIndex = '134';
+            case '3'
+                tyreLoadIndex = '138';
+            case '7'
+                tyreLoadIndex = '156';
+            case '8'
+                tyreLoadIndex = '158';
+            otherwise
+                tyreLoadIndex = 'error';
+        end
+        
         % Increase the tyre index depending on number of tyres on the axle
         iTyreIndex = iTyreIndex + nTyres;
         
         ExtractedTyreData.Datasets{:,iUnit}{iAxle} = tyreDataset;
         ExtractedTyreData.Sizes{:,iUnit}{iAxle} = strcat(tyreSize, reportText);
+        ExtractedTyreData.LoadIndices{:,iUnit}{iAxle} = tyreLoadIndex;
     end
     
 end
 
+disp('wait')
 end
