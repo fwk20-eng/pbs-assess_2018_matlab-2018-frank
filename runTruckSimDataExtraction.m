@@ -143,8 +143,8 @@ end
 % Determine which axles are driven, this will not work if there are driven axles other than on the prime mover
 axlePowertrainTorqueLogicArray = getVariableValuesFromPar(endParLadenFileData, '^R_DRIVE_SC');
 
-% Extract tyre properties and determine which units are dolly's
-[ExtractedTyreData, Combination.dollys] = extractTyreAllParData(allParLadenFileData, Sprung);
+% Extract tyre properties and determine which units are dollies or trailer front axles
+[ExtractedTyreData, Combination.dollys_trailerFrontAxles] = extractTyreAllParData(allParLadenFileData, Sprung);
 
 %% Extracting dataset names
 % Axle type
@@ -277,6 +277,9 @@ Axle.NumberOffSteer = length(Axle.Grouping{1});
 % Tyre sizes
 Tyre.sizes = ExtractedTyreData.Sizes;
 
+% Tyre datasets
+Tyre.datasets = ExtractedTyreData.Datasets;
+
 % Tyre indices
 Tyre.loadindices = ExtractedTyreData.LoadIndices;
 
@@ -302,6 +305,25 @@ Axle.SteerAxleOverallWidth = Axle.TrackWidthArray(1) + str2double(Tyre.width{1}{
 Axle.XPositionArray = Axle.XPositionArray .* 0.001;
 Axle.ZPositionArray = Axle.ZPositionArray .* 0.001;
 Tyre.RollingRadius = Tyre.RollingRadius .* 0.001;
+
+%% Adding VehicleUnitCellArray variable
+
+Axle.VehicleUnitCellArray = Axle.UnitCellArray; % Initialise VehicleUnitCellArray with same size as UnitCellArray
+offset = 0; % Counter for how many 'Front Trailer' units have been encountered
+for i = 1:numel(Axle.UnitCellArray) % Loop through sprung units    
+    
+    % Adjust numbers for this unit based on offset
+    Axle.VehicleUnitCellArray{i} = cellfun(@(x) ...
+        num2str(str2double(x) - offset), ...
+        Axle.UnitCellArray{i}, ...
+        'UniformOutput', false);
+    
+    % Update offset if current unit has any 'Front Trailer'
+    if any(strcmp(Axle.type{i}, 'Front Trailer'))
+        offset = offset + 1;
+    end
+
+end
 
 %% Dummy axle check for number of tyres
 % Find number of tyres from number of tyre model instances in the par file

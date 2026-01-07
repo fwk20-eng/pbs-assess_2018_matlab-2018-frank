@@ -40,7 +40,7 @@ for iUnit = 1 : Sprung.numberOffUnits
     
     % Dolly units have reference points of zeros. This is to maintain the numerical integrity of unit and reference points.
     
-    if any(iUnit == Combination.dollys)
+    if any(iUnit == Combination.dollys_trailerFrontAxles)
         nPreviousDollyUnits = nPreviousDollyUnits + 1;
         referencePointsCell{iUnit,1} = zeros(4,1);
         referencePointsCell{iUnit,2} = zeros(4,1);

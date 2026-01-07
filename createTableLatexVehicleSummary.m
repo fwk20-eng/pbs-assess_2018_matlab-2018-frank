@@ -38,12 +38,13 @@ function [PBSreportTable, axleDescriptionCellArray, logTable] = createTableLatex
 % Extracting table contents
 
 %% Table One: Units
-Table.Units = Axle.UnitCellArray;
+Table.Units = Axle.VehicleUnitCellArray;
 Table.AxleDescription = Axle.type;
 axleDescriptionCellArray = Table.AxleDescription;
 Table.AxleConfiguration = computeAxleGroupType(Axle);
 Table.AxleSpringType = Axle.springType;
 Table.TyreSize = Tyre.sizes;
+Table.Datasets = Tyre.datasets;
 Table.TyreLoadIndex = Tyre.loadindices;
 Table.RimMaterial = Axle.rimMaterial;
 %% Convert Table to a format that will create the latexTable correctly.
@@ -88,9 +89,9 @@ for iCol = 2 : nFields
     
 end
 
-Table.Headings = {'\textbf{Unit}' '\textbf{Axle}' '\textbf{Axle configuration}' '\textbf{Suspension type}' '\textbf{Tyre size}' '\textbf{Load index}' '\textbf{Rim material}'};
+Table.Headings = {'\textbf{Vehicle unit}' '\textbf{Axle}' '\textbf{Axle configuration}' '\textbf{Suspension type}' '\textbf{Tyre size}' '\textbf{Tyre dataset}' '\textbf{Load index}' '\textbf{Rim material}'};
 
-markdownHeadings = {'Unit' 'Axle' 'Axle configuration' 'Suspension type' 'Tyre size' 'Load index' 'Rim material'};
+markdownHeadings = {'Vehicle unit' 'Axle' 'Axle configuration' 'Suspension type' 'Tyre size' 'Dataset' 'Load index' 'Rim material'};
 MdTable.data = [markdownHeadings; Table.data];
 
 % Compiling the structure fields required by latexTable

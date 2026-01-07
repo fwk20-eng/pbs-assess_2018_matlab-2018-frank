@@ -53,7 +53,7 @@ for iUnit = 1:Sprung.numberOffUnits
             % Determine main grouping from axle type
             switch axleType
                 case 'Steer'
-                    vehicleString{iUnit} = [vehicleString{iUnit} 'S('];
+                    vehicleString{iUnit} = [vehicleString{iUnit} 'S('];                 
                 case 'Drive'
                     vehicleString{iUnit} = [vehicleString{iUnit} 'D('];
                 case 'Trailer'
@@ -125,6 +125,8 @@ for iUnit = 1:Sprung.numberOffUnits
             % Special formatting if the axle is a tag axle - this still needs to be tested when the case arises
             if strcmp(axleType,'Tag')
                 vehicleString{iUnit} = [vehicleString{iUnit} ')T('];
+            elseif strcmp(axleType,'Self-Steer')
+                vehicleString{iUnit} = [vehicleString{iUnit} 'S('];
             end
             
             % Add duals or singles for the axle
@@ -134,12 +136,19 @@ for iUnit = 1:Sprung.numberOffUnits
                 case 'singles'
                     vehicleString{iUnit} = [vehicleString{iUnit} 's)'];
             end
+            
+            if strcmp(axleType,'Self-Steer')
+                vehicleString{iUnit} = [vehicleString{iUnit} ')'];
+            end
+            
             currentAxleGroup = Axle.UnitAndGroup(indicesOfAxlesInUnit(iAxle),3);
             
         elseif iAxle == length(indicesOfAxlesInUnit)
             switch axleType
                 case 'Steer'
                     vehicleString{iUnit} = [vehicleString{iUnit} ').S('];
+                case 'Self-Steer'
+                    vehicleString{iUnit} = [vehicleString{iUnit} ').S('];                    
                 case 'Drive'
                     vehicleString{iUnit} = [vehicleString{iUnit} ').D('];
                 case 'Trailer'

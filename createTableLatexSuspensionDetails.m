@@ -92,9 +92,9 @@ for iCol = 2 : nFields
     
 end
 
-Table.Headings = {'\textbf{Unit}' '\textbf{Axle}' '\textbf{Suspension}' '\textbf{Spring Model}' '\textbf{Damper Model}' '\textbf{Stabiliser Model}\tnote{1}'};
+Table.Headings = {'\textbf{Sprung unit}' '\textbf{Axle}' '\textbf{Suspension}' '\textbf{Spring model}' '\textbf{Damper model}' '\textbf{Stabiliser model}\tnote{1}'};
 
-markdownHeadings = {'Unit' 'Axle' 'Suspension' 'Spring Model' 'Damper Model' 'Stabiliser Model'};
+markdownHeadings = {'Sprung unit' 'Axle' 'Suspension' 'Spring model' 'Damper model' 'Stabiliser model'};
 MdTable.data = [markdownHeadings; Table.data];
 
 % Compiling the structure fields required by latexTable

@@ -123,7 +123,7 @@ if Is.plotOn
     xlabel('Time [sec]')
     ylabel(yLabels{limitMotionVarIndex});
     
-    legend(legTitles, 'Location', 'northeastoutside'); legend('boxoff');
+    legend(legTitles, 'Location', 'Best')
 end
 
 %-------------------------------------------------
@@ -284,6 +284,12 @@ if length(valPeak) == 1
     
     % If there is only 1 peak, the damping ratio is recorded as 1
     DR = 1;
+
+elseif length(valPeak) == 2
+    
+    % If there are only 2 peaks, the eqn C15 p.65 gives unreliable results
+    % use 0.3
+    DR = 0.3;
     
 elseif length(valPeak) < 6
     

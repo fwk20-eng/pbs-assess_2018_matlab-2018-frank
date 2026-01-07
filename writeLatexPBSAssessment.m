@@ -163,9 +163,9 @@ if Is.latexReport
     createLatexTables(TableRedacted, '5-1-CombinationTablesRedacted.tex', pbsAssessCopyToFullPath);
     %% Create the CommissioningTable    
     [CommissioningTable.vehicleAndAssessor] = createTableLatexCommissioningVehicleAndAssessor;
-    nUnits = length(Axle.UnitCellArray);
-    for iUnit = 1 : nUnits
-        eval(['CommissioningTable.Unit' num2str(iUnit) ' = createTableLatexCommissioningUnits(Tyre, Axle, Hitch,Combination.dollys,Dimensions.RefPointsLadenCell,iUnit);']);
+    nVehicleUnits = str2num(Axle.VehicleUnitCellArray{end}{end});
+    for iUnit = 1 : nVehicleUnits
+        eval(['CommissioningTable.Unit' num2str(iUnit) ' = createTableLatexCommissioningUnits(Tyre, Axle, Hitch,Combination.dollys_trailerFrontAxles,Dimensions.RefPointsLadenCell,iUnit);']);
     end
     createLatexTables(CommissioningTable, '6-1-CommissioningTables.tex', pbsAssessCopyToFullPath);
     %% Modify the PBS assessment parameters and save to a new file

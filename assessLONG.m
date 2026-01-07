@@ -339,7 +339,7 @@ if Is.plotOn
     xlabel('Velocity [km/h]')
     ylabel('Acceleration x 10 [m/s^2] ; gear')
     legTitles = {'acceleration'; 'gear'};
-    legend(legTitles, 'Location', 'northeastoutside'); legend('boxoff');
+    legend(legTitles, 'Location', 'Best');
     if saturate==0
         text(0.8*floor(GRADB),0.6*max(acc*10.0),['GRADB = ' num2str(floor(GRADB)) ' km/h']);
         text(0.6*floor(GRADB),0.8*max(acc*10.0),'Limited by torque');
@@ -521,7 +521,7 @@ if Is.plotOn
     ylabel('Velocity [m/s] ; gear')
     text(tspan(i)-5,2,['ACC = ' num2str(round(tspan(i)*10)/10) ' s'])
     legTitles = {'velocity'; 'gear';};
-    legend(legTitles, 'Location', 'northeastoutside'); legend('boxoff');
+    legend(legTitles, 'Location', 'Best');
     set(gcf,'PaperPosition',[0 0 16 11])
     set(gca,'Xgrid','on');
     set(gca,'Ygrid','on');

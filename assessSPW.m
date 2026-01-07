@@ -166,7 +166,7 @@ if Is.plotOn
         text(XplotMin + (XplotMax - XplotMin)*.3, YplotMin + (YplotMax - YplotMin)*.45,['max SPW = ' num2str(ceil(SPWmax*10)/10,'%5.1f') ' m'])
         legTitles = {'inner path for LSSP'; 'PM Pt. 3'; 'PM Pt. 4'; 'PM Pt. 5'; 'maximum width'};
     end
-    legend(legTitles, 'Location', 'northeastoutside'); legend('boxoff');
+    legend(legTitles, 'Location', 'northwest');  % 'best' puts the legend outside
     
     set(gcf,'PaperPosition',[0 0 16 11])
     set(gca,'Xgrid','on');

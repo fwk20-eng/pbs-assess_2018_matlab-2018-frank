@@ -23,7 +23,7 @@ YexitTan = [0 max(Y_StOut)];
 %----------------------------------------------
 iCurr = 1;
 while iCurr <= Sprung.numberOffUnits
-    if sum(iCurr == Combination.dollys(:)) == 0       % Only evaluated if veh unit number not in dollys vector
+    if sum(iCurr == Combination.dollys_trailerFrontAxles(:)) == 0       % Only evaluated if veh unit number not in dollys vector
         j3start=find(X_RP3{iCurr}>=X_StOut(end),1,'first'); % Only start evaluating once X is greater then X_StOut
         if isempty(j3start), j3start = 1; end
         j4start=find(X_RP4{iCurr}>=X_StOut(end),1,'first'); % Only start evaluating once X is greater then X_StOut
@@ -84,7 +84,7 @@ iPrev = 1;
 iCurr = 2;
 
 while iCurr <= Sprung.numberOffUnits
-    if sum(iCurr == Combination.dollys(:)) == 0       % only evaluated if veh unit number not in dollys vector
+    if sum(iCurr == Combination.dollys_trailerFrontAxles(:)) == 0       % only evaluated if veh unit number not in dollys vector
         % We expect Y to be lowest for iCurr when starting j=0, and Y to be lowest for iPrev when finished j=end
         j=1;
         while (j<=(length(X1{iCurr}))&(Y1{iCurr}(j)<Y2{iCurr}(end-1))&(Y1{iCurr}(j)<Y3{iCurr}(end-1)))
@@ -141,14 +141,14 @@ if Is.plotOn
     legTitles = [legTitles; 'front steer path'];
     
     for i = 1:Sprung.numberOffUnits
-        if sum(i == Combination.dollys(:)) == 0       % only plotted if veh unit number not in dollys vector
+        if sum(i == Combination.dollys_trailerFrontAxles(:)) == 0       % only plotted if veh unit number not in dollys vector
             plot(X345{i}, Y345{i},'Color', getColour((i+1)));
             legTitles = [legTitles; ['widest of pts 3-5 on unit ' int2str(i)]];
         end
     end
     
     for i = 1:Sprung.numberOffUnits-1
-        if sum(i == Combination.dollys(:)) == 0       % only evaluated if veh unit number not in dollys vector
+        if sum(i == Combination.dollys_trailerFrontAxles(:)) == 0       % only evaluated if veh unit number not in dollys vector
             plot(MoDx{i}, MoDy{i}, '-or')
             text(MoDx{i}(2)+0.1, MoDy{i}(1)+1, MoDtext(i))
         end
@@ -166,7 +166,7 @@ if Is.plotOn
     set(gca,'Ygrid','on');
     xlabel('X [m]')
     ylabel('Y [m]')
-    legend(legTitles, 'Location', 'northeastoutside'); legend('boxoff');
+    legend(legTitles, 'Location', 'Best');
     
     if Is.save
         savePlot(Project.savePath, Project.runKey, ['MoD' ladentext])
@@ -184,7 +184,7 @@ pt{1}(indMaxPx(1));
 iPrev = 1;
 iCurr = 2;
 while iCurr <= Sprung.numberOffUnits
-    if sum(iCurr == Combination.dollys(:)) == 0       % only evaluated if veh unit number not in dollys vector
+    if sum(iCurr == Combination.dollys_trailerFrontAxles(:)) == 0       % only evaluated if veh unit number not in dollys vector
         [maxPx(iCurr), indMaxPx(iCurr)] = max(X345{iCurr});
         
         DoM(iPrev) = maxPx(iCurr) - maxPx(iPrev);
@@ -225,14 +225,14 @@ if Is.plotOn
     legTitles = [legTitles; 'front steer path'];
     
     for i = 1:Sprung.numberOffUnits
-        if sum(i == Combination.dollys(:)) == 0       % only plotted if veh unit number not in dollys vector
+        if sum(i == Combination.dollys_trailerFrontAxles(:)) == 0       % only plotted if veh unit number not in dollys vector
             plot(X345{i}, Y345{i},'Color', getColour((i-1)+2));
             legTitles = [legTitles; ['widest of pts 3-5 on unit ' int2str(i)]];
         end
     end
     
     for i = 1:Sprung.numberOffUnits-1
-        if sum(i == Combination.dollys(:)) == 0       % only plotted if veh unit number not in dollys vector
+        if sum(i == Combination.dollys_trailerFrontAxles(:)) == 0       % only plotted if veh unit number not in dollys vector
             plot(DoMx{i}, DoMy{i}, '-or')
             text(max(DoMx{i}(2), DoMx{i}(3))+0.1, Y345{i}(indMaxPx(i)), DoMtext(i))
         end
@@ -250,7 +250,7 @@ if Is.plotOn
     set(gca,'Ygrid','on');
     xlabel('X [m]')
     ylabel('Y [m]')
-    legend(legTitles, 'Location', 'northeastoutside'); legend('boxoff');
+    legend(legTitles, 'Location', 'Best');
     
     if Is.save
         savePlot(Project.savePath, Project.runKey, ['DoM' ladentext])

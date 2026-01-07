@@ -97,9 +97,9 @@ for iCol = 2 : nFields
 end
 
 if isRedacted
-    Table.Headings = {'\textbf{Unit}' '\textbf{Axle}' '\textbf{Suspension}' '\textbf{RC height (mm)}\tnote{1,2}' '\textbf{Track width (mm)}' '\textbf{Auxiliary roll stiffness (Nm/\degree{})}\tnote{2}' '\textbf{Steer/roll ratio (\degree{}/\degree{})}\tnote{2}'}; 
+    Table.Headings = {'\textbf{Sprung unit}' '\textbf{Axle}' '\textbf{Suspension}' '\textbf{RC height (mm)}\tnote{1,2}' '\textbf{Track width (mm)}' '\textbf{Auxiliary roll stiffness (Nm/\degree{})}\tnote{2}' '\textbf{Steer/roll ratio (\degree{}/\degree{})}\tnote{2}'}; 
 else
-    Table.Headings = {'\textbf{Unit}' '\textbf{Axle}' '\textbf{Suspension}' '\textbf{RC height (mm)}\tnote{1}' '\textbf{Track width (mm)}' '\textbf{Auxiliary roll stiffness (Nm/\degree{})}' '\textbf{Steer/roll ratio (\degree{}/\degree{})}'};
+    Table.Headings = {'\textbf{Sprung unit}' '\textbf{Axle}' '\textbf{Suspension}' '\textbf{RC height (mm)}\tnote{1}' '\textbf{Track width (mm)}' '\textbf{Auxiliary roll stiffness (Nm/\degree{})}' '\textbf{Steer/roll ratio (\degree{}/\degree{})}'};
 end
 
 markdownHeadings = {'Unit' 'Axle' 'Suspension' 'RC height (mm)' 'Track width (mm)' 'Auxiliary roll stiffness (Nm/deg)' 'Steer/roll ratio (deg/deg)'};

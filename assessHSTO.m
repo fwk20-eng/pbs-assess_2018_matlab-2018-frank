@@ -83,7 +83,7 @@ if Is.plotOn
   set(gca,'Ygrid','on');
   xlabel('X [m]')
   ylabel('Y [m]')
-  legend(legTitles, 'Location', 'northeastoutside'); legend('boxoff');
+  legend(legTitles, 'Location', 'Best');
   
   if Is.save
     savePlot(Project.savePath, Project.runKey, 'HSTO');

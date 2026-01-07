@@ -34,7 +34,7 @@ if Is.plotOn
     axis([0 floor(max(Time)/5)*5 0 110]);  % y axis settings overwritten next line
     text(Time(iMax) + 5, STFD + 5, ['STFD = ' num2str(ceil(STFD)) '%']);
     legTitles = {'steer axle'; 'max limit'; 'peak friction demand'};
-    legend(legTitles, 'Location', 'northeastoutside'); legend('boxoff');
+    legend(legTitles, 'Location', 'Best')
     
     set(gcf,'PaperPosition',[0 0 16 11])            
     set(gca,'Xgrid','on');

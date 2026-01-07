@@ -69,7 +69,7 @@ for iHitch = 1 : nHitches
     if strcmp(Hitch.RollMomentArray{iHitch},'0')
         Hitch.RollCoupledArray(iHitch) = 0;
         % If the next unit is a dolly - then there is also no load coupling.
-        if any(iHitch + 1 == Combination.dollys)
+        if any(iHitch + 1 == Combination.dollys_trailerFrontAxles)
             Hitch.LoadCoupledArray(iHitch) = 0;
         end
     end

@@ -105,7 +105,7 @@ SRTrollThresh = 30;    % PBS rules
 
 %%	Execute PBS manoeuvres if required
 if Is.pbs
-  Sprung.numberOffUnits = length(Sprung.MassArray);      % includes Combination.dollys
+  Sprung.numberOffUnits = length(Sprung.MassArray);      % includes Combination.dollys_trailerFrontAxles
   
   fullName = getFullPBSNames();
   [Lim, LimReport] = getPBSLimits(Is);

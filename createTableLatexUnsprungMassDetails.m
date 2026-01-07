@@ -76,9 +76,9 @@ for iUnit = 1 : nUnits
     end
 end
 %% Generating the Latex Tables (this should be moved to a standalone function file when suitably tested.
-Table.Headings = {'\textbf{Unit}' '\textbf{Axle}' '\textbf{Mass (kg)}' '\textbf{CoG height (mm)}' '\textbf{Longitudinal Position (mm)\tnote{1}}'};
+Table.Headings = {'\textbf{Sprung unit}' '\textbf{Axle}' '\textbf{Mass (kg)}' '\textbf{CoG height (mm)}' '\textbf{Longitudinal position (mm)\tnote{1}}'};
 
-markdownHeadings = {'Unit' 'Axle' 'Mass (kg)' 'CoG height (mm)' 'Longitudinal Position (mm)'};
+markdownHeadings = {'Sprung unit' 'Axle' 'Mass (kg)' 'CoG height (mm)' 'Longitudinal position (mm)'};
 MdTable.data = [markdownHeadings; Table.data];
 
 % Compiling the structure fields required by latexTable

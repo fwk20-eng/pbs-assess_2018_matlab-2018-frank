@@ -31,7 +31,7 @@
 % * First code to allow extraction of tyre data for each axle.
 % * Adapted from extractAxleAllParData.
 
-function [ExtractedTyreData, dollyUnits] = extractTyreAllParData(allParFileData, Sprung)
+function [ExtractedTyreData, dolly_trailerFrontAxleUnits] = extractTyreAllParData(allParFileData, Sprung)
 %% Extracting data for unit 1
 % disp('Note: code works for standard combinations with a single lead unit only');
 % Begin with the first unit
@@ -60,14 +60,20 @@ for iAxle = 1 : nAxles
     % Extract number after "dataset"
     tyreDatasetNumber = regexp(tyreDataset{:}, 'dataset\s+(\d+)', 'tokens');
     switch tyreDatasetNumber{1}{:}
-        case '2'
-            tyreLoadIndex = '134';
-        case '3'
-            tyreLoadIndex = '138';
-        case '7'
-            tyreLoadIndex = '156';
-        case '8'
-            tyreLoadIndex = '158';
+            case '2'
+                tyreLoadIndex = '134/132';
+            case '3'
+                tyreLoadIndex = '138/136';
+            case '4'
+                tyreLoadIndex = '142/140';
+            case '5'
+                tyreLoadIndex = '144/142';                
+            case '6'
+                tyreLoadIndex = '150/146';                
+            case '7'
+                tyreLoadIndex = '154/150';
+            case '8'
+                tyreLoadIndex = '158/154';
         otherwise
             tyreLoadIndex = 'error';
     end
@@ -83,7 +89,7 @@ for iAxle = 1 : nAxles
     % Increase the tyre index depending on number of tyres on the axle
     iTyreIndex = iTyreIndex + nTyres;
     
-    ExtractedTyreData.Datasets{:,iUnit}{iAxle} = tyreDataset;
+    ExtractedTyreData.Datasets{:,iUnit}{iAxle} =tyreDatasetNumber{1}{:};
     ExtractedTyreData.Sizes{:,iUnit}{iAxle} = strcat(tyreSize, reportText);
     ExtractedTyreData.LoadIndices{:,iUnit}{iAxle} = tyreLoadIndex;
 end
@@ -96,8 +102,8 @@ if Sprung.numberOffUnits > 1
     SplicedAllPar.units = [SplicedAllPar.units, spliceAllPar(allParFileData, keyCell)];
 end
 
-% Extracting the dolly dataset if present
-[SplicedAllPar.units, dollyUnits] = extractDollyDataFromTrailer(SplicedAllPar.units);
+% Extracting the dolly_trailerFrontAxle dataset if present
+[SplicedAllPar.units, dolly_trailerFrontAxleUnits] = extractDollyDataFromTrailer(SplicedAllPar.units);
 
 for iUnit = 2:Sprung.numberOffUnits
     
@@ -128,13 +134,19 @@ for iUnit = 2:Sprung.numberOffUnits
         tyreDatasetNumber = regexp(tyreDataset{:}, 'dataset\s+(\d+)', 'tokens');
         switch tyreDatasetNumber{1}{:}
             case '2'
-                tyreLoadIndex = '134';
+                tyreLoadIndex = '134/132';
             case '3'
-                tyreLoadIndex = '138';
+                tyreLoadIndex = '138/136';
+            case '4'
+                tyreLoadIndex = '142/140';                
+            case '5'
+                tyreLoadIndex = '144/142';
+            case '6'
+                tyreLoadIndex = '150/146';                
             case '7'
-                tyreLoadIndex = '156';
+                tyreLoadIndex = '154/150';
             case '8'
-                tyreLoadIndex = '158';
+                tyreLoadIndex = '158/154';
             otherwise
                 tyreLoadIndex = 'error';
         end
@@ -142,7 +154,7 @@ for iUnit = 2:Sprung.numberOffUnits
         % Increase the tyre index depending on number of tyres on the axle
         iTyreIndex = iTyreIndex + nTyres;
         
-        ExtractedTyreData.Datasets{:,iUnit}{iAxle} = tyreDataset;
+        ExtractedTyreData.Datasets{:,iUnit}{iAxle} = tyreDatasetNumber{1}{:};
         ExtractedTyreData.Sizes{:,iUnit}{iAxle} = strcat(tyreSize, reportText);
         ExtractedTyreData.LoadIndices{:,iUnit}{iAxle} = tyreLoadIndex;
     end

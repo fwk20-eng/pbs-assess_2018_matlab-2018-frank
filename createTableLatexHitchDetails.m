@@ -46,9 +46,9 @@ for iHitch = 1 : nHitches
     Table.data = [Table.data; rowOfDataForTable];
 end
 
-Table.Headings = {'\textbf{Unit}' '\textbf{Hitch type}' '\textbf{Longitudinal position (mm)}\tnote{1}' '\textbf{Height (mm)}\tnote{2}' '\textbf{Roll stiffness (Nm/\degree{})}'};
+Table.Headings = {'\textbf{Sprung unit}' '\textbf{Hitch type}' '\textbf{Longitudinal position (mm)}\tnote{1}' '\textbf{Height (mm)}\tnote{2}' '\textbf{Roll stiffness (Nm/\degree{})}'};
 
-markdownHeadings = {'Unit' 'Hitch type' 'Longitudinal position (mm)' 'Height (mm)' 'Roll stiffness (Nm/degree)'};
+markdownHeadings = {'Sprung unit' 'Hitch type' 'Longitudinal position (mm)' 'Height (mm)' 'Roll stiffness (Nm/degree)'};
 MdTable.data = [markdownHeadings; Table.data];
 
 % Compiling the structure fields required by latexTable

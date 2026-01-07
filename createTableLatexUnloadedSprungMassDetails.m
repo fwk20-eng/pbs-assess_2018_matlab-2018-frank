@@ -56,9 +56,9 @@ for iUnit = 1 : Sprung.numberOffUnits
     
 end
 %% Generating the Latex Tables (this should be moved to a standalone function file when suitably tested.
-Table.Headings = {'\textbf{Unit}' '\textbf{Mass (kg)}' '\makecell{\textbf{Moments of inertia (kg.m\sstw{})} \\ \textbf{Ixx; Iyy; Izz}}' '\makecell{\textbf{CoG position (mm)} \\ \textbf{(x; y; z)}\tnote{1}}'};
+Table.Headings = {'\textbf{Sprung unit}' '\textbf{Mass (kg)}' '\makecell{\textbf{Moments of inertia (kg.m\sstw{})} \\ \textbf{Ixx; Iyy; Izz}}' '\makecell{\textbf{CoG position (mm)} \\ \textbf{(x; y; z)}\tnote{1}}'};
 
-markdownHeadings = {'Unit' 'Mass (kg)' 'Moments of inertia (kg.m2) Ixx; Iyy; Izz' 'CoG position (mm) (x; y; z)'};
+markdownHeadings = {'Sprung unit' 'Mass (kg)' 'Moments of inertia (kg.m2) Ixx; Iyy; Izz' 'CoG position (mm) (x; y; z)'};
 MdTable.data = [markdownHeadings; Table.data];
 
 %% Compiling the structure fields required by latexTable

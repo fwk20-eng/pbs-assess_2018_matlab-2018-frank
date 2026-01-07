@@ -273,73 +273,118 @@ end
 % Axle loads
 Axle = computeAxleLoadWithGradient(0,mAxle,xAxle,zAxle,l,h,mSprung,XcgSprung,HcgSprung,grouping,loadshare1,loadCoupled);
 %Determine start gear
-
-FrrD = rolling(0,sum(Axle(Ndrive)),ch,radial); %Rolling resistance at 0 velocity
-FrrN = rolling(0,(sum(mTotal) - sum(Axle(Ndrive))),ch,radial);
-Frr = FrrD + FrrN;
-Fengine = engageTNm*eff_diffStart/rr*difStart.*gears.*eff_gear - FrrD;
-maxFthrust = sum(0.8*9.81*Axle(Ndrive))-sin(0)*sum(mTotal)*9.81 - FrrN;
-%startGear=find(Fengine<maxFthrust,1,'first');
-startGear=2;
-Freq = engageTNm*eff_gear(startGear)*eff_diffStart/rr*difStart*gears(startGear);
+FrrDriveAxles = rolling(0,sum(Axle(Ndrive)),ch,radial); %Rolling resistance at 0 velocity
+FrrNonDriveAxles = rolling(0,(sum(mTotal) - sum(Axle(Ndrive))),ch,radial);
+FrrTotal = FrrDriveAxles + FrrNonDriveAxles;
+Fengine = engageTNm*eff_diff/rr*dif.*gears.*eff_gear - FrrDriveAxles;
+maxTraction = sum(0.8*9.81*Axle(Ndrive));
+startGear=find(Fengine<maxTraction,1,'first');
+Fengine = engageTNm*eff_gear(startGear)*eff_diff/rr*dif*gears(startGear);
 %
 %1 Start gear and release clutch
 % Allow a linear increase up to engageTNm in 1 s
 tspan=[0:0.01:1];
 dt=tspan(2);
-v2=0;
 v(1)=0;
 gearvec(1)=startGear;
-G=gears(startGear)*difStart;
-for i=1:(length(tspan)-1); %-1 for extra i+1
-    t2=tspan(i);
-    dvdt=veh_start1(t2,v2,Freq,rr,G,sum(mTotal),Ie,It,ch,radial,A,cd,ce);
-    v(i+1)=v(i)+dvdt*dt;
-    gearvec(i+1)=startGear;
+Ftract(1) = 0;
+G=gears(startGear)*dif;
+State(1)=1;
+for i=2:length(tspan); %
+    t=tspan(i);
+    v_at_t=v(i-1);
+    me=sum(mTotal)+It/rr/rr+Ie*G^2/rr/rr;
+    FrrDriveAxles = rolling(v_at_t,sum(Axle(Ndrive)),ch,radial); %Rolling resistance at 0 velocity
+    FrrNonDriveAxles = rolling(v_at_t,(sum(mTotal) - sum(Axle(Ndrive))),ch,radial);
+    FrrTotal = FrrDriveAxles + FrrNonDriveAxles;    
+    Fdrag = drag(A,cd,v_at_t,ce);
+    dvdt=(t*(Fengine-FrrTotal)-Fdrag)/me; % Fengine takes 1s to engage. FrrTotal included to ensure no backwards
+    v(i)=v(i-1)+dvdt*dt;
+    gearvec(i)=startGear;
+    State(i)=1;
+    Ftract(i)=t*(Fengine-FrrNonDriveAxles);
 end
 %
 %2 Get to engageTrpm
-% If N>=engageTrpm then move to 3, else keep Torque = engageTNm
+% If N>=engageTrpm then move to 3, else keep engineTNm = engageTNm
 N=v(end)/rr*G*60/2/pi;
 while N<engageTrpm,
     i=i+1;
     tspan(i)=tspan(i-1)+dt;
-    t2=tspan(i);
-    dvdt=veh_start2(t2,v2,Freq,rr,gears(startGear)*difStart,sum(mTotal),Ie,It,ch,radial,A,cd,ce);
-    v(i+1)=v(i)+dvdt*dt;
-    gearvec(i+1)=startGear;
-    N=v(end)/rr*G*60/2/pi;
+    v_at_t=v(i-1);
+    me=sum(mTotal)+It/rr/rr+Ie*G^2/rr/rr;
+    FrrDriveAxles = rolling(v_at_t,sum(Axle(Ndrive)),ch,radial); %Rolling resistance at 0 velocity
+    FrrNonDriveAxles = rolling(v_at_t,(sum(mTotal) - sum(Axle(Ndrive))),ch,radial);
+    FrrTotal = FrrDriveAxles + FrrNonDriveAxles;    
+    Fdrag = drag(A,cd,v_at_t,ce);
+    dvdt=(Fengine-FrrTotal-Fdrag)/me; % Fengine takes 1s to engage. FrrTotal included to ensure no backwards
+    v(i)=v(i-1)+dvdt*dt;
+    gearvec(i)=startGear;
+    State(i)=2;
+    Ftract(i)=(Fengine-FrrNonDriveAxles);
+    N=v(end)/rr*G*60/2/pi;    
 end
-tspan(i+1)=tspan(i)+dt;
 %
-%3 Get to full torque
-% If Torque>=engageTNm then move to 4, else take 1 s to allow Torque to
-% increase to full value
-for j=1:100
+%3 Get to torque of engine
+% The simulation is at engageTNm but the engine torque curve will be more
+% For 1 second the transition is made if required
+engineTNm = interp1(Torquerpm,TorqueNm,N,'linear',0);
+currentTNm = engageTNm;
+j=0;
+while (currentTNm < engineTNm) && (j<100),
     i=i+1;
-    Freq1=interp1(Torquerpm,TorqueNm,N,'linear',0)*eff_gear(startGear)*eff_diffStart/rr*difStart*gears(startGear);
-    Freq2=engageTNm*eff_gear(startGear)*eff_diffStart/rr*difStart*gears(startGear);
-    Freq=Freq1*j/100+Freq2*(100-j)/100;
-    tspan(i)=tspan(end)+0.01;
-    dvdt=veh_start2(t2,v2,Freq,rr,G,sum(mTotal),Ie,It,ch,radial,A,cd,ce);
-    v(i+1)=v(i)+dvdt*dt;
-    N=v(end)/rr*G*60/2/pi;
-    gearvec(i+1)=startGear;
+    tspan(i)=tspan(i-1)+dt;
+    v_at_t=v(i-1);
+    me=sum(mTotal)+It/rr/rr+Ie*G^2/rr/rr;
+    FrrDriveAxles = rolling(v_at_t,sum(Axle(Ndrive)),ch,radial); %Rolling resistance at 0 velocity
+    FrrNonDriveAxles = rolling(v_at_t,(sum(mTotal) - sum(Axle(Ndrive))),ch,radial);
+    FrrTotal = FrrDriveAxles + FrrNonDriveAxles;    
+    Fdrag = drag(A,cd,v_at_t,ce);    
+    currentTNm=interp1(Torquerpm,TorqueNm,N,'linear',0)*j/100+engageTNm*(100-j)/100;
+    Fengine = currentTNm*eff_gear(startGear)*eff_diff/rr*dif*gears(startGear);
+    State(i)=3;    
+    if (Fengine-FrrDriveAxles) > maxTraction, % Ftraction cannot be bigger than maxTraction    
+        Ftract(i) = maxTraction;
+        dvdt=(maxTraction-FrrNonDriveAxles-Fdrag)/me;
+    else
+        Ftract(i) = Fengine-FrrDriveAxles;
+        dvdt=(Fengine-FrrTotal-Fdrag)/me;
+    end
+    v(i)=v(i-1)+dvdt*dt;
+    gearvec(i)=startGear;
+    N=v(end)/rr*G*60/2/pi;    
+    j=j+1;
 end
-tspan(i+1)=tspan(i)+dt;
 %
 %4 Alter Freq with speed of engine accelerate until N matches changeT
 %  If yes Gear changes to next and integrate for 1 s with Freq=0
 Gear=startGear;
-changephase=0;
-Tchange=0;
-while t2<40,
+gearchangephase=0;
+timeInGearChangeMode=0;
+while tspan(i)<40,
     i=i+1;
     tspan(i)=tspan(i-1)+dt;
-    t2=tspan(i);
-    if changephase==0 %Assume not in gear change mode
+    v_at_t=v(i-1);
+    FrrDriveAxles = rolling(v_at_t,sum(Axle(Ndrive)),ch,radial); %Rolling resistance at 0 velocity
+    FrrNonDriveAxles = rolling(v_at_t,(sum(mTotal) - sum(Axle(Ndrive))),ch,radial);
+    FrrTotal = FrrDriveAxles + FrrNonDriveAxles;    
+    Fdrag = drag(A,cd,v_at_t,ce);    
+    if gearchangephase==0 %Not in gear change mode        
+        me=sum(mTotal)+It/rr/rr+Ie*G^2/rr/rr;
+        Fengine = interp1(Torquerpm,TorqueNm,N,'linear',0)*eff_gear(Gear)*eff_diff/rr*dif*gears(Gear);
+        State(i)=4;        
+        if (Fengine-FrrDriveAxles) > maxTraction, % Ftraction cannot be bigger than maxTraction    
+            Ftract(i) = maxTraction;
+            dvdt=(maxTraction-FrrNonDriveAxles-Fdrag)/me;
+        else
+            Ftract(i) = Fengine-FrrDriveAxles;
+            dvdt=(Fengine-FrrTotal-Fdrag)/me;
+        end
+        v(i)=v(i-1)+dvdt*dt;
+        gearvec(i)=Gear;
+        N=v(end)/rr*G*60/2/pi;          
         if (N>changeT)&Gear<length(gears), %Change gears
-            changephase=1;
+            gearchangephase=1;
             if gearshiftregime==1,
                 Gear=Gear+1;
             else
@@ -349,36 +394,27 @@ while t2<40,
                     Gear=Gear+1;
                 end
             end
-            G=gears(Gear)*difStart;
-            N=v(end)/rr*G*60/2/pi;
-            Freq=0;
-            dvdt=veh_change(t2,v2,Freq,rr,gears(startGear)*difStart,sum(mTotal),Ie,It,ch,radial,A,cd,ce);
-            Tchange=Tchange+dt;
-        else
-            Freq=interp1(Torquerpm,TorqueNm,N,'linear',0)*eff_gear(Gear)*eff_diffStart/rr*difStart*gears(Gear);
-            dvdt=veh_throttle(t2,v2,Freq,rr,gears(startGear)*difStart,sum(mTotal),Ie,It,ch,radial,A,cd,ce);
+            G=gears(Gear)*dif;
         end
     else
-        Tchange=Tchange+dt;
-        if Tchange>=1.5,
-            Tchange=0;
-            changephase=0;
-            Freq=0;
-            dvdt=veh_change(t2,v2,Freq,rr,gears(startGear)*difStart,sum(mTotal),Ie,It,ch,radial,A,cd,ce);
+        timeInGearChangeMode=timeInGearChangeMode+dt;
+        if timeInGearChangeMode>=1.5,
+            timeInGearChangeMode=0;
+            gearchangephase=0;
         end
+        me=sum(mTotal)+It/rr/rr; % Engine is disengaged
+        Ftract(i)=0;
+        dvdt=(-FrrTotal-Fdrag)/me;
+        v(i)=v(i-1)+dvdt*dt;
+        gearvec(i)=Gear;
+        N=v(end)/rr*G*60/2/pi;
     end
-    v(i+1)=v(i)+dvdt*dt;
-    gearvec(i+1)=Gear;
-    N=v(end)/rr*G*60/2/pi;
 end
-v=v(1:end-1);
-gearvec=gearvec(1:end-1);
 s=cumtrapz(tspan,v);
 i=find(s>100,1,'first');
 endGear=gearvec(i);
-
+%
 ACC=[tspan(i)];
-
 if Is.plotOn
     if (isfield(Is,'plotBackground') & Is.plotBackground)
         figure('name', 'ACC','visible', 'off');
@@ -403,45 +439,12 @@ if Is.plotOn
     
     title('Acceleration Capability')
     hold off
+    disp('howsit')
     
 end
 end
 
-%ensure t is output every 0.01;
-%[t,v]=ode45(@(t,v) veh_start(t,v,Freq,rr,gears(startGear)*dif,sum(mTotal),Ie,It,ch,radial,A,cd,ce),tspan,0);
-%function dydt = f(t,y)
-%dydt = [y(2); -9.8];
-%end
-% --------------------------------------------------------------------------
-
-%function [value,isterminal,direction] = events(t,y)
-%% Locate the time when height passes through zero in a decreasing direction
-%% and stop integration.
-%value = y;     % detect height = 0
-%isterminal = [1; 0];   % stop the integration
-%direction = [-1; 0];  % negative direction
-%end
-
-%%
-function vdot=veh_start1(t,v,Freq,rr,G,m,Ie,It,ch,radial,A,cd,ce)
-me=m+It/rr/rr+Ie*G^2/rr/rr;
-vdot=(t*(Freq-rolling(v,m,ch,radial))-drag(A,cd,v,ce))/me;
-end
-
-function vdot=veh_start2(t,v,Freq,rr,G,m,Ie,It,ch,radial,A,cd,ce)
-me=m+It/rr/rr+Ie*G^2/rr/rr;
-vdot=((Freq-rolling(v,m,ch,radial))-drag(A,cd,v,ce))/me;
-end
-
-function vdot=veh_throttle(t,v,Freq,rr,G,m,Ie,It,ch,radial,A,cd,ce)
-me=m+It/rr/rr+Ie*G^2/rr/rr;
-vdot=((Freq-rolling(v,m,ch,radial))-drag(A,cd,v,ce))/me;
-end
-
-function vdot=veh_change(t,v,Freq,rr,G,m,Ie,It,ch,radial,A,cd,ce)
-vdot=((Freq-rolling(v,m,ch,radial))-drag(A,cd,v,ce))/m;
-end
-
+%% Rolling resistance and drag functions
 function [Frr] = rolling(v,m,ch,radial);
 % velocity in m/s
 % mass in kg

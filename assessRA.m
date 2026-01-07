@@ -122,7 +122,7 @@ for i = i1st:iLast
   % only include unit if not in dollys vector (see C12.3(c)(i, ii & iii) of NTC standards)
   % evaluated here and not above in case dolly is in the middle of rrcu (i.e. C-dolly)
   %----------------------------------------------
-  if sum(i == Combination.dollys(:)) == 0
+  if sum(i == Combination.dollys_trailerFrontAxles(:)) == 0
     AYrrcu = AYrrcu + mSprung(i).*HcgSprung(i).*Ay{i};
     denom = denom + mSprung(i)*HcgSprung(i);
   end
@@ -182,7 +182,7 @@ if Is.plotOn
 % Legend
 %----------------------------------------------
   legTitles = {'front steer axle'; 'last unit'; 'peak lat. acc.'};  
-  legend(legTitles, 'Location', 'northeastoutside'); legend('boxoff');
+  legend(legTitles, 'Location', 'Best');
   
 % Axis labels
 %----------------------------------------------

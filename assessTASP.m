@@ -15,7 +15,7 @@ function [SW99] = assessTASP(Sprung, Combination, Project, MatKey, Is)
   'Y_S1' 'Y_S2' 'Y_S6' 'Y_S7' 'Y_S8' 'Y_S9'},...
   Sprung.numberOffUnits*ones(1,12),...
   {'' '' '' '' '' '' '' '' '' '' '' ''},...
-  Combination.dollys,...
+  Combination.dollys_trailerFrontAxles,...
   Project.savePath,...
   Project.truckSimRunsDirectory,...
   Project.runKey,...
@@ -81,7 +81,7 @@ for i = iStart:iEnd
   for iVU = 1 : Sprung.numberOffUnits
     
     % only evaluated if veh unit number not in dollys vector
-    if sum(iVU == Combination.dollys(:)) == 0
+    if sum(iVU == Combination.dollys_trailerFrontAxles(:)) == 0
       
       % get i for when this RP on this veh unit was at this X position
       iRP1 = indClosestX(i, X_RP1{1}(i), X_RP1{iVU});
@@ -106,7 +106,7 @@ for i = iStart:iEnd
   for iVU = 1 : Sprung.numberOffUnits
     
     % only evaluated if veh unit number not in dollys vector
-    if sum(iVU == Combination.dollys(:)) == 0
+    if sum(iVU == Combination.dollys_trailerFrontAxles(:)) == 0
       % get i for when this RP on this veh unit was at this X position
       iRP6 = indClosestX(i, X_RP1{1}(i), X_RP6{iVU});
       iRP7 = indClosestX(i, X_RP1{1}(i), X_RP7{iVU});
@@ -159,7 +159,7 @@ if Is.plotOn
   for i = 1 : Sprung.numberOffUnits % plot: X_RP, Y_RP
     
     % only evaluated if veh unit number not in dollys vector
-    if sum(i == Combination.dollys(:)) == 0
+    if sum(i == Combination.dollys_trailerFrontAxles(:)) == 0
       plot(X_RP1{i}, Y_RP1{i}, 'Color', getColour(i));
       plot(X_RP2{i}, Y_RP2{i}, 'Color', getColour(i));
       plot(X_RP6{i}, Y_RP6{i}, 'Color', getColour(i));

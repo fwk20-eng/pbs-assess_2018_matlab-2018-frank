@@ -8,7 +8,7 @@ function [TS_max] = assessTS(Sprung, Combination, Axle, Project, Is, X_StOut, Y_
     X_RP8, Y_RP8, X_RP9, Y_RP9, ladentext)
 
 for i = 1:Sprung.numberOffUnits
-    if sum(i == Combination.dollys(:)) == 0       % only evaluated if veh unit number not in dollys vector
+    if sum(i == Combination.dollys_trailerFrontAxles(:)) == 0       % only evaluated if veh unit number not in dollys vector
         [minY6(i), indTS6(i)] = min(Y_RP6{i});             % find minimums        
         [minY7(i), indTS7(i)] = min(Y_RP7{i});             % find minimums
         [minY8(i), indTS8(i)] = min(Y_RP8{i});             % find minimums
@@ -41,7 +41,7 @@ if Is.plotOn
     
     ind=1;
     for i = 1:Sprung.numberOffUnits                                             % plot: X_RP6789, Y_RP6789
-        if sum(i == Combination.dollys(:)) == 0                                 % only evaluated if veh unit number not in dollys vector
+        if sum(i == Combination.dollys_trailerFrontAxles(:)) == 0                                 % only evaluated if veh unit number not in dollys vector
             ind=ind+1;
             plot(X_RP6{i}, Y_RP6{i}+(max(Combination.maxWidth)-Axle.SteerAxleOverallWidth)/2000, 'Color', getColour(ind));      % plot next line
             ind=ind+1;
@@ -55,7 +55,7 @@ if Is.plotOn
     end
     
     for i = 1:Sprung.numberOffUnits                                             % plot: X_RP6789, Y_RP6789
-        if sum(i == Combination.dollys(:)) == 0                                 % only evaluated if veh unit number not in dollys vector
+        if sum(i == Combination.dollys_trailerFrontAxles(:)) == 0                                 % only evaluated if veh unit number not in dollys vector
             plot(X_RP6{i}(indTS6(i)), Y_RP6{i}(indTS6(i))+(max(Combination.maxWidth)-Axle.SteerAxleOverallWidth)/2000, 'or'); % plot peaks            
             plot(X_RP7{i}(indTS7(i)), Y_RP7{i}(indTS7(i))+(max(Combination.maxWidth)-Axle.SteerAxleOverallWidth)/2000, 'or'); % plot peaks            
             plot(X_RP8{i}(indTS8(i)), Y_RP8{i}(indTS8(i))+(max(Combination.maxWidth)-Axle.SteerAxleOverallWidth)/2000, 'or'); % plot peaks
@@ -91,11 +91,11 @@ if Is.plotOn
     
     iPlot = 1;
     for i = 1:Sprung.numberOffUnits
-        if sum(i == Combination.dollys(:)) == 0       % only evaluated if veh unit number not in dollys vector
+        if sum(i == Combination.dollys_trailerFrontAxles(:)) == 0       % only evaluated if veh unit number not in dollys vector
             [Yloc j] = min([Y_RP6{i}(indTS6(i)) Y_RP7{i}(indTS7(i)) Y_RP8{i}(indTS8(i)) Y_RP9{i}(indTS9(i))]);
             vecr=[X_RP6{i}(indTS6(i)); X_RP7{i}(indTS7(i)); X_RP8{i}(indTS8(i)); X_RP9{i}(indTS9(i))];
             Xloc=vecr(j);
-            text(Xloc, Yloc-0.1*i,['TS_' int2str(i) ' = ' num2str(ceil(TS(i)*100)/100) ' m'])
+            text(Xloc+1, Yloc,['TS_' int2str(i) ' = ' num2str(ceil(TS(i)*100)/100) ' m'])
             iPlot = iPlot + 1;
         end
     end
@@ -105,7 +105,7 @@ if Is.plotOn
     set(gca,'Ygrid','on');
     xlabel('X [m]')
     ylabel('Y [m]')
-    legend(legTitles, 'Location', 'northeastoutside'); legend('boxoff');
+    legend(legTitles, 'Location', 'southwest')
     
     if Is.save
         savePlot(Project.savePath, Project.runKey, ['TS' ladentext])

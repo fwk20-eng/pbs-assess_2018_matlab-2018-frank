@@ -60,12 +60,12 @@ referencePointNames = {...
     'Rear';...% 8
     'Rear'};% 9
 
-nDollys = length(Combination.dollys);
+nDollys = length(Combination.dollys_trailerFrontAxles);
 nUnitsWithReferencePoints = Sprung.numberOffUnits - nDollys;
 
 for iUnit = 1 : Sprung.numberOffUnits
     % Do not print reference points if a dolly unit
-    if ~any(iUnit == Combination.dollys)
+    if ~any(iUnit == Combination.dollys_trailerFrontAxles)
         iReferencePointsUnit = iUnit * ones(9,1);
         
         % Only the first 9 reference points are used in the current post processor
@@ -89,9 +89,9 @@ for iUnit = 1 : Sprung.numberOffUnits
 
 end
 
-Table.Headings = {'\textbf{Unit}'  '\textbf{Pt.}' '\textbf{PM}' '\textbf{L/R}' '\textbf{Description}' '\textbf{X (mm)\tnote{1}}' '\textbf{Y (mm)\tnote{1}}' '\textbf{Z (mm)\tnote{1}}'};
+Table.Headings = {'\textbf{Sprung unit}'  '\textbf{Pt.}' '\textbf{PM}' '\textbf{L/R}' '\textbf{Description}' '\textbf{X (mm)\tnote{1}}' '\textbf{Y (mm)\tnote{1}}' '\textbf{Z (mm)\tnote{1}}'};
 
-markdownHeadings = {'Unit' 'Pt.' 'PM' 'L/R' 'Description' 'X (mm)' 'Y (mm)' 'Z (mm)'};
+markdownHeadings = {'Sprung unit' 'Pt.' 'PM' 'L/R' 'Description' 'X (mm)' 'Y (mm)' 'Z (mm)'};
 MdTable.data = [markdownHeadings; Table.data];
 
 % Compiling the structure fields required by latexTable

@@ -166,7 +166,7 @@ if Is.plotOn
     
   end
   
-  legend(legTitles, 'Location', 'northeastoutside'); legend('boxoff');
+  legend(legTitles, 'Location', 'Best')
   
   set(gcf,'PaperPosition',[0 0 16 11])
   set(gca,'Xgrid','on');
