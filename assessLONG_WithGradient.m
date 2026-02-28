@@ -6,7 +6,7 @@
 %% Change Log
 %% [0.1.0] - 2020-02-09
 % * First code
-function [START, GRADA, GRADB, ACC] = assessLONG_WithGradient(mTotal,A,radial,ch,cd,ce,gears,eff_gear,gearsStart,eff_gearStart,eff_diff,dif,eff_diffStart,difStart,Torquerpm,TorqueNm,engageTrpm,engageTNm,changeT,rr,Ie,It,Ndrive,gearshiftregime,savePath, runKey, plotOn, isSave,mAxle,xAxle,zAxle,l,h,mSprung,XcgSprung,HcgSprung,grouping,loadshare1,loadshare2,loadCoupled,Is);
+function [START, GRADA, GRADB, ACC] = assessLONG_WithGradient( Combination, Engine, Tyre, Axle, Project, Is, mTotal, Axle1, Axle2, radial, Hitch, mSprung, XcgSprung, HcgSprung)
 % START: grade; sat = 0 if tyres not saturated and 1 if yes & 2 if over 30%
 % GRADA: grade; sat = 0 if tyres not saturated and 1 if yes & 2 if over 30%
 % GRADB: speed; sat = 0 if tyres not saturated and 1 if yes & 2 if over 120
@@ -14,7 +14,52 @@ function [START, GRADA, GRADB, ACC] = assessLONG_WithGradient(mTotal,A,radial,ch
 % ACC: time to 100; startGear; endGear v(i)*3.6;
 % Planned improvements
 % Use ode45 rather than use cumtrapz
+%%
+% --- Combination ---
+A = Combination.frontalAreaForDrag;
+ch = Combination.ch;
+cd = Combination.cd;
+ce = Combination.ce;
+loadshare1 = Combination.loadshare1;
+loadshare2 = Combination.loadshare2;
 
+%% --- Engine ---
+gears = Engine.gears;
+eff_gear = Engine.eff_gear;
+gearsStart = Engine.gearsStart;
+eff_gearStart = Engine.eff_gearStart;
+eff_diff = Engine.eff_diff;
+dif = Engine.dif;
+eff_diffStart = Engine.eff_diffStart;
+difStart = Engine.difStart;
+Torquerpm = Engine.Torquerpm;
+TorqueNm = Engine.TorqueNm;
+engageTrpm = Engine.engageTrpm;
+engageTNm = Engine.engageTNm;
+changeT = Engine.changeT;
+Ie = Engine.Ie;
+It = Engine.It;
+gearshiftregime = Engine.gearshiftregime;
+
+%% --- Tyre ---
+rr = Tyre.RollingRadius;
+
+%% --- Axle ---
+mAxle = Axle.UnsprungMassArray;       % unsprung mass per axle
+xAxle = Axle.XPositionArray;          % longitudinal positions
+zAxle = Axle.ZPositionArray;          % vertical positions
+Ndrive = Axle.Driven;                 % indices of driven axles
+grouping = Axle.Grouping;             % axle group IDs
+
+%% --- Hitch ---
+l = Hitch.XPositionArray;
+h = Hitch.ZPositionArray;
+loadCoupled = Hitch.LoadCoupledArray;
+
+%% --- Project ---
+isSave = Is.save;
+savePath = Project.savePath;
+runKey = Project.runKey;
 %%
 %Startability
 G = difStart*gearsStart(1); %Assume start in first
@@ -32,8 +77,13 @@ while contin
     
     Axle = computeAxleLoadWithGradient(grad(i),mAxle,xAxle,zAxle,l,h,mSprung,XcgSprung,HcgSprung,grouping,loadshare2,loadCoupled);
     
-    FrrD = rolling(0,sum(Axle(Ndrive)),ch,radial); % Rolling resistance at 0 velocity
-    FrrN = rolling(0,(sum(mTotal) - sum(Axle(Ndrive))),ch,radial);
+    if isfield(Is, 'SimpleRollingResistance') && Is.SimpleRollingResistance == 1,
+        FrrD = 0.008*sum(Axle(Ndrive));
+        FrrN = 0.006*(sum(mTotal) - sum(Axle(Ndrive)));
+    else
+        FrrD = rolling(0,sum(Axle(Ndrive)),ch,radial); % Rolling resistance at 0 velocity
+        FrrN = rolling(0,(sum(mTotal) - sum(Axle(Ndrive))),ch,radial);
+    end
     Frr = FrrD + FrrN;
     
     Fengine = (engageTNm*eff_diffStart*eff_gearStart(1)*G/rr) - FrrD;
@@ -117,8 +167,13 @@ while contin
     
     Axle = computeAxleLoadWithGradient(grad(i),mAxle,xAxle,zAxle,l,h,mSprung,XcgSprung,HcgSprung,grouping,loadshare2,loadCoupled);
     
-    FrrD = rolling(v,sum(Axle(Ndrive)),ch,radial); % Rolling resistance at 0 velocity
-    FrrN = rolling(v,(sum(mTotal) - sum(Axle(Ndrive))),ch,radial);
+    if isfield(Is, 'SimpleRollingResistance') && Is.SimpleRollingResistance == 1,
+        FrrD = 0.008*sum(Axle(Ndrive));
+        FrrN = 0.006*(sum(mTotal) - sum(Axle(Ndrive)));
+    else
+        FrrD = rolling(0,sum(Axle(Ndrive)),ch,radial); % Rolling resistance at 0 velocity
+        FrrN = rolling(0,(sum(mTotal) - sum(Axle(Ndrive))),ch,radial);
+    end
     Frr = FrrD + FrrN;
     
     Fengine = (maxTorqueNm*eff_gear(1)*eff_diffStart/rr*difStart*gears(1)) - FrrD;
@@ -196,8 +251,13 @@ while contin
     i=i+1;
     v=vel(i)/3.6; % convert speed to m/s metric units
     
-    FrrD = rolling(v,sum(Axle(Ndrive)),ch,radial); % Rolling resistance at 0 velocity
-    FrrN = rolling(v,(sum(mTotal) - sum(Axle(Ndrive))),ch,radial);
+    if isfield(Is, 'SimpleRollingResistance') && Is.SimpleRollingResistance == 1,
+        FrrD = 0.008*sum(Axle(Ndrive));
+        FrrN = 0.006*(sum(mTotal) - sum(Axle(Ndrive)));
+    else
+        FrrD = rolling(0,sum(Axle(Ndrive)),ch,radial); % Rolling resistance at 0 velocity
+        FrrN = rolling(0,(sum(mTotal) - sum(Axle(Ndrive))),ch,radial);
+    end
     Frr = FrrD + FrrN;
     
     FA = drag(A,cd,v,ce);
@@ -294,9 +354,14 @@ for i=2:length(tspan); %
     t=tspan(i);
     v_at_t=v(i-1);
     me=sum(mTotal)+It/rr/rr+Ie*G^2/rr/rr;
-    FrrDriveAxles = rolling(v_at_t,sum(Axle(Ndrive)),ch,radial); %Rolling resistance at 0 velocity
-    FrrNonDriveAxles = rolling(v_at_t,(sum(mTotal) - sum(Axle(Ndrive))),ch,radial);
-    FrrTotal = FrrDriveAxles + FrrNonDriveAxles;    
+    if isfield(Is, 'SimpleRollingResistance') && Is.SimpleRollingResistance == 1,
+        FrrDriveAxles = 0.008*sum(Axle(Ndrive));
+        FrrDriveAxles = 0.006*(sum(mTotal) - sum(Axle(Ndrive)));
+    else
+        FrrDriveAxles = rolling(v_at_t,sum(Axle(Ndrive)),ch,radial);
+        FrrNonDriveAxles = rolling(v_at_t,(sum(mTotal) - sum(Axle(Ndrive))),ch,radial);
+    end
+    FrrTotal = FrrDriveAxles + FrrNonDriveAxles;  
     Fdrag = drag(A,cd,v_at_t,ce);
     dvdt=(t*(Fengine-FrrTotal)-Fdrag)/me; % Fengine takes 1s to engage. FrrTotal included to ensure no backwards
     v(i)=v(i-1)+dvdt*dt;
@@ -313,9 +378,14 @@ while N<engageTrpm,
     tspan(i)=tspan(i-1)+dt;
     v_at_t=v(i-1);
     me=sum(mTotal)+It/rr/rr+Ie*G^2/rr/rr;
-    FrrDriveAxles = rolling(v_at_t,sum(Axle(Ndrive)),ch,radial); %Rolling resistance at 0 velocity
-    FrrNonDriveAxles = rolling(v_at_t,(sum(mTotal) - sum(Axle(Ndrive))),ch,radial);
-    FrrTotal = FrrDriveAxles + FrrNonDriveAxles;    
+    if isfield(Is, 'SimpleRollingResistance') && Is.SimpleRollingResistance == 1,
+        FrrDriveAxles = 0.008*sum(Axle(Ndrive));
+        FrrDriveAxles = 0.006*(sum(mTotal) - sum(Axle(Ndrive)));
+    else
+        FrrDriveAxles = rolling(v_at_t,sum(Axle(Ndrive)),ch,radial);
+        FrrNonDriveAxles = rolling(v_at_t,(sum(mTotal) - sum(Axle(Ndrive))),ch,radial);
+    end
+    FrrTotal = FrrDriveAxles + FrrNonDriveAxles;  
     Fdrag = drag(A,cd,v_at_t,ce);
     dvdt=(Fengine-FrrTotal-Fdrag)/me; % Fengine takes 1s to engage. FrrTotal included to ensure no backwards
     v(i)=v(i-1)+dvdt*dt;
@@ -336,9 +406,14 @@ while (currentTNm < engineTNm) && (j<100),
     tspan(i)=tspan(i-1)+dt;
     v_at_t=v(i-1);
     me=sum(mTotal)+It/rr/rr+Ie*G^2/rr/rr;
-    FrrDriveAxles = rolling(v_at_t,sum(Axle(Ndrive)),ch,radial); %Rolling resistance at 0 velocity
-    FrrNonDriveAxles = rolling(v_at_t,(sum(mTotal) - sum(Axle(Ndrive))),ch,radial);
-    FrrTotal = FrrDriveAxles + FrrNonDriveAxles;    
+    if isfield(Is, 'SimpleRollingResistance') && Is.SimpleRollingResistance == 1,
+        FrrDriveAxles = 0.008*sum(Axle(Ndrive));
+        FrrDriveAxles = 0.006*(sum(mTotal) - sum(Axle(Ndrive)));
+    else
+        FrrDriveAxles = rolling(v_at_t,sum(Axle(Ndrive)),ch,radial);
+        FrrNonDriveAxles = rolling(v_at_t,(sum(mTotal) - sum(Axle(Ndrive))),ch,radial);
+    end
+    FrrTotal = FrrDriveAxles + FrrNonDriveAxles;
     Fdrag = drag(A,cd,v_at_t,ce);    
     currentTNm=interp1(Torquerpm,TorqueNm,N,'linear',0)*j/100+engageTNm*(100-j)/100;
     Fengine = currentTNm*eff_gear(startGear)*eff_diff/rr*dif*gears(startGear);
@@ -365,9 +440,14 @@ while tspan(i)<40,
     i=i+1;
     tspan(i)=tspan(i-1)+dt;
     v_at_t=v(i-1);
-    FrrDriveAxles = rolling(v_at_t,sum(Axle(Ndrive)),ch,radial); %Rolling resistance at 0 velocity
-    FrrNonDriveAxles = rolling(v_at_t,(sum(mTotal) - sum(Axle(Ndrive))),ch,radial);
-    FrrTotal = FrrDriveAxles + FrrNonDriveAxles;    
+    if isfield(Is, 'SimpleRollingResistance') && Is.SimpleRollingResistance == 1,
+        FrrDriveAxles = 0.008*sum(Axle(Ndrive));
+        FrrDriveAxles = 0.006*(sum(mTotal) - sum(Axle(Ndrive)));
+    else
+        FrrDriveAxles = rolling(v_at_t,sum(Axle(Ndrive)),ch,radial);
+        FrrNonDriveAxles = rolling(v_at_t,(sum(mTotal) - sum(Axle(Ndrive))),ch,radial);
+    end
+    FrrTotal = FrrDriveAxles + FrrNonDriveAxles;   
     Fdrag = drag(A,cd,v_at_t,ce);    
     if gearchangephase==0 %Not in gear change mode        
         me=sum(mTotal)+It/rr/rr+Ie*G^2/rr/rr;
@@ -439,7 +519,6 @@ if Is.plotOn
     
     title('Acceleration Capability')
     hold off
-    disp('howsit')
     
 end
 end
