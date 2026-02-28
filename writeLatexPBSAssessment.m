@@ -161,13 +161,20 @@ if Is.latexReport
     % Generate the latex tables and save in the PBS assessment tex folder
     createLatexTables(Table, '5-1-CombinationTables.tex', pbsAssessCopyToFullPath);
     createLatexTables(TableRedacted, '5-1-CombinationTablesRedacted.tex', pbsAssessCopyToFullPath);
-    %% Create the CommissioningTable    
+    %% Create the 6-1-CommissioningTables.tex
     [CommissioningTable.vehicleAndAssessor] = createTableLatexCommissioningVehicleAndAssessor;
     nVehicleUnits = str2num(Axle.VehicleUnitCellArray{end}{end});
     for iUnit = 1 : nVehicleUnits
         eval(['CommissioningTable.Unit' num2str(iUnit) ' = createTableLatexCommissioningUnits(Tyre, Axle, Hitch,Combination.dollys_trailerFrontAxles,Dimensions.RefPointsLadenCell,iUnit);']);
     end
     createLatexTables(CommissioningTable, '6-1-CommissioningTables.tex', pbsAssessCopyToFullPath);
+    %% Create the 6-1-CommissioningTables.tex
+    [CommissioningTable.vehicleAndAssessor] = createTableLatexCommissioningVehicleAndAssessor;
+    nVehicleUnits = str2num(Axle.VehicleUnitCellArray{end}{end});
+    for iUnit = 1 : nVehicleUnits
+        eval(['CommissioningTable.Unit' num2str(iUnit) ' = createTableLatexCommissioningUnits(Tyre, Axle, Hitch,Combination.dollys_trailerFrontAxles,Dimensions.RefPointsLadenCell,iUnit);']);
+    end
+    createLatexTables(CommissioningTable, '6-1-CommissioningTables.tex', pbsAssessCopyToFullPath);    
     %% Modify the PBS assessment parameters and save to a new file
     % Create the PBS assessment paths
     Report.pbsAssessmentCommands = strcat(pbsAssessCopyToFullPath, ...
