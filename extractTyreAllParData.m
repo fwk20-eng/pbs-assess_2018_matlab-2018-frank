@@ -60,20 +60,26 @@ for iAxle = 1 : nAxles
     % Extract number after "dataset"
     tyreDatasetNumber = regexp(tyreDataset{:}, 'dataset\s+(\d+)', 'tokens');
     switch tyreDatasetNumber{1}{:}
+            case '1'
+                tyreLoadIndex = '130/126';
             case '2'
-                tyreLoadIndex = '134/132';
+                tyreLoadIndex = '134/131';
             case '3'
-                tyreLoadIndex = '138/136';
+                tyreLoadIndex = '138/135';
             case '4'
-                tyreLoadIndex = '142/140';
+                tyreLoadIndex = '142/139';                
             case '5'
-                tyreLoadIndex = '144/142';                
+                tyreLoadIndex = '146/143';
             case '6'
                 tyreLoadIndex = '150/146';                
             case '7'
                 tyreLoadIndex = '154/150';
             case '8'
-                tyreLoadIndex = '158/154';
+                tyreLoadIndex = '158/155';
+            case '9'
+                tyreLoadIndex = '162/158';
+            case '10'
+                tyreLoadIndex = '164/160';     
         otherwise
             tyreLoadIndex = 'error';
     end
@@ -133,20 +139,26 @@ for iUnit = 2:Sprung.numberOffUnits
         % Extract number after "dataset"
         tyreDatasetNumber = regexp(tyreDataset{:}, 'dataset\s+(\d+)', 'tokens');
         switch tyreDatasetNumber{1}{:}
+            case '1'
+                tyreLoadIndex = '130/126';
             case '2'
-                tyreLoadIndex = '134/132';
+                tyreLoadIndex = '134/131';
             case '3'
-                tyreLoadIndex = '138/136';
+                tyreLoadIndex = '138/135';
             case '4'
-                tyreLoadIndex = '142/140';                
+                tyreLoadIndex = '142/139';                
             case '5'
-                tyreLoadIndex = '144/142';
+                tyreLoadIndex = '146/143';
             case '6'
                 tyreLoadIndex = '150/146';                
             case '7'
                 tyreLoadIndex = '154/150';
             case '8'
-                tyreLoadIndex = '158/154';
+                tyreLoadIndex = '158/155';
+            case '9'
+                tyreLoadIndex = '162/158';
+            case '10'
+                tyreLoadIndex = '164/160';                
             otherwise
                 tyreLoadIndex = 'error';
         end
