@@ -57,10 +57,11 @@ for i = 1:1:Axle.NumberOff
         indFz(j)=find((Fz_L{i} <= 0),1);
     end
 end
+indFz(1) = 1; %Effectively ignore the steer axle
 
 %% Initialise the variables
 iRCUnit = 1;
-iLastAxleGroup=1;
+iLastAxleGroup=0; %This used to be 1 which effectively ignored the steer axle but included now and added above so if 2 steer then SRT when 2nd steer in air
 iAxleGroup=1;
 SRTrcu = [];
 %% Reasons for liftoff

@@ -110,10 +110,10 @@ for iCol = 2 : nFields
     Table.data = [Table.data, tableData{iCol}];
 end
 
-Table.headings = {'\textbf{Sprung unit}' '\textbf{Axle}' '\textbf{Fully laden axle group load (kg)}\tnote{1}'...
+Table.headings = {'\textbf{Sprung unit}' '\textbf{Axle}' '\textbf{Laden axle group load (kg)}\tnote{1}'...
                   '\textbf{Unladen axle group load (kg)}\tnote{2}' '\textbf{Axle load rating (kg)}'};
               
-markdownHeadings = {'Sprung unit' 'Axle' 'Fully laden axle group load (kg)' 'Unladen axle group load (kg)' 'Axle load rating (kg)'};
+markdownHeadings = {'Sprung unit' 'Axle' 'Laden axle group load (kg)' 'Unladen axle group load (kg)' 'Axle load rating (kg)'};
 MdTable.data = [markdownHeadings; Table.data];
 
 Table.footNotes = {'\item[1] Discrepancies between axle loads and GCM may occur due to rounding';...

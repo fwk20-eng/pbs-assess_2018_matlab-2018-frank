@@ -1,6 +1,7 @@
 function [Lim, LimReport] = getPBSLimits(Is)
 %% Change Log
 %
+% [0.1.0] - 2026-08-24 Fixed GraA to 8% for Level 4
 % [0.1.0] - 2020-06-30
 % * Changed frontal swing limits to new value of 0.85 m
 
@@ -89,7 +90,7 @@ elseif ~Is.australianPBS
     
     % % PBS Levels for PBS Report
     LimReport.STA =     {'$\geq$15' '$\geq$12' '$\geq$10' '$\geq$5'};
-    LimReport.GRAa =    {'$\geq$20'	'$\geq$15' '$\geq$12' '$\geq$10'};
+    LimReport.GRAa =    {'$\geq$20'	'$\geq$15' '$\geq$12' '$\geq$8'};
     LimReport.GRAb =    {'$\geq$80'	'$\geq$70' '$\geq$70' '$\geq$60'};
     LimReport.ACC =     {'$\leq$20'	'$\leq$23' '$\leq$26' '$\leq$29'};
     

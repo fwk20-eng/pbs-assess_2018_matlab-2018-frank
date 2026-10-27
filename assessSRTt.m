@@ -73,7 +73,7 @@ if Is.plotOn
   % if rrcu is run, then rrcu must be plotted with the data that was extracted in the rrcu script
   %-------------------------------------------------
   
-  if Is.srtRrcu & MatKey{1,2}~=MatKey{2,2}
+  if Is.srtRrcu
     %-------------------------------------------------
     %% *** Plot for if a second rrcu SRT manoeuvre was run ***
     %-------------------------------------------------
@@ -96,7 +96,7 @@ if Is.plotOn
     % ** Plot the rrcu with the rrcu data **
     %-------------------------------------------------
     iRrcu = length(AYrcu); % rearmost roll-coupled unit
-    plot(Time_rrcu(1:ind_rrcu(iRrcu)), AYrcu_rrcu{i}(1:ind_rrcu(iRrcu)), 'Color', getColour(iRrcu));
+    plot(Time_rrcu(1:ind_rrcu(iRrcu)), AYrcu_rrcu{iRrcu}(1:ind_rrcu(iRrcu)), 'Color', getColour(iRrcu), 'LineWidth', 2);
     legTitles = [legTitles; ['roll-coupled unit ' int2str(iRrcu)]];
 
     
@@ -157,7 +157,7 @@ if Is.plotOn
   elseif (SRTreason(indiC)==2)
     
     text([floor(Time(min(ind))/2) + 1], 0.02,...
-      ['SRT when all tyres (excluding steer) of roll-coupled unit in the air']);
+      ['SRT when all tyres (excluding 1st steer) of roll-coupled unit in the air']);
     
   else
     
@@ -166,7 +166,7 @@ if Is.plotOn
     
   end
   
-  legend(legTitles, 'Location', 'Best')
+  legend(legTitles, 'Location', 'northwest')
   
   set(gcf,'PaperPosition',[0 0 16 11])
   set(gca,'Xgrid','on');

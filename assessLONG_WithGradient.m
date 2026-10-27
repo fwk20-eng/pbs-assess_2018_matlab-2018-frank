@@ -77,13 +77,9 @@ while contin
     
     Axle = computeAxleLoadWithGradient(grad(i),mAxle,xAxle,zAxle,l,h,mSprung,XcgSprung,HcgSprung,grouping,loadshare2,loadCoupled);
     
-    if isfield(Is, 'SimpleRollingResistance') && Is.SimpleRollingResistance == 1,
-        FrrD = 0.008*sum(Axle(Ndrive));
-        FrrN = 0.006*(sum(mTotal) - sum(Axle(Ndrive)));
-    else
-        FrrD = rolling(0,sum(Axle(Ndrive)),ch,radial); % Rolling resistance at 0 velocity
-        FrrN = rolling(0,(sum(mTotal) - sum(Axle(Ndrive))),ch,radial);
-    end
+    FrrD = rolling(0,sum(Axle(Ndrive)),ch,1); % Rolling resistance at 0 velocity
+    FrrN = rolling(0,(sum(mTotal) - sum(Axle(Ndrive))),ch,0);
+
     Frr = FrrD + FrrN;
     
     Fengine = (engageTNm*eff_diffStart*eff_gearStart(1)*G/rr) - FrrD;
@@ -124,11 +120,11 @@ if Is.plotOn
     plot(grad(1:i),acc(1:i))
     plot([0 floor(START)],[0 0],'r:')
     if saturate==0
-        text(0.8*floor(START),0.6*max(acc),['START = ' num2str(floor(START)) '%']);
+        text(0.8*floor(START),0.6*max(acc),['STA = ' num2str(floor(START)) '%']);
         text(0.6*floor(START),0.8*max(acc),'Limited by torque');
         plot([floor(START) floor(START)],[min(acc(1:i)) max(acc(1:i))],'r:');
     elseif saturate==1
-        text(0.8*floor(START),0.6*max(acc),['START = ' num2str(floor(START)) '%']);
+        text(0.8*floor(START),0.6*max(acc),['STA = ' num2str(floor(START)) '%']);
         text(0.6*floor(START),0.8*max(acc),'Tyres saturated');
         plot([floor(START) floor(START)],[min(acc(1:i)) max(acc(1:i))],'r:')
     else
@@ -167,13 +163,9 @@ while contin
     
     Axle = computeAxleLoadWithGradient(grad(i),mAxle,xAxle,zAxle,l,h,mSprung,XcgSprung,HcgSprung,grouping,loadshare2,loadCoupled);
     
-    if isfield(Is, 'SimpleRollingResistance') && Is.SimpleRollingResistance == 1,
-        FrrD = 0.008*sum(Axle(Ndrive));
-        FrrN = 0.006*(sum(mTotal) - sum(Axle(Ndrive)));
-    else
-        FrrD = rolling(0,sum(Axle(Ndrive)),ch,radial); % Rolling resistance at 0 velocity
-        FrrN = rolling(0,(sum(mTotal) - sum(Axle(Ndrive))),ch,radial);
-    end
+    FrrD = rolling(0,sum(Axle(Ndrive)),ch,1); % Rolling resistance at 0 velocity
+    FrrN = rolling(0,(sum(mTotal) - sum(Axle(Ndrive))),ch,0);
+
     Frr = FrrD + FrrN;
     
     Fengine = (maxTorqueNm*eff_gear(1)*eff_diffStart/rr*difStart*gears(1)) - FrrD;
@@ -213,11 +205,11 @@ if Is.plotOn
     plot(grad(1:i),acc(1:i))
     plot([0 floor(GRADA)],[0 0],'r:')
     if saturate==0
-        text(0.8*floor(GRADA),0.6*max(acc),['GRADA = ' num2str(floor(GRADA)) '%']);
+        text(0.8*floor(GRADA),0.6*max(acc),['GRAa = ' num2str(floor(GRADA)) '%']);
         text(0.6*floor(GRADA),0.8*max(acc),'Limited by torque');
         plot([floor(GRADA) floor(GRADA)],[min(acc(1:i)) max(acc(1:i))],'r:');
     elseif saturate==1
-        text(0.8*floor(GRADA),0.6*max(acc),['GRADA = ' num2str(floor(GRADA)) '%']);
+        text(0.8*floor(GRADA),0.6*max(acc),['GRAa = ' num2str(floor(GRADA)) '%']);
         text(0.6*floor(GRADA),0.8*max(acc),'Tyres saturated');
         plot([floor(GRADA) floor(GRADA)],[min(acc(1:i)) max(acc(1:i))],'r:')
     else
@@ -251,13 +243,9 @@ while contin
     i=i+1;
     v=vel(i)/3.6; % convert speed to m/s metric units
     
-    if isfield(Is, 'SimpleRollingResistance') && Is.SimpleRollingResistance == 1,
-        FrrD = 0.008*sum(Axle(Ndrive));
-        FrrN = 0.006*(sum(mTotal) - sum(Axle(Ndrive)));
-    else
-        FrrD = rolling(0,sum(Axle(Ndrive)),ch,radial); % Rolling resistance at 0 velocity
-        FrrN = rolling(0,(sum(mTotal) - sum(Axle(Ndrive))),ch,radial);
-    end
+    FrrD = rolling(0,sum(Axle(Ndrive)),ch,1); % Rolling resistance at 0 velocity
+    FrrN = rolling(0,(sum(mTotal) - sum(Axle(Ndrive))),ch,0);
+
     Frr = FrrD + FrrN;
     
     FA = drag(A,cd,v,ce);
@@ -301,11 +289,11 @@ if Is.plotOn
     hold on
     plot(vel(1:i),acc(1:i)*10.0,vel(1:i),gearvec(1:i));
     if saturate==0
-        text(0.8*floor(GRADB),0.6*max(acc*10.0),['GRADB = ' num2str(floor(GRADB)) ' km/h']);
+        text(0.8*floor(GRADB),0.6*max(acc*10.0),['GRAb = ' num2str(floor(GRADB)) ' km/h']);
         text(0.6*floor(GRADB),0.8*max(acc*10.0),'Limited by torque');
         plot([floor(GRADB) floor(GRADB)],[0 max(gearvec)],'r:');
     elseif saturate==1
-        text(0.8*floor(GRADB),0.6*max(acc*10.0),['GRADB = ' num2str(floor(GRADB)) ' km/h']);
+        text(0.8*floor(GRADB),0.6*max(acc*10.0),['GRAb = ' num2str(floor(GRADB)) ' km/h']);
         text(0.6*floor(GRADB),0.8*max(acc*10.0),'Tyres saturated');
         plot([floor(GRADB) floor(GRADB)],[0 max(gearvec)],'r:')
     else
@@ -333,8 +321,8 @@ end
 % Axle loads
 Axle = computeAxleLoadWithGradient(0,mAxle,xAxle,zAxle,l,h,mSprung,XcgSprung,HcgSprung,grouping,loadshare1,loadCoupled);
 %Determine start gear
-FrrDriveAxles = rolling(0,sum(Axle(Ndrive)),ch,radial); %Rolling resistance at 0 velocity
-FrrNonDriveAxles = rolling(0,(sum(mTotal) - sum(Axle(Ndrive))),ch,radial);
+FrrDriveAxles = rolling(0,sum(Axle(Ndrive)),ch,1); %Rolling resistance at 0 velocity
+FrrNonDriveAxles = rolling(0,(sum(mTotal) - sum(Axle(Ndrive))),ch,0);
 FrrTotal = FrrDriveAxles + FrrNonDriveAxles;
 Fengine = engageTNm*eff_diff/rr*dif.*gears.*eff_gear - FrrDriveAxles;
 maxTraction = sum(0.8*9.81*Axle(Ndrive));
@@ -354,13 +342,10 @@ for i=2:length(tspan); %
     t=tspan(i);
     v_at_t=v(i-1);
     me=sum(mTotal)+It/rr/rr+Ie*G^2/rr/rr;
-    if isfield(Is, 'SimpleRollingResistance') && Is.SimpleRollingResistance == 1,
-        FrrDriveAxles = 0.008*sum(Axle(Ndrive));
-        FrrDriveAxles = 0.006*(sum(mTotal) - sum(Axle(Ndrive)));
-    else
-        FrrDriveAxles = rolling(v_at_t,sum(Axle(Ndrive)),ch,radial);
-        FrrNonDriveAxles = rolling(v_at_t,(sum(mTotal) - sum(Axle(Ndrive))),ch,radial);
-    end
+
+    FrrDriveAxles = rolling(v_at_t,sum(Axle(Ndrive)),ch,1);
+    FrrNonDriveAxles = rolling(v_at_t,(sum(mTotal) - sum(Axle(Ndrive))),ch,0);
+        
     FrrTotal = FrrDriveAxles + FrrNonDriveAxles;  
     Fdrag = drag(A,cd,v_at_t,ce);
     dvdt=(t*(Fengine-FrrTotal)-Fdrag)/me; % Fengine takes 1s to engage. FrrTotal included to ensure no backwards
@@ -378,13 +363,10 @@ while N<engageTrpm,
     tspan(i)=tspan(i-1)+dt;
     v_at_t=v(i-1);
     me=sum(mTotal)+It/rr/rr+Ie*G^2/rr/rr;
-    if isfield(Is, 'SimpleRollingResistance') && Is.SimpleRollingResistance == 1,
-        FrrDriveAxles = 0.008*sum(Axle(Ndrive));
-        FrrDriveAxles = 0.006*(sum(mTotal) - sum(Axle(Ndrive)));
-    else
-        FrrDriveAxles = rolling(v_at_t,sum(Axle(Ndrive)),ch,radial);
-        FrrNonDriveAxles = rolling(v_at_t,(sum(mTotal) - sum(Axle(Ndrive))),ch,radial);
-    end
+
+    FrrDriveAxles = rolling(v_at_t,sum(Axle(Ndrive)),ch,1);
+    FrrNonDriveAxles = rolling(v_at_t,(sum(mTotal) - sum(Axle(Ndrive))),ch,0);
+
     FrrTotal = FrrDriveAxles + FrrNonDriveAxles;  
     Fdrag = drag(A,cd,v_at_t,ce);
     dvdt=(Fengine-FrrTotal-Fdrag)/me; % Fengine takes 1s to engage. FrrTotal included to ensure no backwards
@@ -406,13 +388,10 @@ while (currentTNm < engineTNm) && (j<100),
     tspan(i)=tspan(i-1)+dt;
     v_at_t=v(i-1);
     me=sum(mTotal)+It/rr/rr+Ie*G^2/rr/rr;
-    if isfield(Is, 'SimpleRollingResistance') && Is.SimpleRollingResistance == 1,
-        FrrDriveAxles = 0.008*sum(Axle(Ndrive));
-        FrrDriveAxles = 0.006*(sum(mTotal) - sum(Axle(Ndrive)));
-    else
-        FrrDriveAxles = rolling(v_at_t,sum(Axle(Ndrive)),ch,radial);
-        FrrNonDriveAxles = rolling(v_at_t,(sum(mTotal) - sum(Axle(Ndrive))),ch,radial);
-    end
+
+    FrrDriveAxles = rolling(v_at_t,sum(Axle(Ndrive)),ch,1);
+    FrrNonDriveAxles = rolling(v_at_t,(sum(mTotal) - sum(Axle(Ndrive))),ch,0);
+        
     FrrTotal = FrrDriveAxles + FrrNonDriveAxles;
     Fdrag = drag(A,cd,v_at_t,ce);    
     currentTNm=interp1(Torquerpm,TorqueNm,N,'linear',0)*j/100+engageTNm*(100-j)/100;
@@ -440,13 +419,10 @@ while tspan(i)<40,
     i=i+1;
     tspan(i)=tspan(i-1)+dt;
     v_at_t=v(i-1);
-    if isfield(Is, 'SimpleRollingResistance') && Is.SimpleRollingResistance == 1,
-        FrrDriveAxles = 0.008*sum(Axle(Ndrive));
-        FrrDriveAxles = 0.006*(sum(mTotal) - sum(Axle(Ndrive)));
-    else
-        FrrDriveAxles = rolling(v_at_t,sum(Axle(Ndrive)),ch,radial);
-        FrrNonDriveAxles = rolling(v_at_t,(sum(mTotal) - sum(Axle(Ndrive))),ch,radial);
-    end
+    
+    FrrDriveAxles = rolling(v_at_t,sum(Axle(Ndrive)),ch,radial);
+    FrrNonDriveAxles = rolling(v_at_t,(sum(mTotal) - sum(Axle(Ndrive))),ch,radial);
+
     FrrTotal = FrrDriveAxles + FrrNonDriveAxles;   
     Fdrag = drag(A,cd,v_at_t,ce);    
     if gearchangephase==0 %Not in gear change mode        
@@ -524,16 +500,17 @@ end
 end
 
 %% Rolling resistance and drag functions
-function [Frr] = rolling(v,m,ch,radial);
+function [Frr] = rolling(v,m,ch,drive);
 % velocity in m/s
 % mass in kg
 % ch dimensionless ch = 1 good road, 1.2  fair road and 1.5 for poor road
-% radial = 1 if radial tyre
-if radial==1,
-    Frr=(0.0041 + 9.1715e-005*v)*m*9.81*ch; % In Newtons page 13-7 Umtri notes
-else
-    Frr=(0.0066 + 1.0290e-004*v)*m*9.81*ch; % In Newtons page 13-8 Umtri notes
-end
+% drive = 1 if drive tyres else drive = 0 for others. This used to be
+% radial but it has been repurposed
+    if drive==1,
+        Frr=0.008*m*9.81*ch; % John de Pont recommendation for drive axles
+    else
+        Frr=0.006*m*9.81*ch; % John de Pont recommendation for non-drive axles
+    end
 end
 
 function [Fa] = drag(A,cd,v,ce);

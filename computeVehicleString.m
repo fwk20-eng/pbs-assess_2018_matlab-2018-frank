@@ -56,7 +56,7 @@ for iUnit = 1:Sprung.numberOffUnits
                     vehicleString{iUnit} = [vehicleString{iUnit} 'S('];                 
                 case 'Drive'
                     vehicleString{iUnit} = [vehicleString{iUnit} 'D('];
-                case 'Trailer'
+                case {'Trailer','Front Trailer'}
                     vehicleString{iUnit} = [vehicleString{iUnit} 't('];
                 case 'Tag'
                     vehicleString{iUnit} = [vehicleString{iUnit} ').T('];
@@ -103,7 +103,7 @@ for iUnit = 1:Sprung.numberOffUnits
                     vehicleString{iUnit} = [vehicleString{iUnit} ').S('];
                 case 'Drive'
                     vehicleString{iUnit} = [vehicleString{iUnit} ').D('];
-                case 'Trailer'
+                case {'Trailer','Front Trailer'}
                     vehicleString{iUnit} = [vehicleString{iUnit} ').t('];
                 case 'Tag'
                     vehicleString{iUnit} = [vehicleString{iUnit} ').T('];
@@ -151,7 +151,7 @@ for iUnit = 1:Sprung.numberOffUnits
                     vehicleString{iUnit} = [vehicleString{iUnit} ').S('];                    
                 case 'Drive'
                     vehicleString{iUnit} = [vehicleString{iUnit} ').D('];
-                case 'Trailer'
+                case {'Trailer','Front Trailer'}
                     vehicleString{iUnit} = [vehicleString{iUnit} ').t('];
                 case 'Tag'
                     vehicleString{iUnit} = [vehicleString{iUnit} ').T('];

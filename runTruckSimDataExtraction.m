@@ -9,78 +9,6 @@
 % * parsPath: Path to the pars file where the vehicle parameters are stored.
 % * parsName: Name of the pars file where the vehicle parameters are stored.
 %
-%% Change Log
-%
-% [0.11.0] 2017-10-04
-%
-% *Added*
-%
-% * Check to ensure that the LST parameters are correct
-%
-%
-% [0.10.0] 2017-09-07
-%
-% * Fixed steer axle extraction
-%
-% [0.9.0] 2017-08-20
-%
-% * Added support for dolly combinations
-%
-% [0.8.0] 2017-08-01
-%
-% * Automatically determine the vehicle string from the extracted TruckSim data
-%
-% [0.7.0] 2017-06-04
-%
-% *Fixed*
-%
-% * Corrected extraction of suspension name from compliance rather than kinematics
-%
-% *Added*
-% * Damper model
-%
-% [0.6.0] 2017-06-03
-%
-% * Support for dummy axles
-%
-% [0.5.0] 217-05-25
-%
-% *Fixed*
-%
-% * Moved all of the information extracted elsewhere to this function file to centralise the data extraction
-%
-% [0.4.0] - 2017-05-03
-%
-% *Added*
-%
-% * Automate LaTeX Tables for reporting
-%
-% [0.3.0] - 2017-05-01
-%
-% *Fixed*
-%
-% * Units converted to suit the PostProcessor requirements
-%
-% [0.2.0] - 2017-04-29
-%
-% *Added*
-%
-% * Converted script to a function for use in any PostProcess file
-%
-% [0.1.0] - 2017-04-18
-%
-% *Added*
-%
-% * Global Matlab script: readLinesFromFile
-% * Global Matlab script: indexTextArray
-% * Read data from par file into a cell array of strings based on selected unit and axle variables
-% * Generate a new cell array for the unit variables containing the value for each unit, the measurement units and
-%   variable name.
-% * Generate a new cell array for the axle variables containing the value for each axle, the measurement units and
-%   variable name.
-% * Generate vehicle configuration
-% * Generated post process variables
-
 function [Tyre, Axle, Hitch, Sprung, Dimensions, PayloadLaden, PayloadUnladen, Dummy, Combination] = ...
     runTruckSimDataExtraction(ParDetails, Is, Combination)
 %% Reading par file data
@@ -154,11 +82,10 @@ GetAxleDescription.keySeperator = '} ';
 Axle.type = extractAxleAllParData(allParLadenFileData, GetAxleDescription, Sprung);
 
 % Axle compliance dataset name
-GetAxleSuspensionModel.dataSetKeyCell = {'ENTER_PARSFILE Suspensions\Compliance', ...
-    'EXIT_PARSFILE Suspensions\Compliance'};
-GetAxleSuspensionModel.key = 'LOG_ENTRY Used Dataset: Suspension: Solid Axle Compliance, Springs, and Dampers;';
+GetAxleSuspensionModel.dataSetKeyCell = {'ENTER_PARSFILE Suspensions\Compliance','EXIT_PARSFILE Suspensions\Compliance'};
+GetAxleSuspensionModel.key ='LOG_ENTRY Used Dataset: Suspension: Solid Axle Compliance, Springs, and Dampers;';
 GetAxleSuspensionModel.keySeperator = '} ';
-Axle.complianceDatasetName = extractAxleAllParData(allParLadenFileData, GetAxleSuspensionModel, Sprung);
+Axle.complianceDatasetName = extractAxleAllParData( allParLadenFileData, GetAxleSuspensionModel, Sprung);
 
 % Axle kinematic dataset name
 GetAxleSuspensionKinematicsModel.dataSetKeyCell = {'ENTER_PARSFILE Suspensions\Kin_Solid', ...
@@ -253,10 +180,38 @@ Axle.suspensionKinematicsReportName = editCombinationCellSplitText(Axle.suspensi
 Axle.complianceReportName = editCombinationCellSplitText(Axle.complianceDatasetName,...
     {' (',' ['}, 1);
 
+Axle.Manufacturer = cell(size(Axle.complianceReportName));
+for iUnit = 1:length(Axle.complianceReportName)
+    Axle.Manufacturer{iUnit} = cell(size(Axle.complianceReportName{iUnit}));
+
+    for iAxle = 1:length(Axle.complianceReportName{iUnit})
+        Axle.Manufacturer{iUnit}{iAxle} = ...
+            strtok(Axle.complianceReportName{iUnit}{iAxle});
+    end
+end
+
 Axle.springReportModel = editCombinationCellSplitText(Axle.springDatasetName, {' (', ' ['}, 1);
 Axle.damperReportModel = editCombinationCellSplitText(Axle.damperDatasetName, {' (', ' ['}, 1);
 
 Axle.rollCentreHeight = editCombinationCellRegexpBetweenText(Axle.rollCentreDatasetName, ':\s+', '\smm');
+
+% Extract suspension S C track width from compliance dataset name
+Axle.sCTrackWidth = cell(size(Axle.complianceDatasetName));
+for iUnit = 1:length(Axle.complianceDatasetName)
+    Axle.sCTrackWidth{iUnit} = cell(size(Axle.complianceDatasetName{iUnit}));
+    
+    for iAxle = 1:length(Axle.complianceDatasetName{iUnit})
+        value = regexp(Axle.complianceDatasetName{iUnit}{iAxle}, ...
+            '(\d+(?:\.\d+)?)\s+S\s+C', 'tokens', 'once');
+        
+        if isempty(value)
+            Axle.sCTrackWidth{iUnit}{iAxle} = '';
+        else
+            Axle.sCTrackWidth{iUnit}{iAxle} = value{1};
+        end
+    end
+end
+
 %% Additional axle and tyre properties
 % The axles are first split into units, and then into groups within that unit to form the correct Axle.Grouping variable
 [Axle.Grouping, Axle.UnitAndGroup, Axle.UnitCellArray] = computeAxleGrouping(endParLadenFileData, ...
@@ -336,7 +291,7 @@ if Dummy.isDummyAxle
 end
 
 %% Extract hitch properties
-[Hitch] = extractHitchData(endParLadenFileData, allParLadenFileData, Combination);
+[Hitch] = extractHitchData(endParLadenFileData, allParLadenFileData, Combination, Axle);
 
 % Converting to the correct units for the Post Processor
 Hitch.XPositionArray = Hitch.XPositionArray .* 0.001;

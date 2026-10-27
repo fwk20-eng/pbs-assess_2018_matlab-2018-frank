@@ -51,7 +51,7 @@ for iUnit = 1 : nUnits
         sUnsprungMass = int2str(Axle.UnsprungMassArray(iAxleIndex));
         % Need to multiply by 1000 to get to mm.
         sAxleCoGz = int2str(Axle.ZPositionArray(iAxleIndex)*1000);
-        sAxleCoGx = int2str(Axle.XPositionArray(iAxleIndex)*1000);
+        sAxleCoGx = int2str(-Axle.XPositionArray(iAxleIndex)*1000);
         dataRow = {sUnit, sAxleDescription, sUnsprungMass, sAxleCoGz, sAxleCoGx};
         
         Table.data = [Table.data; dataRow];

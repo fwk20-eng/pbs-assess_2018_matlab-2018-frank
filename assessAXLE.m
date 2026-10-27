@@ -85,7 +85,7 @@ if Is.plotOn
     legTitles = [legTitles; ['Axle ' int2str(iAxle)]];
   end
   
-  xlabel('Time [sec]')
+  xlabel('Time [s]')
   ylabel('Axle Load [kg]')
   
   legend(legTitles, 'Location', 'Best');

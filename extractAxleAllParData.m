@@ -65,7 +65,7 @@ for iAxle = 1: nSplicedAxles
     % the suspension kinematics/compensation dataset for each axle
     axleDescription = getDatasetNameFromPar(SplicedAllPar.AxleDataset{:,iUnit}{iAxle}, ...
         GetAxleData.key, GetAxleData.keySeperator);
-    
+
     % The second index is to properly extract the string. If it is not there, there are problems when generating a table
     if ~isempty(axleDescription)
         extractedAxleData{:,iUnit}{iAxle} = axleDescription{1}{1};
@@ -86,25 +86,25 @@ end
 SplicedAllPar.units = extractDollyDataFromTrailer(SplicedAllPar.units);
 
 for iUnit = 2:Sprung.numberOffUnits
-    
+
     keyCell = GetAxleData.dataSetKeyCell;
     SplicedAllPar.AxleDataset{:,iUnit} = spliceAllPar(SplicedAllPar.units{:,iUnit}, keyCell)';
-    
+
     nSplicedAxles = length(SplicedAllPar.AxleDataset{:,iUnit});
-    
+
     for iAxle = 1: nSplicedAxles
         % Note in this extraction there will only be a single dataset for each axle, as the all par has been sliced down to
         % the suspension kinematics/compensation dataset for each axle
         axleDescription = getDatasetNameFromPar(SplicedAllPar.AxleDataset{:,iUnit}{iAxle}, ...
             GetAxleData.key, GetAxleData.keySeperator);
-        
+
         if ~isempty(axleDescription)
             extractedAxleData{:,iUnit}{iAxle} = axleDescription{1}{1};
         else
             extractedAxleData{:,iUnit}{iAxle} = 'Dummy';
         end
     end
-    
+
 end
 
 end

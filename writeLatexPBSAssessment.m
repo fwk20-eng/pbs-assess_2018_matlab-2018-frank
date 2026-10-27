@@ -9,26 +9,6 @@
 %% Outputs
 %
 % * variable: description
-%
-%% Change Log
-%
-% [0.3.0]
-%
-% * No longer copy across the PBS template folder since the report can now be made manually and the
-% figures and tables be added seperately as the run is done. This is to help with writing of the
-% report before the final details are known.
-%
-% [0.2.0]
-%
-% *Added*
-%
-% * Combination properties written to a log file
-%
-% [0.1.0] - 2017-01-01
-%
-% *Added*
-%
-% * First code
 
 function writeLatexPBSAssessment(Project, Combination, ParDetails, Sprung, Axle, Hitch, Engine, Report, Dimensions,...
     fullName, Lim, LimReport, resultsPbs, nLevels, Is, PayloadLaden, Axle1, AxleU1, Tyre, Topdeck)
@@ -53,8 +33,8 @@ isRedacted = 0;
     createTableLatexUnloadedSprungMassDetails(Sprung);
 
 [Table.payloadDetails, LogTable.payloadDetails] = ...
-    createTableLatexPayloadDetails(Sprung, PayloadLaden, 'Fully Laden Payload Details',...
-    'FullyLadenPayloadDetails');
+    createTableLatexPayloadDetails(Sprung, PayloadLaden, 'Payload Details',...
+    'PayloadDetails');
 
 if Is.carCarrier
     [Table.payloadDetailsTopdeck, LogTable.payloadDetailsTopdeck] = ...
@@ -91,13 +71,13 @@ fid=fopen(runLogFilePath,'w');
 fprintf(fid,'%s\n', '# Control parameters');
 
 if Is.ra
-fprintf(fid,'%s\n', ['Lane change manoeuvre maximum lateral error: ', ...
-    num2str(Project.raMaxLatError), ' mm']);
+    fprintf(fid,'%s\n', ['Lane change manoeuvre maximum lateral error: ', ...
+        num2str(Project.raMaxLatError), ' mm']);
 end
 
 if Is.yawD
-fprintf(fid,'%s\n', ['Yaw damping manoeuvre maximum lateral acceleration: ', ...
-    num2str(Project.yawDMaxLatAccel), ' g\n']);
+    fprintf(fid,'%s\n', ['Yaw damping manoeuvre maximum lateral acceleration: ', ...
+        num2str(Project.yawDMaxLatAccel), ' g\n']);
 end
 
 fclose(fid);
@@ -123,8 +103,9 @@ if Is.latexReport
     Report.pbsBaselineResultsTable = createBaselineResults(baselineResults, Lim, nLevels, Is);
     
     if Is.carCarrier
-        Report.pbsResultsTableTopdeck = createBaselineResults...
-            (computeRoundedResults(Topdeck.resultsPbs, Is), Lim, nLevels, Is);
+        Report.pbsResultsTableTopdeck = createBaselineResults( ...
+            computeRoundedResults(Topdeck.resultsPbs, Is), ...
+            Topdeck.Lim, nLevels, Is);
     end
     
     %% Set-up the paths for copying to the assessment folder
@@ -165,16 +146,16 @@ if Is.latexReport
     [CommissioningTable.vehicleAndAssessor] = createTableLatexCommissioningVehicleAndAssessor;
     nVehicleUnits = str2num(Axle.VehicleUnitCellArray{end}{end});
     for iUnit = 1 : nVehicleUnits
-        eval(['CommissioningTable.Unit' num2str(iUnit) ' = createTableLatexCommissioningUnits(Tyre, Axle, Hitch,Combination.dollys_trailerFrontAxles,Dimensions.RefPointsLadenCell,iUnit);']);
+        eval(['CommissioningTable.Unit' num2str(iUnit) ' = createTableLatexCommissioningUnits(Tyre, Axle, Hitch,Combination.dollys_trailerFrontAxles,Dimensions.RefPointsLadenCell,iUnit,Combination);']);
     end
     createLatexTables(CommissioningTable, '6-1-CommissioningTables.tex', pbsAssessCopyToFullPath);
     %% Create the 6-1-CommissioningTables.tex
     [CommissioningTable.vehicleAndAssessor] = createTableLatexCommissioningVehicleAndAssessor;
     nVehicleUnits = str2num(Axle.VehicleUnitCellArray{end}{end});
     for iUnit = 1 : nVehicleUnits
-        eval(['CommissioningTable.Unit' num2str(iUnit) ' = createTableLatexCommissioningUnits(Tyre, Axle, Hitch,Combination.dollys_trailerFrontAxles,Dimensions.RefPointsLadenCell,iUnit);']);
+        eval(['CommissioningTable.Unit' num2str(iUnit) ' = createTableLatexCommissioningUnits(Tyre, Axle, Hitch,Combination.dollys_trailerFrontAxles,Dimensions.RefPointsLadenCell,iUnit,Combination);']);
     end
-    createLatexTables(CommissioningTable, '6-1-CommissioningTables.tex', pbsAssessCopyToFullPath);    
+    createLatexTables(CommissioningTable, '6-1-CommissioningTables.tex', pbsAssessCopyToFullPath);
     %% Modify the PBS assessment parameters and save to a new file
     % Create the PBS assessment paths
     Report.pbsAssessmentCommands = strcat(pbsAssessCopyToFullPath, ...
@@ -186,6 +167,10 @@ if Is.latexReport
     additionalModifiers = {...
         '\\newcommand\{\\combOverallLength\}', ...
         strcat(num2str(Combination.totalLength*0.001, '%0.3f'), '~m');
+        '\\newcommand\{\\combOverallLengthProj\}', ...
+        strcat(num2str(Combination.totalLengthProj*0.001, '%0.3f'), '~m');        
+        '\\newcommand\{\\combOverallLengthmm\}', ...
+        num2str(Combination.totalLength);
         '\\newcommand\{\\combMaxHt\}', ...
         strcat(num2str(max(Combination.maxHeight)*0.001, '%0.3f'), '~m');
         '\\newcommand\{\\combMaxWidth\}', ...
@@ -194,8 +179,14 @@ if Is.latexReport
         num2str(Combination.pbsLevelDesired);
         '\\newcommand\{\\combAxles\}', ...
         num2str(Axle.NumberOff);
-        '\\newcommand\{\\combGCM\}', ...
+        '\\newcommand\{\\combPCM\}', ...
+        num2str(sum(Axle1));
+        '\\newcommand\{\\combPCMkg\}', ...
         strcat(num2str(sum(Axle1)), '~kg');
+        '\\newcommand\{\\combGCMkg\}', ...
+        strcat(num2str(Combination.GCM), '~kg');
+        '\\newcommand\{\\combGVMkg\}', ...
+        strcat(num2str(Combination.GVM), '~kg');
         '\\newcommand\{\\combPayload\}', ...
         strcat(num2str(sum(cell2mat(PayloadLaden.MassCell) .* ...
         cell2mat(Combination.includedPayloads))), '~kg');

@@ -135,6 +135,10 @@ if Is.pbs
     Axle.ZPositionArray, Hitch.XPositionArray, Hitch.ZPositionArray, mSprung, XcgSprung,...
     HcgSprung, Axle.Grouping, Combination.loadshare1, Hitch.LoadCoupledArray);
   
+  % Increase tyre load index if required by the calculated laden axle load
+  %----------------------------------------------
+  Tyre.loadindices = correctTyreLoadIndices(Tyre, Axle1);
+
   % Loaded axles loads for Startability
   %----------------------------------------------
   Axle2 = computeAxleLoadWithGradient(0, Axle.UnsprungMassArray, Axle.XPositionArray,...
@@ -185,6 +189,7 @@ if Is.pbs
     % only be run along with the SRT manoeuvre
     if Is.ra
       Lim.RA = computePBSLimitsRA(r);
+      
       [r.RA, Project.raMaxLatError] = assessRA(Combination, Hitch, Project, MatKey.ra, Is,...
         mSprung, HcgSprung);
     end
@@ -234,9 +239,9 @@ if Is.pbs
     
     switch warnAxleLoad
       case 'Yes'
-        uiwait(msgbox('Please note that the assessed combination does not satisfy NRTA regulation 239 (3)'));
+        disp('Please note that the assessed combination does not satisfy NRTA regulation 239 (3)');
       case 'End Assessment'
-        uiwait(msgbox('The assessment will now be ended with a manually initialised error'));
+        disp('The assessment will now be ended with a manually initialised error');
         error('Manually initiated error in order to jump out of the script');
     end
     

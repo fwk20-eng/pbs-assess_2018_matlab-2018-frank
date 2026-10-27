@@ -36,7 +36,7 @@
 %
 % * First code
 
-function [Hitch] = extractHitchData(endParFileData, allParFileData, Combination)
+function [Hitch] = extractHitchData(endParFileData, allParFileData, Combination, Axle)
 
 Hitch.XPositionArray = getVariableValuesFromPar(endParFileData, '\<LX_H');
 
@@ -68,9 +68,11 @@ Hitch.LoadCoupledArray = ones(1, nHitches);
 for iHitch = 1 : nHitches
     if strcmp(Hitch.RollMomentArray{iHitch},'0')
         Hitch.RollCoupledArray(iHitch) = 0;
-        % If the next unit is a dolly - then there is also no load coupling.
+        % If the next unit is a dolly and has more than one axle - then there is also no load coupling.
         if any(iHitch + 1 == Combination.dollys_trailerFrontAxles)
-            Hitch.LoadCoupledArray(iHitch) = 0;
+            if size(Axle.VehicleUnitCellArray{iHitch + 1},2) ~= 1
+                Hitch.LoadCoupledArray(iHitch) = 0;
+            end
         end
     end
 end

@@ -24,15 +24,17 @@ function [PBSreportTable, logTable] = createTableLatexSuspensionProperties(Axle,
 %% Table: Data
 Table.Units = Axle.UnitCellArray;
 Table.AxleDescription = Axle.DescriptionCell;
-Table.AxleSuspensionModel = Axle.complianceReportName;
+Table.AxleRating = Axle.loadRatings;
+
 if isRedacted
     for i = 1:length(Axle.rollCentreHeight)
         for j = 1:length(Axle.rollCentreHeight{i})
             dummy{i}{j}=' ';
         end
     end
+    
     Table.AxleRollCentre = dummy;
-    Table.AxleTrack = Axle.trackWidth;
+    Table.AxleTrack = dummy;
     Table.AxleAuxRoll = dummy;
     Table.AxleSteerRoll = dummy;
 else
@@ -41,6 +43,7 @@ else
     Table.AxleAuxRoll = Axle.auxRollMoment;
     Table.AxleSteerRoll = Axle.steerRollRatio;
 end
+
 %% Convert Table to a format that will create the latexTable correctly.
 %
 % *Some notes on the conversion*
@@ -56,8 +59,10 @@ sFieldNames = fieldnames(Table);
 
 nFields = length(sFieldNames);
 nUnits = length(Table.(sFieldNames{1}));
+
 % Check if suspensions on a vehicle are all the same or not
-suspensionName = Table.(sFieldNames{3});
+suspensionName = Axle.complianceReportName;
+
 % Loop through the trailer units
 for iUnit = 2 : nUnits
     % Note the indexing here with the circular brackets.
@@ -85,29 +90,44 @@ for iField = 1 : nFields
             tableData{iField} = [tableData{iField}; fieldData{iUnit}(1)'];
         end
     end
-    
 end
 
 Table.data = tableData{1};
 
 for iCol = 2 : nFields
-    
     Table.data = [Table.data, tableData{iCol}];
-    
 end
 
 if isRedacted
-    Table.Headings = {'\textbf{Sprung unit}' '\textbf{Axle}' '\textbf{Suspension}' '\textbf{RC height (mm)}\tnote{1,2}' '\textbf{Track width (mm)}' '\textbf{Auxiliary roll stiffness (Nm/\degree{})}\tnote{2}' '\textbf{Steer/roll ratio (\degree{}/\degree{})}\tnote{2}'}; 
+    Table.Headings = {'\textbf{Sprung unit}' ...
+        '\textbf{Axle}' ...
+        '\textbf{Axle rating [kg]}' ...
+        '\textbf{RC height (mm)}\tnote{1,2}' ...
+        '\textbf{Track width (mm)}' ...
+        '\textbf{Auxiliary roll stiffness (Nm/\degree{})}\tnote{2}' ...
+        '\textbf{Steer/roll ratio (\degree{}/\degree{})}\tnote{2}'};
 else
-    Table.Headings = {'\textbf{Sprung unit}' '\textbf{Axle}' '\textbf{Suspension}' '\textbf{RC height (mm)}\tnote{1}' '\textbf{Track width (mm)}' '\textbf{Auxiliary roll stiffness (Nm/\degree{})}' '\textbf{Steer/roll ratio (\degree{}/\degree{})}'};
+    Table.Headings = {'\textbf{Sprung unit}' ...
+        '\textbf{Axle}' ...
+        '\textbf{Axle rating [kg]}' ...
+        '\textbf{RC height (mm)}\tnote{1}' ...
+        '\textbf{Track width (mm)}' ...
+        '\textbf{Auxiliary roll stiffness (Nm/\degree{})}' ...
+        '\textbf{Steer/roll ratio (\degree{}/\degree{})}'};
 end
 
-markdownHeadings = {'Unit' 'Axle' 'Suspension' 'RC height (mm)' 'Track width (mm)' 'Auxiliary roll stiffness (Nm/deg)' 'Steer/roll ratio (deg/deg)'};
+markdownHeadings = {'Unit' ...
+    'Axle' ...
+    'Axle rating [kg]' ...
+    'RC height (mm)' ...
+    'Track width (mm)' ...
+    'Auxiliary roll stiffness (Nm/deg)' ...
+    'Steer/roll ratio (deg/deg)'};
+
 MdTable.data = [markdownHeadings; Table.data];
 
 % Compiling the structure fields required by latexTable
 Table.data = [Table.Headings; Table.data];
-
 
 if isRedacted
     Table.footNotes = {'\item[1] Roll centre height relative to the axle centre height (+ above, - below)';...

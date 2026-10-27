@@ -59,29 +59,37 @@ for iAxle = 1 : nAxles
     
     % Extract number after "dataset"
     tyreDatasetNumber = regexp(tyreDataset{:}, 'dataset\s+(\d+)', 'tokens');
+    % The pairing of the dual rating is the lowest readily-available in
+    % South Africa that is linked with the given single rating
     switch tyreDatasetNumber{1}{:}
-            case '1'
-                tyreLoadIndex = '130/126';
-            case '2'
-                tyreLoadIndex = '134/131';
-            case '3'
-                tyreLoadIndex = '138/135';
-            case '4'
-                tyreLoadIndex = '142/139';                
-            case '5'
-                tyreLoadIndex = '146/143';
-            case '6'
-                tyreLoadIndex = '150/146';                
-            case '7'
-                tyreLoadIndex = '154/150';
-            case '8'
-                tyreLoadIndex = '158/155';
-            case '9'
-                tyreLoadIndex = '162/158';
-            case '10'
-                tyreLoadIndex = '164/160';     
+        case '1'
+            tyreLoadIndex = '128/124';
+        case '2'
+            tyreLoadIndex = '132/130';
+        case '3'
+            tyreLoadIndex = '136/134';
+        case '4'
+            tyreLoadIndex = '140/137';
+        case '5'
+            tyreLoadIndex = '144/142';
+        case '6'
+            tyreLoadIndex = '148/144';
+        case '7'
+            tyreLoadIndex = '152/147';
+        case '8'
+            tyreLoadIndex = '156/150';
+        case '9'
+            tyreLoadIndex = '160/156';
+        case '10'
+            tyreLoadIndex = '164/160';
         otherwise
             tyreLoadIndex = 'error';
+    end
+    
+    % For single tyre configurations, only use the single load index.
+    % For dual configurations retain the full single/dual load index.
+    if tyreDualSpacing(iAxle) == 0 && ~strcmp(tyreLoadIndex, 'error')
+        tyreLoadIndex = strtok(tyreLoadIndex, '/');
     end
     
     if tyreDualSpacing(iAxle) == 0
@@ -140,27 +148,33 @@ for iUnit = 2:Sprung.numberOffUnits
         tyreDatasetNumber = regexp(tyreDataset{:}, 'dataset\s+(\d+)', 'tokens');
         switch tyreDatasetNumber{1}{:}
             case '1'
-                tyreLoadIndex = '130/126';
+                tyreLoadIndex = '128/124';
             case '2'
-                tyreLoadIndex = '134/131';
+                tyreLoadIndex = '132/130';
             case '3'
-                tyreLoadIndex = '138/135';
+                tyreLoadIndex = '136/134';
             case '4'
-                tyreLoadIndex = '142/139';                
+                tyreLoadIndex = '140/137';
             case '5'
-                tyreLoadIndex = '146/143';
+                tyreLoadIndex = '144/142';
             case '6'
-                tyreLoadIndex = '150/146';                
+                tyreLoadIndex = '148/144';
             case '7'
-                tyreLoadIndex = '154/150';
+                tyreLoadIndex = '152/147';
             case '8'
-                tyreLoadIndex = '158/155';
+                tyreLoadIndex = '156/150';
             case '9'
-                tyreLoadIndex = '162/158';
+                tyreLoadIndex = '160/156';
             case '10'
-                tyreLoadIndex = '164/160';                
+                tyreLoadIndex = '164/160';
             otherwise
                 tyreLoadIndex = 'error';
+        end
+        
+        % For single tyre configurations, only use the single load index.
+        % For dual configurations retain the full single/dual load index.
+        if tyreDualSpacing(iAxle) == 0 && ~strcmp(tyreLoadIndex, 'error')
+            tyreLoadIndex = strtok(tyreLoadIndex, '/');
         end
         
         % Increase the tyre index depending on number of tyres on the axle

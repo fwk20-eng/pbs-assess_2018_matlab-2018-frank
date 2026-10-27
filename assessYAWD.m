@@ -120,7 +120,7 @@ if Is.plotOn
         legTitles = [legTitles; [unitType{limitMotionVarIndex} int2str(i)]];
     end
     
-    xlabel('Time [sec]')
+    xlabel('Time [s]')
     ylabel(yLabels{limitMotionVarIndex});
     
     legend(legTitles, 'Location', 'Best')

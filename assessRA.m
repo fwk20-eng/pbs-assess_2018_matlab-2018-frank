@@ -186,7 +186,7 @@ if Is.plotOn
   
 % Axis labels
 %----------------------------------------------
-  xlabel('Time [sec]')
+  xlabel('Time [s]')
   ylabel('Lateral Acceleration [g]')
 
 % Axis settings

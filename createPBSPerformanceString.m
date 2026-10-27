@@ -68,11 +68,11 @@ for iPM = 1 : length(limitingPerformanceDescriptions)
             limitingPerformanceCode{iPM,1} = '\gls{ydc}';
         case 'Rearward Amplification'
             limitingPerformanceCode{iPM,1} = '\gls{ra}';
-        case 'High-speed Transient Offtracking'
+        case 'High-Speed Transient Offtracking'
             limitingPerformanceCode{iPM,1} = '\gls{hsto}';
         case 'Tracking Ability on a Straight Path'
             limitingPerformanceCode{iPM,1} = '\gls{tasp}';
-        case 'Low-speed Swept Path'
+        case 'Low-Speed Swept Path'
             limitingPerformanceCode{iPM,1} = '\gls{lssp}';
         case 'Tail Swing'
             limitingPerformanceCode{iPM,1} = '\gls{ts}';
@@ -82,9 +82,9 @@ for iPM = 1 : length(limitingPerformanceDescriptions)
             limitingPerformanceCode{iPM,1} = '\gls{mod}';
         case 'Difference of Maxima'
             limitingPerformanceCode{iPM,1} = '\gls{dom}';
-        case 'Steer-tyre Friction Demand'
+        case 'Steer-Tyre Friction Demand'
             limitingPerformanceCode{iPM,1} = '\gls{stfd}';
-        case 'Low-speed Swept Path - Unladen'
+        case 'Low-Speed Swept Path - Unladen'
             limitingPerformanceCode{iPM,1} = '\gls{lssp}';
         case 'Tail Swing - Unladen'
             limitingPerformanceCode{iPM,1} = '\gls{ts}';
@@ -94,7 +94,7 @@ for iPM = 1 : length(limitingPerformanceDescriptions)
             limitingPerformanceCode{iPM,1} = '\gls{mod}';
         case 'Difference of Maxima - Unladen'
             limitingPerformanceCode{iPM,1} = '\gls{dom}';
-        case 'Steer-tyre Friction Demand - Unladen'
+        case 'Steer-Tyre Friction Demand - Unladen'
             limitingPerformanceCode{iPM,1} = '\gls{stfd}';
     end
 end

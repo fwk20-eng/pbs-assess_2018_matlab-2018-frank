@@ -1,0 +1,233 @@
+%% --------------------------------------------------------------------------------------
+%	Change Log
+%----------------------------------------------------------------------------------------
+%% 2020-03-21
+%binModel - e.g. 'Afrit 40 m3'
+%angleRepose - angle of repose of load, taken as 15
+%roh - density 
+%m - mass
+%x_hitch - x-distance from hitch to inside wall of bucket
+% Should make simpler with no angle of repose
+function [htot, hcog, Ixx, Iyy, Izz, hcog1, m1, Ixx1, Iyy1, Izz1] = computeTipperBinCoG_NoFileSave(binModel, angleRepose, roh, m, x_hitch,binHeight)
+% Function calculates the total height, COG height, and inertias of the
+% load: htot (heap not included), hcog, Ixx, Iyy, Izz given the bucket profile, length and
+% density of the load and mass. The bucket mass and inertias are also
+% calculated: m1, Ixx1, Iyy1, Izz1
+% The input parameters are roh=density; m=mass of load;x_hitch = distance
+% to bin front from 5th wheel position (-ve forward and +ve back)
+% Known error when bucket walls are flat and interpolation to find height
+% has no solution
+%close all
+%clear
+% Add input data here. Units mm and kg. roh=1000e-9 water. =833e-9 coal. 7810e-9 steel.
+% The co-ordinates below are for the inside of the bucket
+
+switch binModel
+    case 'Afrit 40 m3'
+        buc_w = [   565     797     963    1349    1646    1797    2030    2143    2448];
+        buc_h = [   0       133     133     209     685     735    1078    1120    1568];
+        L = 7000; %[mm]
+        f_anc = 1.8;
+        t = 3; %[mm] Plate thickness acc.to D718-28 SHEET 1 OF 2 21/06/16
+        roh1 = 7850e-9*f_anc; %[kg/mm^-3] Density of the bucket material - factored for equipment
+
+    case 'Afrit 45 m3'
+        buc_w = [   566     794     1132    1347    1549    1682    1964    2069    2444];
+        buc_h = [   0       133     133     212     539     627     1090    1136    1767];
+        L = 7000; %[mm]
+        f_anc = 1.8;
+        t = 3; %[mm] Plate thickness acc.to D718-28 SHEET 1 OF 2 21/06/16
+        roh1 = 7850e-9*f_anc; %[kg/mm^-3] Density of the bucket material - factored for equipment
+    case 'SATB 50 m3'
+        buc_w = [   204     309     1125    1355    1565    1707    1786    1979    2081    2238    2453];
+        buc_h = [   0       -45     -45     51      51      111     335     416     757     826     1545];
+        L = 7500; %[mm]
+        f_anc = 1.8; %[-] Ancilliaries loading factor (to take into account the ancilliary equipment such as pistons, mechanicals etc)
+        t = 3; %[mm] Plate thickness acc.to D718-28 SHEET 1 OF 2 21/06/16
+        roh1 = 7850e-9*f_anc; %[kg/mm^-3] Density of the bucket material - factored for equipment
+    case 'SATB 50 m3 (v2 with reduced CoGz)'
+        buc_w = [   200     309     1125    1355    1565    1707    1786    1979    2081    2238    2453];
+        buc_h = [   0       45      45      142     142     201     425     506     847     916     1635];
+        L = 7500; %[mm]
+        f_anc = 1.8; %[-] Ancilliaries loading factor (to take into account the ancilliary equipment such as pistons, mechanicals etc)
+        t = 3; %[mm] Plate thickness acc.to D718-28 SHEET 1 OF 2 21/06/16
+        roh1 = 7850e-9*f_anc; %[kg/mm^-3] Density of the bucket material - factored for equipment
+    otherwise
+        error('THE REQUESTED BIN MODEL DOES NOT EXIST, PLEASE ADD DATA FOR THIS BIN INTO getBinCoG.m');
+end
+%
+bet = angleRepose;
+%% --------------------------------------------------------------------------------------
+%	Calculations
+%----------------------------------------------------------------------------------------
+[htot, hcog, Ixx, Iyy, Izz, w] = inertia_calc(buc_w,buc_h,roh,m,L,bet) % Load - CoG heights relative to the bottom of the bin
+% Estimate approximate bucket mass, cog, Ixx, Iyy and Izz
+[hcog1, m1, Ixx1, Iyy1, Izz1] = inertia_calc1(buc_w,buc_h,roh1,t,L); % Bucket - CoG heights relative to the bottom of the bin
+
+dummy=plotload(w,htot,bet)
+dummy=plotbucketout(buc_w,buc_h)
+
+end
+
+function [hcog1, m1, Ixx1, Iyy1, Izz1]=inertia_calc1(buc_w,buc_h,roh,t,L)
+%
+% Front and back plates
+Vbuc=(buc_w(2:end)+buc_w(1:end-1)).*(buc_h(2:end)-buc_h(1:end-1))*t;
+Vtot=sum(Vbuc);
+mbuc=roh*Vbuc;
+mtot=roh*Vtot;
+mbuccum=cumsum(mbuc);
+h=hc(buc_h(2:end)-buc_h(1:end-1),buc_w(2:end),buc_w(1:end-1))+buc_h(1:end-1);
+hcog=sum(h.*mbuc)/mtot;
+ixx=Ixxc(buc_h(2:end)-buc_h(1:end-1),buc_w(2:end),buc_w(1:end-1),mbuc);
+Ixx=sum(ixx)+sum(mbuc.*(h-hcog).^2);
+iyy=Iyyc(buc_h(2:end)-buc_h(1:end-1),buc_w(2:end),buc_w(1:end-1),2*t,mbuc);
+Iyy=sum(iyy)+sum(mbuc.*(h-hcog).^2)+mtot*L^2/4;
+izz=Izzc(buc_w(2:end),buc_w(1:end-1),2*t,mbuc);
+Izz=sum(izz)+mtot*L^2/4;
+%
+% Bottom and side plates
+buc_l=((buc_w(1:end)/2-[0 buc_w(1:end-1)/2]).^2+(buc_h(1:end)-[0 buc_h(1:end-1)]).^2).^0.5;
+ltot=sum(buc_l);
+buc_hc1=sum(buc_l.*(buc_h(1:end)+[0 buc_h(1:end-1)])/2)/ltot;
+buc_dx=(buc_w(1:end)-[0 buc_w(1:end-1)])/2;
+buc_dy=(buc_h(1:end)-[0 buc_h(1:end-1)]);
+buc_cx=(buc_w(1:end)+[0 buc_w(1:end-1)])/4;
+buc_cy=(buc_h(1:end)+[0 buc_h(1:end-1)])/2;
+ll=L+2*t;
+mbuc1=buc_l*ll*t*roh;
+mtot1=sum(mbuc1);
+m1=mtot+mtot1*2;
+hcog1=(mtot*hcog+mtot1*2*buc_hc1)/m1;
+ixx1=sum(1/6*mbuc1.*buc_l.^2+2*mbuc1.*(buc_cx.^2+(buc_cy-buc_hc1).^2));
+Ixx1=ixx1+Ixx+mtot*(hcog1-hcog)^2+2*mtot1*(hcog1-buc_hc1)^2;
+iyy1=sum(1/6*mbuc1.*(buc_dy.^2+ll^2)+2*mbuc1.*((buc_cy-buc_hc1).^2));
+Iyy1=iyy1+Iyy+mtot*(hcog1-hcog)^2+2*mtot1*(hcog1-buc_hc1)^2;
+izz1=sum(1/6*mbuc1.*(buc_dx.^2+ll^2)+2*mbuc1.*(buc_cx.^2));
+Izz1=izz1+Izz;
+end
+
+function [htot, hcog, Ixx, Iyy, Izz, w]=inertia_calc(buc_w,buc_h,roh,m,L,bet)
+Vbuc_nh=(buc_w(2:end)+buc_w(1:end-1)).*(buc_h(2:end)-buc_h(1:end-1))/2*L; % Without heap
+% V1heap inside heap or prism
+V1heap=(buc_w(2:end)/4*tand(bet).*buc_w(2:end).*(L-buc_w(2:end)))-[0 (buc_w(2:end-1)/4*tand(bet).*buc_w(2:end-1).*(L-buc_w(2:end-1)))];
+% V2heap outside heap or cone
+V2heap=pi*(buc_w(2:end)/2).^2.*tand(bet).*buc_w(2:end)/2/3-[0 pi*(buc_w(2:end-1)/2).^2.*tand(bet).*buc_w(2:end-1)/2/3];
+Vbuc=Vbuc_nh+V1heap+V2heap;
+Vtot=sum(Vbuc);
+mbuc=roh*Vbuc;
+mbuc_nh=roh*Vbuc_nh;
+mtot=roh*Vtot;
+mbuccum=cumsum(mbuc);
+mbuccum_nh=cumsum(mbuc_nh);
+ind=find(m<mbuccum,1,'first');
+if isempty(ind)
+    htot=buc_h(end);
+    w=buc_w(end);
+    ind=length(mbuccum);
+    disp(['Bucket overflows. Maximum m = ' num2str(mbuccum(end))]) ;
+    m=mbuccum(end);
+else
+    if ind==1,
+        h1=buc_h(1);
+        h2=buc_h(2);
+        dh12=h2-h1;
+        w1=buc_w(1);
+        w2=buc_w(2);
+        a=(w2-w1)/dh12;
+        b=w1;
+        c1=(pi/24-0.25)*tand(bet);
+        c2=0.25*tand(bet)*L;
+        %
+        if (w1^2/4*tand(bet)*(L-w1)+pi*w1^3/24*tand(bet))*roh>m
+            disp(['The bucket does not have enough material to fill the floor of the bucket. Expect unreliable results.']) ;
+        end
+        %
+        dhall=roots([c1*a^3 a*L/2+c2*a^2+3*c1*a^2*b b*L/2+w1*L/2+2*c2*a*b+3*c1*a*b^2 -m/roh+c1*b^3+c2*b^2]);
+        htot=min(dhall(dhall>0));
+        % Check w=a*dh+b v=(w+w1)/2*dh*L+w^2/4*tand(bet)*(L-w)+pi*w^3/24*tand(bet) v=(m-mbuccum_nh(ind-1))/roh
+    else
+        h1=buc_h(ind);
+        h2=buc_h(ind+1);
+        dh12=h2-h1;
+        w1=buc_w(ind);
+        w2=buc_w(ind+1);
+        a=(w2-w1)/dh12;
+        b=w1;
+        c1=(pi/24-0.25)*tand(bet);
+        c2=0.25*tand(bet)*L;
+        dhall=roots([c1*a^3 a*L/2+c2*a^2+3*c1*a^2*b b*L/2+w1*L/2+2*c2*a*b+3*c1*a*b^2 (-(m-mbuccum_nh(ind-1)))/roh+c1*b^3+c2*b^2]);
+        dh=min(dhall(dhall>0));
+        htot=dh+buc_h(ind);
+        % Check w=a*dh+b v=(w+w1)/2*dh*L+w^2/4*tand(bet)*(L-w)+pi*w^3/24*tand(bet) v=(m-mbuccum_nh(ind-1))/roh
+    end
+end
+%
+% Non heaped layers first
+buc_w(ind+1)=buc_w(ind)+(buc_w(ind+1)-buc_w(ind))*(htot-buc_h(ind))/(buc_h(ind+1)-buc_h(ind));
+buc_h(ind+1)=htot;
+buc_w=buc_w(1:ind+1);
+buc_h=buc_h(1:ind+1);
+Vbuc_nh=(buc_w(2:end)+buc_w(1:end-1)).*(buc_h(2:end)-buc_h(1:end-1))/2*L ;
+Vtot_nh=sum(Vbuc_nh);
+mbuc_nh=roh*Vbuc_nh;
+mtot_nh=roh*Vtot_nh;
+mbuccum_nh=cumsum(mbuc_nh);
+h_nh=hc(buc_h(2:ind+1)-buc_h(1:ind),buc_w(2:ind+1),buc_w(1:ind))+buc_h(1:ind);
+%
+% Heaped layer on top
+w=buc_w(ind+1);
+V1heap=w^2/4*tand(bet)*(L-w); % The triangalur prism heap
+V2heap=pi*w^3/24*tand(bet); % The split cone heap (makes a full cone) r=w/2
+m1heap=V1heap*roh;
+m2heap=V2heap*roh;
+h1=w*tand(bet)/2/3+htot; % CoG height of prism 1/3 up total height
+h2=w*tand(bet)/2/4+htot; % CoG height of cone 1/4 up total height
+%
+mbuc=[mbuc_nh m1heap m2heap];
+mtot=sum(mbuc);
+h=[h_nh h1 h2];
+hcog=sum(h.*mbuc)/mtot;
+%
+ixx=[Ixxc(buc_h(2:ind+1)-buc_h(1:ind),buc_w(2:ind+1),buc_w(1:ind),mbuc_nh) Ixxc(w*tand(bet)/2,0,w,m1heap) 3/80*m2heap*(w*tand(bet)/2)^2+3/20*m2heap*(w/2)^2];
+Ixx=sum(ixx)+sum(mbuc.*(h-hcog).^2);
+iyy=[Iyyc(buc_h(2:ind+1)-buc_h(1:ind),buc_w(2:ind+1),buc_w(1:ind),L,mbuc_nh) Iyyc(w*tand(bet)/2,0,w,L-w,m1heap) m2heap*(3/80*(w*tand(bet)/2)^2+(3/20-1/4/pi^2)+(L/2-w/2+w/2/2/pi)^2)];
+Iyy=sum(iyy)+sum(mbuc.*(h-hcog).^2);
+izz=[Izzc(buc_w(2:ind+1),buc_w(1:ind),L,mbuc_nh) Izzc(0,w,L-w,m1heap) m2heap*((3/10-4/pi^2)*(w/2)^2+(L/2-w/2+w/2/2/pi)^2)];
+Izz=sum(izz);
+end
+
+function htrap=hc(h,a,b)
+htrap=h/3.*(b+2.*a)./(a+b);
+end
+
+function Ixx=Ixxc(h,a,b,m) %trapezoid
+Ixx=2*(16*h.^2.*a.*b+4*h.^2.*b.^2+4*h.^2.*a.^2+3*a.^4+6*a.^2.*b.^2+6*a.^3.*b+6*a.*b.^3+3.*b.^4)./(a+b).^2./144.*m;
+end
+
+function Iyy=Iyyc(h,a,b,L,m) %trapezoid
+Iyy=(h.^2.*(2+4*a.*b./(a+b).^2)/36+L^2/12).*m;
+end
+
+function Izz=Izzc(a,b,L,m) %trapezoid
+Izz=((6*(a.^2+b.^2))/144+L^2/12).*m;
+end
+
+function dummy=plotbucketout(buc_w,buc_h)
+sta_w=[0];
+sta_h=[0];
+for i=1:length(buc_w)
+    plot([sta_w(1)/2 buc_w(i)/2],[sta_h(1) buc_h(i)],'k-');
+    plot([-sta_w(1)/2 -buc_w(i)/2],[sta_h(1) buc_h(i)],'k-');
+    sta_w=buc_w(i);
+    sta_h=buc_h(i);
+end
+axis equal;
+dummy=1;
+end
+
+function dummy=plotload(w,h,bet)
+plot([-w/2 0],[h h+tand(bet)*w/2],'k-');
+plot([w/2 0],[h h+tand(bet)*w/2],'k-');
+dummy=1;
+end

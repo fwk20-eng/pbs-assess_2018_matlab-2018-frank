@@ -40,16 +40,16 @@ pbsResultsTable = addResultsRow_ForReport(pbsResultsTable, fullName.YDC        ,
 pbsResultsTable = addResultsRow_ForReport(pbsResultsTable, fullName.RA         , '-'       , num2str(r.RA,'%.2f')     , computePBSLevel('<', r.RA, Lim.RA, nLevels), LimReport.RA);
 pbsResultsTable = addResultsRow_ForReport(pbsResultsTable, fullName.HSTO       , 'm'       , num2str(r.HSTO,'%.1f')   , computePBSLevel('<', r.HSTO, Lim.HSTO, nLevels), LimReport.HSTO);
 if ~Is.australianPBS
-    pbsResultsTable = addResultsRow_ForReport(pbsResultsTable, [fullName.TASP '\tnote{1}']       , 'm'       , num2str(r.TASP,'%.1f')   , computePBSLevel('<', r.TASP, Lim.TASP, nLevels), LimReport.TASP);
-    pbsResultsTable = addResultsRow_ForReport(pbsResultsTable, fullName.LSSP       , 'm'       , num2str(r.LSSP,'%.1f')   , computePBSLevel('<', r.LSSP, Lim.LSSP, nLevels), LimReport.LSSP);
-    pbsResultsTable = addResultsRow_ForReport(pbsResultsTable, fullName.TS         , 'm'       , num2str(r.TS,'%.2f')     , computePBSLevel('<', r.TS, Lim.TS, nLevels), LimReport.TS);
-    pbsResultsTable = addResultsRow_ForReport(pbsResultsTable, [fullName.FS '\tnote{3}'], 'm'       , num2str(r.FS,'%.2f')     , computePBSLevel('<', r.FS, Lim.FS, nLevels), LimReport.FS);
+    pbsResultsTable = addResultsRow_ForReport(pbsResultsTable, fullName.TASP   , 'm'       , num2str(ceil(20*r.TASP)/20,'%.2f')   , computePBSLevel('<', r.TASP, Lim.TASP, nLevels), LimReport.TASP);
+    pbsResultsTable = addResultsRow_ForReport(pbsResultsTable, fullName.LSSP   , 'm'       , num2str(r.LSSP,'%.1f')   , computePBSLevel('<', r.LSSP, Lim.LSSP, nLevels), LimReport.LSSP);
+    pbsResultsTable = addResultsRow_ForReport(pbsResultsTable, fullName.TS     , 'm'       , num2str(r.TS,'%.2f')     , computePBSLevel('<', r.TS, Lim.TS, nLevels), LimReport.TS);
+    pbsResultsTable = addResultsRow_ForReport(pbsResultsTable, fullName.FS     , 'm'       , num2str(r.FS,'%.2f')     , computePBSLevel('<', r.FS, Lim.FS, nLevels), LimReport.FS);
     if Is.semi %doesnt add MoD, DoM if it is not a SemiTrailer
-        pbsResultsTable = addResultsRow_ForReport(pbsResultsTable, [fullName.MoD '\tnote{2}']    , 'm', num2str(r.MoD,'%.2f')    , computePBSLevel('<', r.MoD, Lim.MoD, nLevels), LimReport.MoD);
-        pbsResultsTable = addResultsRow_ForReport(pbsResultsTable, [fullName.DoM '\tnote{2}']    , 'm', num2str(r.DoM,'%.2f')    , computePBSLevel('<', r.DoM, Lim.DoM, nLevels), LimReport.DoM);
+        pbsResultsTable = addResultsRow_ForReport(pbsResultsTable, fullName.MoD, 'm', num2str(r.MoD,'%.2f')    , computePBSLevel('<', r.MoD, Lim.MoD, nLevels), LimReport.MoD);
+        pbsResultsTable = addResultsRow_ForReport(pbsResultsTable, fullName.DoM, 'm', num2str(r.DoM,'%.2f')    , computePBSLevel('<', r.DoM, Lim.DoM, nLevels), LimReport.DoM);
     end
 else
-    pbsResultsTable = addResultsRow_ForReport(pbsResultsTable, fullName.TASP       , 'm'       , num2str(r.TASP,'%.1f')   , computePBSLevel('<', r.TASP, Lim.TASP, nLevels), LimReport.TASP);
+    pbsResultsTable = addResultsRow_ForReport(pbsResultsTable, fullName.TASP       , 'm'       , num2str(r.TASP,'%.2f')   , computePBSLevel('<', r.TASP, Lim.TASP, nLevels), LimReport.TASP);
     pbsResultsTable = addResultsRow_ForReport(pbsResultsTable, fullName.LSSP       , 'm'       , num2str(r.LSSP,'%.1f')   , computePBSLevel('<', r.LSSP, Lim.LSSP, nLevels), LimReport.LSSP);
     pbsResultsTable = addResultsRow_ForReport(pbsResultsTable, fullName.TS         , 'm'       , num2str(r.TS,'%.2f')     , computePBSLevel('<', r.TS, Lim.TS, nLevels), LimReport.TS);
     pbsResultsTable = addResultsRow_ForReport(pbsResultsTable, fullName.FS         , 'm'       , num2str(r.FS,'%.2f')     , computePBSLevel('<', r.FS, Lim.FS, nLevels), LimReport.FS);
@@ -62,10 +62,10 @@ pbsResultsTable = addResultsRow_ForReport(pbsResultsTable, fullName.STFD   , '\%
 pbsResultsTable = addResultsRow_ForReport(pbsResultsTable, fullName.LSSPu  , 'm', num2str(r.LSSPu,'%.1f')  , computePBSLevel('<', r.LSSPu, Lim.LSSP, nLevels), LimReport.LSSP);
 pbsResultsTable = addResultsRow_ForReport(pbsResultsTable, fullName.TSu    , 'm', num2str(r.TSu,'%.2f')    , computePBSLevel('<', r.TSu, Lim.TS, nLevels), LimReport.TS);
 if ~Is.australianPBS
-    pbsResultsTable = addResultsRow_ForReport(pbsResultsTable, [fullName.FSu '\tnote{3}'], 'm', num2str(r.FSu,'%.2f')   , computePBSLevel('<', r.FSu, Lim.FS, nLevels), LimReport.FS);
+    pbsResultsTable = addResultsRow_ForReport(pbsResultsTable, fullName.FSu, 'm', num2str(r.FSu,'%.2f')   , computePBSLevel('<', r.FSu, Lim.FS, nLevels), LimReport.FS);
     if Is.semi %Doesnt add MoDu, DoMu if it is not a SemiTrailer
-        pbsResultsTable = addResultsRow_ForReport(pbsResultsTable, [fullName.MoDu '\tnote{1}']   , 'm', num2str(r.MoDu,'%.2f')   , computePBSLevel('<', r.MoDu, Lim.MoD, nLevels), LimReport.MoD);
-        pbsResultsTable = addResultsRow_ForReport(pbsResultsTable, [fullName.DoMu '\tnote{1}']   , 'm', num2str(r.DoMu,'%.2f')   , computePBSLevel('<', r.DoMu, Lim.DoM, nLevels), LimReport.DoM);
+        pbsResultsTable = addResultsRow_ForReport(pbsResultsTable, fullName.MoDu, 'm', num2str(r.MoDu,'%.2f')   , computePBSLevel('<', r.MoDu, Lim.MoD, nLevels), LimReport.MoD);
+        pbsResultsTable = addResultsRow_ForReport(pbsResultsTable, fullName.DoMu, 'm', num2str(r.DoMu,'%.2f')   , computePBSLevel('<', r.DoMu, Lim.DoM, nLevels), LimReport.DoM);
     end
 else
     pbsResultsTable = addResultsRow_ForReport(pbsResultsTable, fullName.FSu, 'm', num2str(r.FSu,'%.2f')   , computePBSLevel('<', r.FSu, Lim.FS, nLevels), LimReport.FS);

@@ -60,7 +60,7 @@ else
 end
 
 if r.TASP ~= '-'
-    results = addResultsRow_ForBaseline(results, num2str(r.TASP,'%.1f'), computePBSLevel('<', r.TASP, Lim.TASP, nLevels));
+    results = addResultsRow_ForBaseline(results, num2str(r.TASP,'%.2f'), computePBSLevel('<', r.TASP, Lim.TASP, nLevels));
 else
     results = addResultsRow_ForBaseline(results, '-', '-');
 end
@@ -122,27 +122,49 @@ else
 end
 
 if Is.semi %Doesnt add MoDu, DoMu if it is not a SemiTrailer
-    if r.TSu ~= '-'
+    if r.MoDu ~= '-'
         results = addResultsRow_ForBaseline(results, num2str(r.MoDu,'%.2f'), computePBSLevel('<', r.MoDu, Lim.MoD, nLevels));
     else
         results = addResultsRow_ForBaseline(results, '-', '-');
     end
     
-    if r.TSu ~= '-'
+    if r.DoMu ~= '-'
         results = addResultsRow_ForBaseline(results, num2str(r.DoMu,'%.2f'), computePBSLevel('<', r.DoMu, Lim.DoM, nLevels));
     else
         results = addResultsRow_ForBaseline(results, '-', '-');
     end
 end
 
-if r.TSu ~= '-'
+if r.STFDu ~= '-'
     results = addResultsRow_ForBaseline(results, num2str(r.STFDu,'%.0f'), computePBSLevel('<', r.STFDu, Lim.STFD, nLevels));
 else
     results = addResultsRow_ForBaseline(results, '-', '-');
 end
 
-if r.RA ~= '-'
-    results = addResultsRow_ForBaseline(results, num2str(5.7*r.SRTt, '%0.1f'), '-');
+%% Rearward Amplification limit
+
+if isnumeric(r.RA)
+
+    if isnumeric(r.SRTtrrcu)
+
+        % Use rearmost roll-coupled unit SRT
+        % Round upwards to nearest 0.01
+        raLimit = ceil(5.7*r.SRTtrrcu*100)/100;
+        raLimitText = num2str(raLimit, '%.2f');
+
+    elseif isnumeric(r.SRTt)
+
+        % Fallback for historical baseline results
+        % without a separate SRTrrcu
+        raLimitText = num2str(5.7*r.SRTt, '%.1f');
+
+    else
+        raLimitText = '-';
+    end
+
+    results = addResultsRow_ForBaseline( ...
+        results, raLimitText, '-');
+
 else
     results = addResultsRow_ForBaseline(results, '-', '-');
 end

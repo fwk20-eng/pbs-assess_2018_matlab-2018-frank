@@ -32,26 +32,26 @@ for i=3:1:length(grouping)
             loadHeadings = [loadHeadings {'' 'Description' 'Hitch' 'Total' 'Trailer axles'}];
             dgaLoad{:,ii} = {'Axle' 'Chassis' dLoad{:,i-1} 'Total'}';
             if (i==length(grouping)) %cannot receive hitch load
-                dgaLoad{:,ii} = {'Axle' 'Chassis' dLoad{:,i-1}{:} 'Total'}';
+                dgaLoad{:,ii} = {'Axle' 'Chassis' dLoad{:,i-1} 'Total'}';
                 loadMat{:,ii} = {dgaLoad{:,ii} [A1{2:end,i-1} sum([A1{2:end,i-1}])]' ([A1{2:end,i-1} sum([A1{2:end,i-1}])]' + [A2{2:end,i-1} sum([A2{2:end,i-1}])]') [A2{2:end,i-1} sum([A2{2:end,i-1}])]'}; % Unit Forward pivot loads | total loads | rear pivot loads
             elseif loadCoupled(i-1) %if receiving hitch load
-                dgaLoad{:,ii} = {'Hitch' 'Axle' 'Chassis' dLoad{:,i-1}{:} 'Total'}';
+                dgaLoad{:,ii} = {'Hitch' 'Axle' 'Chassis' dLoad{:,i-1} 'Total'}';
                 loadMat{:,ii} = {dgaLoad{:,ii} [A1{:,i-1} sum([A1{:,i-1}])]' ([A1{:,i-1} sum([A1{:,i-1}])]' + [A2{:,i-1} sum([A2{:,i-1}])]') [A2{:,i-1} sum([A2{:,i-1}])]'}; % Unit Forward pivot loads | total loads | rear pivot loads
             else %not receiving hitch load
-                dgaLoad{:,ii} = {'Axle' 'Chassis' dLoad{:,i-1}{:} 'Total'}';
+                dgaLoad{:,ii} = {'Axle' 'Chassis' dLoad{:,i-1} 'Total'}';
                 loadMat{:,ii} = {dgaLoad{:,ii} [A1{2:end,i-1} sum([A1{2:end,i-1}])]' ([A1{2:end,i-1} sum([A1{2:end,i-1}])]' + [A2{2:end,i-1} sum([A2{2:end,i-1}])]') [A2{2:end,i-1} sum([A2{2:end,i-1}])]'}; % Unit Forward pivot loads | total loads | rear pivot loads
             end
             Acomb(i) = sum([A2{:,i-1}]);
-        else %axle group in front is a dolley
+        else %axle group in front is a dolly
             loadHeadings = [loadHeadings {'' 'Description' 'Dolly' 'Total' 'Trailer axles'}];
             dgaLoad{:,ii} = {'Axle' 'Chassis' dLoad{:,i-1} 'Total'}';
             if (i<=length(loadCoupled)+1)&loadCoupled(i-1) %if receiving hitch load
-                dgaLoad{:,ii} = {'Hitch' 'Axle' 'Dolly' 'Chassis' dLoad{:,i-1}{:} 'Total'}';
+                dgaLoad{:,ii} = {'Hitch' 'Axle' 'Dolly' 'Chassis' dLoad{:,i-1} 'Total'}';
                 loadMat{:,ii} = {dgaLoad{:,ii} [A1{1,i-1} A2{2,i-2} A2{3,i-2} A1{3:end,i-1} sum([A1{1,i-1} A2{2,i-2} A2{3,i-2} A1{3:end,i-1}])]' ...
                     ([A1{1,i-1} A2{2,i-2} A2{3,i-2} A1{3:end,i-1} sum([A1{1,i-1} A2{2,i-2} A2{3,i-2} A1{3:end,i-1}])]' + [A2{1:2,i-1} 0 A2{3:end,i-1} sum([A2{1:2,i-1} 0 A2{3:end,i-1}])]') ...
                     [A2{1:2,i-1} 0 A2{3:end,i-1} sum([A2{1:2,i-1} 0 A2{3:end,i-1}])]'}; % Unit Forward pivot loads | total loads | rear pivot loads
             else %not receiving hitch load
-            dgaLoad{:,ii} = {'Axle' 'Chassis' 'Dolly' dLoad{:,i-1}{:} 'Total'}';
+            dgaLoad{:,ii} = {'Axle' 'Chassis' 'Dolly' dLoad{:,i-1} 'Total'}';
             loadMat{:,ii} = {dgaLoad{:,ii} [A2{2,i-2} A2{3,i-2} A1{3:end,i-1} sum([A2{2,i-2} A2{3,i-2} A1{3:end,i-1}])]' ...
                 ([A2{2,i-2} A2{3,i-2} A1{3:end,i-1} sum([A2{2,i-2} A2{3,i-2} A1{3:end,i-1}])]' + [0 A2{2:end,i-1} sum([A2{2:end,i-1}])]') [0 A2{2:end,i-1} sum([A2{2:end,i-1}])]'}; % Unit Forward pivot loads | total loads | rear pivot loads
             end

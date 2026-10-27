@@ -36,7 +36,7 @@ if Is.carCarrier
     if Is.hsto;         MatKey.hsto    = {'RA_TD', ResultCode.ra_TD};                                 end
 
     if Is.srtRrcu %if there is an srtRrcu, it is assumed a normal srt is also being run
-                        MatKey.srt     = {'SRT_TD', ResultCode.srt_TD; 'SRTrrcu_TD', ResultCode.srtRrcu_TD}; % The suffix will remain the same, however the resultcode will be different
+                        MatKey.srt     = {'SRT_TD', ResultCode.srt_TD; 'SRTrrcu_TD', ResultCode.srtRrcu_TD}; % The suffix will remain the same, however the resultcode will be different                        
     elseif Is.srt
                         MatKey.srt     = {'SRT_TD', ResultCode.srt_TD};
     end
@@ -47,8 +47,8 @@ if Is.carCarrier
     if Is.long;         MatKey.long    = {'LST_TD', ResultCode.lst_TD};                               end % use LST erd file if you are going to be calculating the longitudinal standards
     if Is.axle;         MatKey.axle    = {'AXLE_TD', ResultCode.axle_TD};                             end
     
-    [Topdeck.Project, ~, ~, ~, ~, ~, ~, ~, ~, ~, ~, Topdeck.resultsPbs, ~, ~, Topdeck.PayloadLaden, ~, ~, ~, ~] = ...
-        runPBSManoeuvres(Is, Project, Combination, MatKey, Report);
+    [Topdeck.Project, ~, ~, ~, ~, ~, ~, ~, ~, Topdeck.Lim, Topdeck.LimReport, Topdeck.resultsPbs, ~, ~, Topdeck.PayloadLaden, ~, ~, ~, ~] = ...
+     runPBSManoeuvres( Is, Project, Combination, MatKey, Report);
     
     %%	Writting results and combination parameters to report if a full assessment is being conducted
     if Is.fullPBS || Is.writeParameterLog

@@ -28,8 +28,8 @@ if Is.plotOn
     plot([0 floor(max(Time)/5)*5], [80 80], '--r');
     plot(Time(iMax), STFD, 'or');
     
-    xlabel('Time [sec]');
-    ylabel('Friction Demand [%]');
+    xlabel('Time [s]');
+    ylabel('Steer-Tyre Friction Demand [%]');
     
     axis([0 floor(max(Time)/5)*5 0 110]);  % y axis settings overwritten next line
     text(Time(iMax) + 5, STFD + 5, ['STFD = ' num2str(ceil(STFD)) '%']);
